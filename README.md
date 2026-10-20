@@ -8,6 +8,8 @@ roles and audit trail — in English and Arabic.
 
 ## Run locally
 
+Needs Node.js 20.19+ or 22.12+ (`node -v`).
+
 ```powershell
 npm ci
 copy .env.example .env.local   # then fill in the Supabase URL and publishable (anon) key

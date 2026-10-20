@@ -40,7 +40,7 @@ export default function App() {
   if (!me) return <SetupPage />;
   if (!hasAnyRole) return <SetupPage />;
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter>
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route element={<Layout />}>

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2 — 20 Oct 2026 — dependency security update
+
+- `npm audit`: 8 findings → 0. React Router 7.18.4 (fixes an open-redirect advisory in the shipped app);
+  Vite 7.3.7, Vitest 5.0.5, @vitejs/plugin-react 5.2.0 (development tools only).
+- Router future-flag warnings removed (v7 behaviour is now the default).
+- Needs Node.js 20.19+ or 22.12+.
+- `.gitattributes` (LF line endings); `*.tsbuildinfo` no longer committed.
+
 ## 1.0.1 — 20 Oct 2026 — live install
 
 - Installed on the live Supabase project; full test suite passed on live and rolled back.
