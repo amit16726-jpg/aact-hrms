@@ -1,4 +1,5 @@
 import { rpc, type Json } from './api';
+import type { Loan, PayAdjustment, PayRule, PayrollRun, Settlement } from './api_pay';
 
 // ---------------------------------------------------------------------------
 // Phase 2 — attendance & leave: types returned by the server
@@ -134,13 +135,17 @@ export interface Adjustment extends EmpBrief {
 }
 export interface MyTasks {
   leave: LeaveReq[]; corrections: Correction[]; overtime: Overtime[]; adjustments: Adjustment[]; rules: TimeRule[]; count: number;
+  pay_rules: PayRule[]; payroll: PayrollRun[]; loans: Loan[]; pay_adjustments: PayAdjustment[]; settlements: Settlement[];
 }
 export interface TimeDash {
   today?: { date: string; present: number; absent: number; missing: number; late: number; leave: number; off: number; scope: 'ALL' | 'TEAM' };
   away_next_14?: (EmpBrief & { leave_type: string; name_en: string; name_ar: string; start_date: string; end_date: string; status: ReqStatus })[];
   mine?: { today: AttDay | null; annual: Balance | null; sick: Balance | null; pending: number;
-    next_leave: { leave_type: string; name_en: string; name_ar: string; start_date: string; end_date: string; status: ReqStatus } | null };
-  tasks: { leave: number; corrections: number; overtime: number; adjustments: number; rules: number; count: number };
+    next_leave: { leave_type: string; name_en: string; name_ar: string; start_date: string; end_date: string; status: ReqStatus } | null;
+    last_payslip?: { id: string; month: string; net: number } | null };
+  tasks: { leave: number; corrections: number; overtime: number; adjustments: number; rules: number; count: number;
+    payroll?: number; loans?: number; pay_adjustments?: number; settlements?: number };
+  payroll?: PayrollRun | null;
 }
 
 // ---------------------------------------------------------------------------

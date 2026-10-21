@@ -378,3 +378,41 @@ details > summary { cursor: pointer; color: var(--petrol); }
   .mgrid-wrap { overflow: visible; }
   .mg-name { position: static; }
 }
+
+/* ---------------------------------------------------------------------------
+   Phase 3 — payroll
+   --------------------------------------------------------------------------- */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.steps li { border-top: 3px solid var(--line); padding-top: 6px; min-width: 0; color: var(--ink-3); }
+.steps li.done { border-color: var(--ok); color: var(--ink); }
+.steps li.next { border-color: var(--soon); color: var(--ink); }
+@media (max-width: 640px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.money { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bi { display: block; font-size: 11.5px; color: var(--ink-3); font-weight: 400; }
+.slip { max-width: 900px; }
+.slip-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 12px; }
+.slip-title { text-align: end; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+.slip-kv { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.slip-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; align-items: start; }
+@media (max-width: 720px) { .slip-cols { grid-template-columns: 1fr; } }
+.slip-lines { width: 100%; table-layout: auto; }
+.slip-lines td, .slip-lines th { padding: 6px 8px; }
+.slip-lines th:first-child { white-space: normal; }
+.slip-lines td:first-child, .slip-lines th:first-child { overflow-wrap: anywhere; }
+.slip { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .slip-lines td, .slip-lines th { padding: 5px 4px; font-size: .9rem; } .slip-lines .bi { font-size: .75rem; } }
+.slip-lines tfoot th { border-top: 2px solid var(--line); }
+.slip-net { display: flex; justify-content: space-between; align-items: center; background: var(--petrol-wash); color: var(--petrol-ink);
+  padding: 12px 16px; border-radius: var(--radius-m); margin: 8px 0 12px; }
+.slip-net b { font-size: 1.4rem; }
+.tile-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tile { border: 1px solid var(--line); border-radius: var(--radius-m); padding: 10px 12px; background: var(--panel); min-width: 0; }
+.tile span { display: block; font-size: 12.5px; color: var(--ink-2); }
+.tile b { display: block; font-size: 1.15rem; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.diff-pos { color: var(--ok); } .diff-neg { color: var(--expired); }
+.sig-line { margin-top: 48px; border-top: 1px solid var(--ink-3); width: 260px; padding-top: 4px; font-size: 12.5px; color: var(--ink-2); }
+@media print {
+  .slip { border: 0; max-width: none; padding: 0; }
+  .slip-net { background: none; border: 2px solid #000; color: #000; }
+  .steps li { color: #000; }
+}

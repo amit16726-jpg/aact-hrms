@@ -30,6 +30,17 @@ const CalendarPage = lazy(() => import('./pages/time/CalendarPage'));
 const ImportPage = lazy(() => import('./pages/time/ImportPage'));
 const PeriodsPage = lazy(() => import('./pages/time/PeriodsPage'));
 const RulesPage = lazy(() => import('./pages/time/RulesPage'));
+const PayrollPage = lazy(() => import('./pages/pay/PayrollPage'));
+const PayrollRunPage = lazy(() => import('./pages/pay/PayrollRunPage'));
+const LoansPage = lazy(() => import('./pages/pay/LoansPage'));
+const PayItemsPage = lazy(() => import('./pages/pay/PayItemsPage'));
+const SettlementsPage = lazy(() => import('./pages/pay/SettlementsPage'));
+const SettlementPage = lazy(() => import('./pages/pay/SettlementsPage').then((m) => ({ default: m.SettlementPage })));
+const GratuityPage = lazy(() => import('./pages/pay/GratuityPage'));
+const PayRulesPage = lazy(() => import('./pages/pay/PayRulesPage'));
+const PayrollSetupPage = lazy(() => import('./pages/pay/PayrollSetupPage'));
+const PayslipPage = lazy(() => import('./pages/pay/PayslipPages').then((m) => ({ default: m.PayslipPage })));
+const MyPayslipsPage = lazy(() => import('./pages/pay/PayslipPages').then((m) => ({ default: m.MyPayslipsPage })));
 
 function NotFound() {
   const { t } = useI18n();
@@ -77,6 +88,17 @@ export default function App() {
             <Route path="time/import" element={<ImportPage />} />
             <Route path="time/periods" element={<PeriodsPage />} />
             <Route path="time/rules" element={<RulesPage />} />
+            <Route path="payroll" element={<PayrollPage />} />
+            <Route path="payroll/loans" element={<LoansPage />} />
+            <Route path="payroll/items" element={<PayItemsPage />} />
+            <Route path="payroll/settlements" element={<SettlementsPage />} />
+            <Route path="payroll/settlements/:id" element={<SettlementPage />} />
+            <Route path="payroll/gratuity" element={<GratuityPage />} />
+            <Route path="payroll/rules" element={<PayRulesPage />} />
+            <Route path="payroll/setup" element={<PayrollSetupPage />} />
+            <Route path="payroll/:id" element={<PayrollRunPage />} />
+            <Route path="payslips" element={<MyPayslipsPage />} />
+            <Route path="payslips/:id" element={<PayslipPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

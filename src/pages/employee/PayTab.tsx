@@ -4,6 +4,7 @@ import { useI18n } from '../../i18n';
 import { Badge, Button, DateText, Empty, ErrorNote, Input, Loading, Modal, Select, Textarea, useAction, useAsync } from '../../components/ui';
 import { fmtMoney, parseMoney, todayMuscat } from '../../lib/format';
 import type { ConfirmFn } from './ProfileTab';
+import { PayrollPanel } from './PayrollPanel';
 
 function RevisionTable({ r }: { r: Revision }) {
   const { t, L } = useI18n();
@@ -170,6 +171,7 @@ export function PayTab({ file, confirm }: { file: EmployeeFile; confirm: Confirm
           </div>
         )}
       </Modal>
+      <PayrollPanel employeeId={e.id} />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default function Layout() {
       { to: '/', key: 'nav.dashboard', show: true },
       { to: '/my', key: 'nav.my_record', show: !!me?.employee_id },
       { to: '/employees', key: 'nav.employees', show: can('EMP_READ') || !!me?.is_manager },
-      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
+      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
     ] },
     { title: 'tnav.group', items: [
       { to: '/attendance', key: 'tnav.attendance', show: can('ATT_READ') || !!me?.is_manager || !!me?.employee_id },
@@ -87,6 +87,16 @@ export default function Layout() {
       { to: '/time/import', key: 'tnav.import', show: can('ATT_WRITE') },
       { to: '/time/periods', key: 'tnav.periods', show: can('ATT_READ') },
       { to: '/time/rules', key: 'tnav.rules', show: can('ATT_READ') || can('RULES_PROPOSE') },
+    ] },
+    { title: 'pnav.group', items: [
+      { to: '/payslips', key: 'pnav.my_payslips', show: !!me?.employee_id },
+      { to: '/payroll', key: 'pnav.runs', show: can('PAY_READ') },
+      { to: '/payroll/items', key: 'pnav.adjustments', show: can('PAY_READ') },
+      { to: '/payroll/loans', key: 'pnav.loans', show: can('PAY_READ') },
+      { to: '/payroll/settlements', key: 'pnav.settlements', show: can('PAY_READ') },
+      { to: '/payroll/gratuity', key: 'pnav.gratuity', show: can('PAY_READ') },
+      { to: '/payroll/rules', key: 'pnav.rules', show: can('PAY_READ') || can('RULES_PROPOSE') },
+      { to: '/payroll/setup', key: 'pnav.setup', show: can('PAY_READ') },
     ] },
     { title: 'nav.compliance', items: [
       { to: '/compliance/expiries', key: 'nav.expiries', show: can('COMPLIANCE_READ') || !!me?.is_manager },
@@ -114,7 +124,7 @@ export default function Layout() {
               <div className="nav-group" key={gi}>
                 {g.title && <div className="nav-group-title">{t(g.title)}</div>}
                 {items.map((i) => (
-                  <NavLink key={i.to} to={i.to} end={i.to === '/'}>
+                  <NavLink key={i.to} to={i.to} end={i.to === '/' || i.to === '/payroll' || i.to === '/leave'}>
                     <span>{t(i.key)}</span>
                     {i.count ? <span className="count num">{i.count}</span> : null}
                   </NavLink>

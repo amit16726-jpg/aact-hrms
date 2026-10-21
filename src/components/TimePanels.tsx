@@ -1,18 +1,21 @@
 import { Link } from 'react-router-dom';
 import { tapi } from '../lib/api_time';
-import { useI18n } from '../i18n';
+import { useI18n, type Key } from '../i18n';
+import { OMR, monthName } from './pay';
 import { useAsync } from './ui';
 import { AttBadge, EmpCell, ReqBadge } from './time';
 import { fmtDate, fmtDuration } from '../lib/format';
 
 /** Dashboard panels for Phase 2 (attendance today, my leave, away list, tasks). Hidden quietly on error. */
 export function TimePanels() {
-  const { t, L } = useI18n();
+  const { t, L, lang } = useI18n();
   const { data: d } = useAsync(() => tapi.timeDashboard(), []);
   if (!d) return null;
   const tk = d.tasks;
   const taskLines = ([['leave', 'dt.tasks_leave', '/approvals'], ['corrections', 'dt.tasks_corrections', '/approvals'], ['overtime', 'dt.tasks_overtime', '/approvals'],
-    ['adjustments', 'dt.tasks_adjustments', '/approvals'], ['rules', 'dt.tasks_rules', '/approvals']] as const).filter(([k]) => tk[k] > 0);
+    ['adjustments', 'dt.tasks_adjustments', '/approvals'], ['rules', 'dt.tasks_rules', '/approvals'], ['payroll', 'pd.tasks_payroll', '/approvals'],
+    ['loans', 'pd.tasks_loans', '/approvals'], ['pay_adjustments', 'pd.tasks_pay_adjustments', '/approvals'],
+    ['settlements', 'pd.tasks_settlements', '/approvals']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
 
   return (
     <div className="stack">
@@ -41,12 +44,25 @@ export function TimePanels() {
             {d.mine.sick && <div className="muted">{t('dt.sick_used', { n: d.mine.sick.used })}</div>}
             {d.mine.next_leave && <div>{t('dt.next_leave')}: {L(d.mine.next_leave.name_en, d.mine.next_leave.name_ar)} · <span className="num">{fmtDate(d.mine.next_leave.start_date)} – {fmtDate(d.mine.next_leave.end_date)}</span> <ReqBadge status={d.mine.next_leave.status} /></div>}
             {d.mine.pending > 0 && <div className="muted">{t('dt.waiting_requests', { n: d.mine.pending })}</div>}
+            {d.mine.last_payslip && <div><Link to={`/payslips/${d.mine.last_payslip.id}`}>{t('pd.my_last', { m: monthName(d.mine.last_payslip.month, lang) })}</Link>
+              {' '}<b className="num">OMR {OMR(d.mine.last_payslip.net)}</b></div>}
+          </section>
+        )}
+        {d.payroll && (
+          <section className="panel panel-pad stack">
+            <div className="row" style={{ justifyContent: 'space-between' }}><h2>{t('pd.payroll')}</h2><Link to="/payroll">{t('pnav.runs')}</Link></div>
+            <div><Link to={`/payroll/${d.payroll.id}`}>{t('pd.last_run', { m: monthName(d.payroll.month, lang), s: t(`prs.${d.payroll.status}` as Key) })}</Link></div>
+            {d.payroll.totals.net !== undefined && <div className="tile-row">
+              <div className="tile"><span>{t('pr.employees')}</span><b>{d.payroll.totals.employees ?? 0}</b></div>
+              <div className="tile"><span>{t('pr.net')}</span><b>{OMR(d.payroll.totals.net)}</b></div>
+              <div className="tile"><span>{t('pr.employer_cost')}</span><b>{OMR(d.payroll.totals.employer_cost)}</b></div>
+            </div>}
           </section>
         )}
         {taskLines.length > 0 && (
           <section className="panel panel-pad stack">
             <h2>{t('dt.tasks')}</h2>
-            <ul style={{ margin: 0, paddingInlineStart: 18 }}>{taskLines.map(([k, key, to]) => <li key={k}><Link to={to}>{t(key, { n: tk[k] })}</Link></li>)}</ul>
+            <ul style={{ margin: 0, paddingInlineStart: 18 }}>{taskLines.map(([k, key, to]) => <li key={k}><Link to={to}>{t(key, { n: tk[k] ?? 0 })}</Link></li>)}</ul>
           </section>
         )}
         {d.away_next_14 && (

@@ -1,6 +1,6 @@
-"""Dump Phase 2 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+"""Dump Phase 2 and 3 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
 
-Usage (after loading supabase/seed.sql and supabase/seed_phase2.sql into the local test database):
+Usage (after loading supabase/seed.sql, seed_phase2.sql and seed_phase3.sql into the local test database):
   python3 e2e/gen_time_fixtures.py
 """
 import json, subprocess, pathlib, os
@@ -30,6 +30,22 @@ CALLS = {
     'hr_leave_calendar': "public.hr_leave_calendar(jsonb_build_object('month', to_char(current_date, 'YYYY-MM')))",
     'hr_list_leave_adjustments': "public.hr_list_leave_adjustments(jsonb_build_object())",
     'hr_list_pending_approvals': "public.hr_list_pending_approvals()",
+    # Phase 3 — payroll
+    'hr_list_payroll_runs': "public.hr_list_payroll_runs(null, null)",
+    'hr_get_payroll_run': "public.hr_get_payroll_run((select id from hr.payroll_runs order by period_start desc limit 1))",
+    'hr_get_payslip': "public.hr_get_payslip((select s.id from hr.payslips s join hr.payroll_runs r on r.id = s.run_id where s.employee_no = 'AACT-00001' order by r.period_start desc limit 1))",
+    'hr_my_payslips': "(select jsonb_agg(jsonb_build_object('id', s.id, 'month', to_char(r.period_start,'YYYY-MM'), 'pay_date', r.pay_date, 'status', r.status, 'net', s.net, 'total_earnings', s.total_earnings, 'total_deductions', s.total_deductions) order by r.period_start desc) from hr.payslips s join hr.payroll_runs r on r.id = s.run_id where s.employee_no = 'AACT-00017')",
+    'hr_employee_payroll': "public.hr_employee_payroll((select id from hr.employees where employee_no = 'AACT-00003'))",
+    'hr_list_loans': "public.hr_list_loans(jsonb_build_object())",
+    'hr_list_pay_adjustments': "public.hr_list_pay_adjustments(jsonb_build_object())",
+    'hr_list_settlements': "public.hr_list_settlements(jsonb_build_object())",
+    'hr_get_settlement': "public.hr_get_settlement((select id from hr.final_settlements limit 1))",
+    'hr_gratuity_report': "public.hr_gratuity_report(null, null)",
+    'hr_list_pay_rules': "public.hr_list_pay_rules()",
+    'hr_payroll_setup': "public.hr_payroll_setup()",
+    'hr_get_compensation': "public.hr_get_compensation((select id from hr.employees where employee_no = 'AACT-00003'))",
+    'hr_list_pay_components': "public.hr_list_pay_components()",
+    'hr_parallel_report': "public.hr_parallel_report((select id from hr.payroll_runs order by period_start desc limit 1))",
 }
 
 out = {}

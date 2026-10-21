@@ -1,7 +1,8 @@
 # AACT HRMS
 
 Human resources system for AACT (Oman): employee master, contracts, documents and expiry alerts, Omanisation,
-attendance, shifts, overtime and leave under the Oman Labour Law, roles and audit trail — in English and Arabic.
+attendance, shifts, overtime and leave under the Oman Labour Law, payroll with SPF, WPS file and end-of-service settlement,
+roles and audit trail — in English and Arabic.
 
 - Architecture, security model, test results and open legal points: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Changes: [CHANGELOG.md](CHANGELOG.md)
@@ -31,4 +32,4 @@ Database tests on plain PostgreSQL (developer/CI machine with PostgreSQL 16+ on 
 ## Database
 
 Migrations are in `supabase/migrations`, in order. They are idempotent (safe to re-run) and contain no destructive statements.
-New change → `npm run db:new <name>`. Dummy data → `scripts/gen-seed.py` → `supabase/seed.sql`, plus `supabase/seed_phase2.sql` (attendance and leave) — local/test only.
+New change → `npm run db:new <name>`. Dummy data → `scripts/gen-seed.py` → `supabase/seed.sql`, plus `supabase/seed_phase2.sql` (attendance and leave) and `supabase/seed_phase3.sql` (payroll) — local/test only.

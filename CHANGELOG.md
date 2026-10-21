@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.3.0 — 22 Oct 2026 — Phase 3: payroll and end of service
+
+- **Payroll rules, dated with their legal source** (`Payroll rules`; changes need a second person's approval):
+  - Social Protection Fund, Omani: employer 14.5 % (old age 11, work injury 1, job security 0.5, maternity 1, sick leave 1 from 19 Jul 2026),
+    employee 8 % (old age 7.5, job security 0.5); old age and work injury capped at OMR 3,000;
+  - Social Protection Fund, expatriates: employer 2 % (maternity 1, sick leave 1) from 19 Jul 2026; work injury seeded at 0 until the date is confirmed;
+  - end-of-service gratuity for expatriates (Art. 61): service to 31 Jul 2023 at 15 days a year for the first 3 years and 30 days after,
+    service from 1 Aug 2023 at one month's basic a year; minimum service configurable;
+  - expatriate savings fund 9 % of basic from 19 Jul 2027 and personal income tax 5 % above OMR 42,000 from 2028 — both built in and switched off;
+  - deduction limit 25 % of the wage (Art. 95–96); pay basis (daily rate = monthly / 30, hourly = daily / 8, what counts as unpaid).
+- **Payroll runs per company per month:** calculate → verify → approve → paid by three different people; nobody verifies or approves a run that
+  contains their own salary; a run is calculated only after the attendance month is locked; return for correction, reopen with a reason.
+- **Calculation:** approved salary structure prorated for joiners, leavers and mid-month increments; unpaid absence and unpaid leave; sick leave
+  at 75 / 50 / 35 / 0 % after 21 days; overtime at the basic hourly or daily rate; approved one-off items; loan instalments that never take net
+  pay below zero; SPF lines; gratuity accrual; warnings for missing salary or bank account and for capped deductions. Amounts to the baisa.
+- **Payslips in English and Arabic**, printable; employees see their own once the run is approved (`My payslips`) and get a notification.
+- **Exports:** WPS salary information file (Central Bank of Oman layout, no byte-order mark), journal for Finance by GL account and cost
+  centre (balanced), payroll register, SPF contribution report.
+- **Parallel run:** upload the current payroll's net pay per employee and see matches and differences before going live.
+- **Loans and advances** with maker-checker, repayment schedule, automatic recovery; **one-off pay items** (bonus, commission, arrears,
+  penalty, damage …) with bulk CSV and bulk approval.
+- **Final settlement:** gratuity split at 31 Jul 2023, annual leave not taken (including the part month), notice pay in lieu, loan recovery,
+  extra items; maker-checker; printable bilingual statement; approval closes loans and pays out the leave balance.
+- **Gratuity provision report**, **payroll set-up** (employer CR, SPF number, payer bank and account, GL accounts, SPF flags per component).
+- Approvals page, menu badge and dashboard include payroll runs, loans, one-off items, settlements and payroll rule changes; employee file
+  Pay tab shows payslips, loans and accrued gratuity.
+- Dummy data `supabase/seed_phase3.sql`: two payroll months (one paid, one approved), loans, one-off items, a parallel-run file and a
+  settlement waiting for approval. `seed_phase2.sql` now covers ten weeks of punches.
+- Tests: `tests/db/30_payroll.sql` (hand-checked figures for SPF ceiling, sick tiers, proration, split salary, deduction cap, gratuity, chain,
+  loans, settlement), WPS file unit tests, 12 new screens in the visual check.
+
 ## 1.2.0 — 21 Oct 2026 — Phase 2: attendance and leave
 
 - **Oman time rules, configurable and dated** (`Oman time rules` page; change = proposal + second-person approval):

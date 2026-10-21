@@ -16,7 +16,8 @@ ENT = 'aaaaaaaa-0000-0000-0000-000000000001'
 E1, E2, E3 = ('bbbbbbbb-0000-0000-0000-00000000000%d' % i for i in (1, 2, 3))
 perms = ['ORG_READ','ORG_WRITE','EMP_READ','EMP_WRITE','EMP_SALARY_READ','EMP_SALARY_WRITE','SALARY_APPROVE','EMP_BANK_READ',
          'EMP_BANK_WRITE','DOC_READ','DOC_WRITE','DOC_SENSITIVE','COMPLIANCE_READ','RULES_PROPOSE','RULES_APPROVE','EXCEPTION_APPROVE','AUDIT_READ',
-         'ATT_READ','ATT_WRITE','ATT_APPROVE','ATT_LOCK','LEAVE_READ','LEAVE_WRITE','LEAVE_APPROVE']
+         'ATT_READ','ATT_WRITE','ATT_APPROVE','ATT_LOCK','LEAVE_READ','LEAVE_WRITE','LEAVE_APPROVE',
+         'PAY_READ','PAY_PREPARE','PAY_VERIFY','PAY_APPROVE']
 ME = {'user_id': 'u1', 'email': 'hr.manager@aact.om', 'display_name': 'Maryam Al Hinai', 'language': 'en', 'is_active': True,
       'employee_id': None, 'employee_no': None, 'employee_name': None, 'employee_name_ar': None, 'roles': ['HR_MANAGER'],
       'permissions': perms, 'is_manager': False, 'admin_exists': True, 'settings': {'employee_no_prefix': 'AACT-', 'employee_no_digits': 5, 'leave_opening_date': '2026-07-01'},
@@ -143,7 +144,11 @@ SCREENS = [('dashboard', '/'), ('employees', '/employees'), ('employee', f'/empl
            ('leave-requests', '/leave?tab=requests'), ('leave-calendar', '/leave?tab=calendar'),
            ('leave-balances', '/leave/admin?tab=balances'), ('leave-adjust', '/leave/admin?tab=adjust'), ('leave-types', '/leave/admin?tab=types'),
            ('leave-year', '/leave/admin?tab=year'), ('shifts', '/time/shifts'), ('calendar', '/time/calendar'), ('import', '/time/import'),
-           ('periods', '/time/periods'), ('rules', '/time/rules')]
+           ('periods', '/time/periods'), ('rules', '/time/rules'),
+           ('payroll', '/payroll'), ('payroll-run', '/payroll/run-1'), ('payslip', '/payslips/slip-1'), ('my-payslips', '/payslips'),
+           ('loans', '/payroll/loans'), ('pay-items', '/payroll/items'), ('settlements', '/payroll/settlements'),
+           ('settlement', '/payroll/settlements/st-1'), ('gratuity', '/payroll/gratuity'), ('pay-rules', '/payroll/rules'),
+           ('pay-setup', '/payroll/setup'), ('employee-pay', f'/employees/{E2}?tab=pay')]
 
 with sync_playwright() as p:
     br = p.chromium.launch()

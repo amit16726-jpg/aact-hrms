@@ -19,6 +19,7 @@
 
 - `supabase/seed.sql` — local only. It refuses to run on a database that already has employees.
 - `supabase/seed_phase2.sql` — local/test only (shifts, punches, leave). It stops if shifts already exist.
+- `supabase/seed_phase3.sql` — local/test only (payroll months, loans, settlement). It stops if payroll runs exist.
 - `.env.development.local` — local only, written by `npm run env:local`, never committed.
 - Production secrets (database password, JWT secret, SMTP password) — only on the company server, never in git.
 
@@ -27,7 +28,7 @@
 1. Al Anwar IT provides the server (Ubuntu 24.04, Docker, fixed IP, ports 80/443), the DNS name from the web vendor,
    and the M365 mail relay.
 2. Install self-hosted Supabase (Docker Compose) and the web front end; set the production secrets.
-3. Apply `supabase/migrations` in order. Do **not** load `seed.sql` or `seed_phase2.sql`.
+3. Apply `supabase/migrations` in order. Do **not** load `seed.sql`, `seed_phase2.sql` or `seed_phase3.sql`.
 4. Run the security checks; test a backup **and a restore**.
 5. Create the real administrator, HR and Finance accounts. Turn off public sign-up.
 6. Enter the real master data (company, departments, grades, job titles, Omanisation targets with their sources).

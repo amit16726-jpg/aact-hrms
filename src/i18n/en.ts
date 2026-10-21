@@ -1,4 +1,5 @@
 import { enTime } from './en_time';
+import { enPay } from './en_pay';
 
 const base = {
   'app.name': 'AACT HRMS',
@@ -256,5 +257,5 @@ const base = {
 };
 
 export type BaseKey = keyof typeof base;
-export const en = { ...base, ...enTime };
+export const en = { ...base, ...enTime, ...enPay };
 export type Key = keyof typeof en;

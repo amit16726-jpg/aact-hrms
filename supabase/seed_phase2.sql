@@ -2,7 +2,7 @@
 -- Runs after seed.sql. Uses the real API functions as the demo users (maker-checker respected), so it also
 -- exercises the rules. Every step is wrapped: a step that is refused is reported with a NOTICE and skipped.
 -- Contains no DROP statements (the cloud SQL runner cancels those). Safe to re-run: it stops if shifts exist.
--- Dates are relative to "today" in Muscat, so the demo always shows the last six weeks.
+-- Dates are relative to "today" in Muscat, so the demo always shows the last ten weeks.
 
 do $p2$
 declare
@@ -41,7 +41,7 @@ begin
 
   v_prev   := (v_m0 - interval '1 month')::date;
   v_open   := (v_m0 - interval '3 months')::date;
-  v_from   := v_today - 42;
+  v_from   := v_today - 75;
   v_assign := v_today - 75;
 
   -- 1. leave opening date (first accrual month) — admin setting

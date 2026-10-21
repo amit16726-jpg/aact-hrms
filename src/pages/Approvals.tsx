@@ -9,11 +9,14 @@ import { tapi, type ReqStatus } from '../lib/api_time';
 import { EmpCell } from '../components/time';
 import { RuleValues } from './time/RulesPage';
 import type { Key } from '../i18n';
+import { papi } from '../lib/api_pay';
+import { EmpLink, OMR, RunBadge, monthName } from '../components/pay';
+import { PayRuleValues } from './pay/PayRulesPage';
 
-type TimeKind = 'leave' | 'correction' | 'overtime' | 'adjustment' | 'rule';
+type TimeKind = 'leave' | 'correction' | 'overtime' | 'adjustment' | 'rule' | 'pay_rule' | 'loan' | 'pay_adjustment';
 
 export default function ApprovalsPage() {
-  const { t, L, tk } = useI18n();
+  const { t, L, tk, lang } = useI18n();
   const { can } = useSession();
   const hrApprover = can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE');
   const { data, error, loading, reload } = useAsync(() => (hrApprover ? api.pendingApprovals() : Promise.resolve({ salary: [], bank: [], targets: [] } as unknown as Awaited<ReturnType<typeof api.pendingApprovals>>)), [hrApprover]);
@@ -44,6 +47,9 @@ export default function ApprovalsPage() {
       else if (kind === 'correction') await tapi.decideCorrection(id, approve, n);
       else if (kind === 'overtime') await tapi.decideOvertime(id, approve, n);
       else if (kind === 'adjustment') await tapi.decideAdjustments([id], approve, n);
+      else if (kind === 'pay_rule') await papi.decidePayRule(id, approve, n);
+      else if (kind === 'loan') await papi.decideLoan(id, approve, n);
+      else if (kind === 'pay_adjustment') await papi.decideAdjustments([id], approve, n);
       else await tapi.decideTimeRule(id, approve, n);
       return true;
     }, t(approve ? 'ap.done_approve' : 'ap.done_reject'));
@@ -142,6 +148,87 @@ export default function ApprovalsPage() {
                 <td className="r">{tAct('adjustment', r.id, `${L(r.full_name_en, r.full_name_ar)} — ${r.days}`)}</td>
               </tr>))}
             </tbody></table></div>
+        </section>
+      )}
+      {td && (td.payroll ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('pap.payroll')}</h2><Link to="/payroll">{t('pnav.runs')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('pr.month')}</th><th>{t('c.status')}</th><th className="r">{t('pr.employees')}</th><th className="r">{t('pr.net')}</th><th /></tr></thead>
+            <tbody>{td.payroll.map((r) => (
+              <tr key={r.id}>
+                <td data-label={t('pr.month')}>{monthName(r.month, lang)}<span className="sub">{L(r.entity_en, r.entity_ar)}</span></td>
+                <td data-label={t('c.status')}><RunBadge status={r.status} /><span className="sub">{r.calculated_by_name}</span></td>
+                <td data-label={t('pr.employees')} className="r num">{r.totals.employees ?? 0}</td>
+                <td data-label={t('pr.net')} className="r num">{OMR(r.totals.net)}</td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/payroll/${r.id}`}>{t(r.can_approve ? 'pr.approve' : 'pr.verify')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.loans ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('pap.loans')}</h2><Link to="/payroll/loans">{t('pnav.loans')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('c.employee')}</th><th>{t('ln.kind')}</th><th className="r">{t('ln.amount')}</th><th className="r">{t('ln.installment')}</th><th>{t('c.reason')}</th><th /></tr></thead>
+            <tbody>{td.loans.map((l) => (
+              <tr key={l.id}>
+                <td data-label={t('c.employee')}><EmpLink id={l.employee_id} no={l.employee_no} en={l.full_name_en} ar={l.full_name_ar} /></td>
+                <td data-label={t('ln.kind')}>{t(`ln.k_${l.kind}` as Key)}<span className="sub num">{l.first_month.slice(0, 7)}</span></td>
+                <td data-label={t('ln.amount')} className="r num">{OMR(l.amount)}</td>
+                <td data-label={t('ln.installment')} className="r num">{OMR(l.installment)}</td>
+                <td data-label={t('c.reason')}>{l.reason}<span className="sub">{l.proposed_by_name}</span></td>
+                <td className="r">{tAct('loan', l.id, `${t(`ln.k_${l.kind}` as Key)} — ${L(l.full_name_en, l.full_name_ar)} — OMR ${OMR(l.amount)}`)}</td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.pay_adjustments ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('pap.adjustments')}</h2><Link to="/payroll/items">{t('pnav.adjustments')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('c.employee')}</th><th>{t('pr.month')}</th><th>{t('pa.code')}</th><th className="r">{t('pr.amount')}</th><th>{t('c.reason')}</th><th /></tr></thead>
+            <tbody>{td.pay_adjustments.map((a) => (
+              <tr key={a.id}>
+                <td data-label={t('c.employee')}><EmpLink id={a.employee_id} no={a.employee_no} en={a.full_name_en} ar={a.full_name_ar} /></td>
+                <td data-label={t('pr.month')} className="num">{a.month}</td>
+                <td data-label={t('pa.code')}>{t(`pa.c_${a.code}` as Key)}</td>
+                <td data-label={t('pr.amount')} className="r num">{a.kind === 'DEDUCTION' ? '−' : '+'}{OMR(a.amount)}</td>
+                <td data-label={t('c.reason')}>{a.reason}<span className="sub">{a.proposed_by_name}</span></td>
+                <td className="r">{tAct('pay_adjustment', a.id, `${t(`pa.c_${a.code}` as Key)} — ${L(a.full_name_en, a.full_name_ar)} — OMR ${OMR(a.amount)}`)}</td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.settlements ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('pap.settlements')}</h2><Link to="/payroll/settlements">{t('pnav.settlements')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('c.employee')}</th><th>{t('st.last_day')}</th><th className="r">{t('st.net')}</th><th>{t('c.by')}</th><th /></tr></thead>
+            <tbody>{td.settlements.map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('c.employee')}><EmpLink id={x.employee_id} no={x.employee_no} en={x.full_name_en} ar={x.full_name_ar} /></td>
+                <td data-label={t('st.last_day')}><DateText v={x.last_working_date} /><span className="sub">{t(`st.r_${x.reason}` as Key)}</span></td>
+                <td data-label={t('st.net')} className="r num">{OMR(x.net)}</td>
+                <td data-label={t('c.by')}>{x.prepared_by_name}<span className="sub">{fmtDateTime(x.prepared_at)}</span></td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/payroll/settlements/${x.id}`}>{t('c.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.pay_rules ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('pap.rules')}</h2><Link to="/payroll/rules">{t('pnav.rules')}</Link></div>
+          <div className="panel-pad stack">{td.pay_rules.map((r) => (
+            <div key={r.id} className="rule-card">
+              <div className="row" style={{ justifyContent: 'space-between', gap: 8 }}>
+                <b>{t(`prl.${r.code}` as Key)} — <DateText v={r.effective_from} /></b>
+                {tAct('pay_rule', r.id, `${t(`prl.${r.code}` as Key)} — ${r.effective_from}`)}
+              </div>
+              <PayRuleValues code={r.code} value={r.value} />
+              <div className="muted small">{r.legal_basis} · {r.proposed_by_name}</div>
+            </div>))}
+          </div>
         </section>
       )}
       {td && td.rules.length > 0 && (
