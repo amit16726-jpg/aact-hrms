@@ -2,6 +2,7 @@ import { rpc, type Json } from './api';
 import type { ChangeReq, Letter } from './api_ss';
 import type { Interview, Offer, Requisition } from './api_rec';
 import type { Loan, PayAdjustment, PayRule, PayrollRun, Settlement } from './api_pay';
+import type { DiscCase, PerfReview } from './api_wf';
 
 // ---------------------------------------------------------------------------
 // Phase 2 — attendance & leave: types returned by the server
@@ -139,6 +140,7 @@ export interface MyTasks {
   leave: LeaveReq[]; corrections: Correction[]; overtime: Overtime[]; adjustments: Adjustment[]; rules: TimeRule[]; count: number;
   pay_rules: PayRule[]; payroll: PayrollRun[]; loans: Loan[]; pay_adjustments: PayAdjustment[]; settlements: Settlement[];
   changes?: ChangeReq[]; letters?: Letter[]; requisitions?: Requisition[]; offers?: Offer[]; interviews?: Interview[];
+  reviews?: PerfReview[]; cases?: DiscCase[]; my_cases?: DiscCase[];
 }
 export interface TimeDash {
   today?: { date: string; present: number; absent: number; missing: number; late: number; leave: number; off: number; scope: 'ALL' | 'TEAM' };
@@ -148,8 +150,9 @@ export interface TimeDash {
     last_payslip?: { id: string; month: string; net: number } | null; requests_open?: number; letters_ready?: number };
   tasks: { leave: number; corrections: number; overtime: number; adjustments: number; rules: number; count: number;
     payroll?: number; loans?: number; pay_adjustments?: number; settlements?: number; changes?: number; letters?: number;
-    requisitions?: number; offers?: number; interviews?: number };
+    requisitions?: number; offers?: number; interviews?: number; reviews?: number; cases?: number; my_cases?: number };
   payroll?: PayrollRun | null;
+  workforce?: { training_expiring_30: number; assets_overdue: number; injuries_open: number; injuries_unreported: number; exits_open: number; plans_active: number };
   recruitment?: { open_requisitions: number; open_positions: number; in_pipeline: number; joining_30: number; onboarding_overdue: number; probation_due_30: number };
 }
 

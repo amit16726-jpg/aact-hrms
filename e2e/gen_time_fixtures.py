@@ -1,6 +1,6 @@
-"""Dump Phase 2–5 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+"""Dump Phase 2–6 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
 
-Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql and seed_phase5.sql into the local test database):
+Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql, seed_phase5.sql and seed_phase6.sql into the local test database):
   python3 e2e/gen_time_fixtures.py
 """
 import json, subprocess, pathlib, os
@@ -67,6 +67,23 @@ CALLS = {
     'hr_recruitment_settings': "public.hr_recruitment_settings()",
     'hr_list_probation': "public.hr_list_probation()",
     'hr_rec_interviewers': "public.hr_rec_interviewers()",
+    # Phase 6 — performance, training, discipline, assets, housing & transport, injuries, exit
+    'hr_list_perf_cycles': "public.hr_list_perf_cycles()",
+    'hr_list_perf_reviews': "public.hr_list_perf_reviews('{\"scope\":\"all\"}'::jsonb)",
+    'hr_get_perf_review': "public.hr_get_perf_review((select r.id from hr.perf_reviews r join hr.employees e on e.id = r.employee_id where e.employee_no = 'AACT-00017'))",
+    'hr_list_perf_plans': "public.hr_list_perf_plans()",
+    'hr_list_courses': "public.hr_list_courses()",
+    'hr_list_training': "public.hr_list_training('{}'::jsonb)",
+    'hr_training_gaps': "public.hr_training_gaps()",
+    'hr_list_cases': "public.hr_list_cases('{}'::jsonb)",
+    'hr_get_case': "public.hr_get_case((select id from hr.disciplinary_cases where status = 'PROPOSED' limit 1))",
+    'hr_list_asset_items': "public.hr_list_asset_items()",
+    'hr_list_asset_issues': "public.hr_list_asset_issues('{\"open_only\":true}'::jsonb)",
+    'hr_list_facilities': "public.hr_list_facilities('ACCOMMODATION')",
+    'hr_list_injuries': "public.hr_list_injuries('{}'::jsonb)",
+    'hr_list_exits': "public.hr_list_exits('{}'::jsonb)",
+    'hr_get_exit': "public.hr_get_exit((select id from hr.exit_cases limit 1))",
+    'hr_hr_policies': "public.hr_hr_policies()",
 }
 
 out = {}

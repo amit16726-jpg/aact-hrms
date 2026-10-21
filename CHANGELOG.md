@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.6.0 — 25 Oct 2026 — Phase 6: people operations
+
+- **Performance** (`Performance`): appraisal cycles per company (draft → open → closed). Opening a cycle creates a review for everyone
+  employed at the period end, with the line manager at that date as reviewer and a standard goal list. Steps: employee self-assessment
+  (self-ratings only) → line manager (ratings 1–5, weighted overall rating, comments) → HR finalises (someone other than the reviewer)
+  or returns → employee acknowledges with an optional comment. Everyone's reviews, my team, my reviews; tasks on the approvals page.
+- **Improvement plans** (poor-performance notice): written plan with the areas to improve and the support given; the improvement period
+  must be **at least 6 months** (Labour Law) and "not improved" can be recorded only after it ends. The employee acknowledges receipt.
+- **Training** (`Training`): course catalogue (category, certificate validity, mandatory flag); records for many employees at once with
+  expiry worked out from the validity; renewals supersede the old certificate. **Certificates join the expiry tracker and the daily
+  expiry alerts.** Missing-mandatory-course list. Employees see their own records (without cost).
+- **Discipline** (`Discipline`, sensitive, every view logged): case → investigation (employee asked for a written response) → proposed
+  penalty → decision by a person who neither opened nor proposed it. Penalty limits are company policy (default 5 days' wage deduction,
+  5 days' suspension) and a deduction becomes a one-off payroll deduction waiting for Finance approval (25 % limit applies there).
+  The employee sees the case (without internal notes), responds and may appeal.
+- **Assets & PPE** (`Assets & PPE`): item catalogue (PPE, uniform, IT, tools, vehicles, keys, cards; returnable or consumable; cost;
+  replacement interval); issue to many employees at once; return with condition; damage or loss can propose a salary recovery
+  (Finance approves). Overdue returns flagged.
+- **Housing & transport** (`Housing & transport`): accommodation and bus routes with capacity, rooms/beds or pick-up points; moving
+  someone ends the previous assignment of the same kind.
+- **Work injuries** (`Work injuries`): register with severity, days lost, root cause, corrective action and Social Protection Fund
+  reporting; serious injuries alert HR; report deadline (default 7 days, configurable) and overdue flag; closing needs the corrective
+  action and, except first aid, the report date.
+- **Exit workflow** (`Exits`): start an exit (resignation, termination, end of contract, retirement) — the notice rule (**30 days for
+  monthly-paid, 15 for others**, unless pay in lieu or on probation) and **non-compete ≤ 2 years** are enforced, and the notice is
+  recorded on the employee. Clearance list built automatically: items still with the employee (ticked when received back),
+  housing/transport, standard steps, and expatriate (resident card, work permit, air ticket) or Omani (SPF) steps. Exit interview;
+  completing the exit separates the employee on the last working day; cancelling withdraws the notice.
+- **HR policy limits** in Settings (deduction and suspension limits, injury reporting deadline); legal values shown with their basis.
+- Dashboard panel for people operations; approvals for reviews, disciplinary decisions and case responses.
+- Dummy data `supabase/seed_phase6.sql`.
+
 ## 1.5.0 — 24 Oct 2026 — Phase 5: recruitment and onboarding
 
 - **Requisitions** (`Recruitment`): raised by HR or by a line manager for his department; approved by someone else (`REC_APPROVE`).

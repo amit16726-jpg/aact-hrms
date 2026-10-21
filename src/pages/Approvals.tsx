@@ -288,6 +288,45 @@ export default function ApprovalsPage() {
             </tbody></table></div>
         </section>
       )}
+      {td && (td.reviews ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('wap.reviews')}</h2><Link to="/performance">{t('wnav.performance')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <tbody>{(td.reviews ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('c.employee')}>{L(x.full_name_en, x.full_name_ar)}<span className="sub num">{x.employee_no} · {x.cycle_name}</span></td>
+                <td data-label={t('c.status')}>{t(`pf.st_${x.status}` as Key)}{x.due_date && <span className="sub">{t('pf.due')} {fmtDate(x.due_date)}</span>}</td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/performance/review/${x.id}`}>{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.cases ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('wap.cases')}</h2><Link to="/discipline">{t('wnav.discipline')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <tbody>{(td.cases ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('c.employee')}>{L(x.full_name_en, x.full_name_ar)}<span className="sub num">{x.ref_no} · {fmtDate(x.incident_date)}</span></td>
+                <td data-label={t('dc.penalty')}>{x.proposed_penalty ? t(`dc.pen_${x.proposed_penalty}` as Key) : '—'}{x.proposed_days ? ` · ${t('dc.days_n', { n: x.proposed_days })}` : ''}
+                  <span className="sub">{x.proposed_by_name}</span></td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/discipline/${x.id}`}>{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.my_cases ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('wap.my_cases')}</h2></div>
+          <div className="table-wrap"><table className="t cards">
+            <tbody>{(td.my_cases ?? []).map((x) => (
+              <tr key={x.id}>
+                <td>{x.ref_no}<span className="sub">{t(`dc.cat_${x.category}` as Key)} · {fmtDate(x.incident_date)}</span></td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/discipline/${x.id}`}>{t('dc.respond')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
       {td && (td.pay_rules ?? []).length > 0 && (
         <section className="panel">
           <div className="panel-head"><h2>{t('pap.rules')}</h2><Link to="/payroll/rules">{t('pnav.rules')}</Link></div>

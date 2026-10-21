@@ -7,6 +7,7 @@ import { useI18n } from '../i18n';
 import { useSession } from '../lib/session';
 import { Button, Input, Select, useAction } from '../components/ui';
 import { PageHead } from '../components/Layout';
+import { HrPoliciesPanel } from '../components/wf';
 
 export default function SettingsPage() {
   const { t } = useI18n();
@@ -47,6 +48,7 @@ export default function SettingsPage() {
 
       <EmailPrefPanel />
       {can('EMAIL_ADMIN') && <EmailAdminPanel />}
+      {can('PERF_MANAGE') && can('DISC_APPROVE') && <HrPoliciesPanel />}
 
       {can('USERS_ADMIN') && (
         <section className="panel panel-pad stack" style={{ maxWidth: 640 }}>

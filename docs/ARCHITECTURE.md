@@ -173,3 +173,22 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
   and salary approval apply unchanged.
 - Open point: confirm the exact Labour Law article for probation before go-live (stored as text in the settings).
 - Tests: `tests/db/50_recruitment.sql`; unit tests for the offer wording.
+
+## 11. Phase 6 — people operations (v1.6.0)
+
+- New tables: `perf_cycles`, `perf_reviews`, `perf_plans`, `training_courses`, `training_records`, `disciplinary_cases`, `asset_items`,
+  `asset_issues`, `facilities`, `facility_assignments`, `work_injuries`, `exit_cases`, `exit_tasks` — all audited, RLS on, reached only
+  through `public.hr_*` functions.
+- Legal and policy values live in `hr.settings.hr_policies` with their legal basis (improvement period 6 months, notice 30/15 days,
+  non-compete 24 months, discipline limits, injury reporting days, exit clearance steps); read with `hr.policy()` / `hr.policy_num()`.
+- Maker-checker: HR finalises a review only if it is not the reviewer; a disciplinary decision needs `DISC_APPROVE` and a person who
+  neither opened nor proposed the case (also a table check). Money effects (disciplinary deduction, damage recovery) are created as
+  `payroll_adjustments` in PENDING status, so Finance approval and the payroll deduction limit apply.
+- Disciplinary cases are sensitive: list views by employee are written to `access_log` (`DISCIPLINE`); employees see their own cases
+  without internal notes once the investigation starts.
+- Training certificates are a third source in `hr.expiry_items` (latest completed record per employee and course), so they appear in
+  the expiry tracker and the daily expiry notifications.
+- Exits call `hr_change_status` (NOTICE, SEPARATE, WITHDRAW_NOTICE), so the employee record, contracts and assignments close exactly as
+  with a manual separation.
+- Open points: confirm the discipline limits against the company's MoL-approved regulation and the SPF work-injury reporting deadline.
+- Tests: `tests/db/60_workforce.sql`; unit tests in `src/lib/api_wf.test.ts`.

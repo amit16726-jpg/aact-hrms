@@ -17,7 +17,8 @@ export function TimePanels() {
     ['loans', 'pd.tasks_loans', '/approvals'], ['pay_adjustments', 'pd.tasks_pay_adjustments', '/approvals'],
     ['settlements', 'pd.tasks_settlements', '/approvals'], ['changes', 'sd.tasks_changes', '/requests'],
     ['letters', 'sd.tasks_letters', '/requests?tab=letters'], ['requisitions', 'rd.tasks_requisitions', '/approvals'],
-    ['offers', 'rd.tasks_offers', '/approvals'], ['interviews', 'rd.tasks_interviews', '/recruitment?tab=interviews']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
+    ['offers', 'rd.tasks_offers', '/approvals'], ['interviews', 'rd.tasks_interviews', '/recruitment?tab=interviews'],
+    ['reviews', 'wd.tasks_reviews', '/approvals'], ['cases', 'wd.tasks_cases', '/approvals'], ['my_cases', 'wd.tasks_my_cases', '/discipline']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
 
   return (
     <div className="stack">
@@ -73,6 +74,19 @@ export function TimePanels() {
             </div>
             {d.recruitment.onboarding_overdue > 0 && <div><Link className="bad-text" to="/recruitment?tab=onboarding">{t('rd.onboarding_overdue')}: {d.recruitment.onboarding_overdue}</Link></div>}
             {d.recruitment.probation_due_30 > 0 && <div><Link to="/probation">{t('rd.probation_30')}: {d.recruitment.probation_due_30}</Link></div>}
+          </section>
+        )}
+        {d.workforce && (
+          <section className="panel panel-pad stack">
+            <h2>{t('wd.title')}</h2>
+            <div className="tile-row">
+              <div className="tile"><span>{t('wd.exits_open')}</span><b>{d.workforce.exits_open}</b></div>
+              <div className="tile"><span>{t('wd.injuries_open')}</span><b>{d.workforce.injuries_open}</b></div>
+              <div className="tile"><span>{t('wd.plans_active')}</span><b>{d.workforce.plans_active}</b></div>
+            </div>
+            {d.workforce.injuries_unreported > 0 && <div><Link className="bad-text" to="/injuries">{t('wd.injuries_unreported')}: {d.workforce.injuries_unreported}</Link></div>}
+            {d.workforce.training_expiring_30 > 0 && <div><Link to="/training?tab=expiring">{t('wd.training_30')}: {d.workforce.training_expiring_30}</Link></div>}
+            {d.workforce.assets_overdue > 0 && <div><Link to="/assets">{t('wd.assets_overdue')}: {d.workforce.assets_overdue}</Link></div>}
           </section>
         )}
         {taskLines.length > 0 && (

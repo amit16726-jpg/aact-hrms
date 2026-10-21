@@ -77,7 +77,7 @@ export default function Layout() {
       { to: '/my', key: 'nav.my_record', show: !!me?.employee_id },
       { to: '/team', key: 'snav.team', show: !!me?.is_manager },
       { to: '/employees', key: 'nav.employees', show: can('EMP_READ') || !!me?.is_manager },
-      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || can('REC_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
+      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || can('REC_APPROVE') || can('DISC_APPROVE') || can('PERF_MANAGE') || !!me?.is_manager || approvals > 0, count: approvals },
       { to: '/requests', key: 'snav.requests', show: can('SS_APPROVE') || can('LETTER_PREPARE') || can('LETTER_APPROVE') },
     ] },
     { title: 'tnav.group', items: [
@@ -104,6 +104,15 @@ export default function Layout() {
     { title: 'rnav.group', items: [
       { to: '/recruitment', key: 'rnav.recruitment', show: can('REC_READ') || can('REC_WRITE') || !!me?.is_manager },
       { to: '/probation', key: 'rnav.probation', show: can('REC_READ') || can('EMP_READ') || !!me?.is_manager },
+    ] },
+    { title: 'wnav.group', items: [
+      { to: '/performance', key: 'wnav.performance', show: can('PERF_MANAGE') || !!me?.is_manager || !!me?.employee_id },
+      { to: '/training', key: 'wnav.training', show: can('TRAIN_WRITE') || !!me?.employee_id },
+      { to: '/discipline', key: 'wnav.discipline', show: can('DISC_READ') || !!me?.employee_id },
+      { to: '/assets', key: 'wnav.assets', show: can('ASSET_WRITE') || can('EMP_READ') || !!me?.employee_id },
+      { to: '/facilities', key: 'wnav.facilities', show: can('ASSET_WRITE') || can('EMP_READ') },
+      { to: '/injuries', key: 'wnav.injuries', show: can('HSE_WRITE') || can('EMP_READ') },
+      { to: '/exits', key: 'wnav.exits', show: can('EXIT_MANAGE') },
     ] },
     { title: 'nav.compliance', items: [
       { to: '/compliance/expiries', key: 'nav.expiries', show: can('COMPLIANCE_READ') || !!me?.is_manager },
