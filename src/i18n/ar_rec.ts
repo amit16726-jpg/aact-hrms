@@ -1,0 +1,75 @@
+import type { RecKey } from './en_rec';
+
+/** المرحلة 5 — التوظيف والتهيئة (عربي). */
+export const arRec: Record<RecKey, string> = {
+  'rnav.group': 'التوظيف', 'rnav.recruitment': 'التوظيف', 'rnav.probation': 'فترة التجربة',
+
+  'rc.title': 'التوظيف', 'rc.hint': 'الوظائف الشاغرة والمرشحون والمقابلات وعروض العمل والتهيئة.',
+  'rc.years': 'خبرة {n} سنة', 'rc.tab_reqs': 'طلبات التوظيف', 'rc.tab_candidates': 'المرشحون', 'rc.tab_interviews': 'المقابلات', 'rc.tab_onboarding': 'التهيئة', 'rc.tab_settings': 'الإعدادات',
+
+  'rq2.new': 'طلب توظيف جديد', 'rq2.edit': 'تعديل طلب التوظيف', 'rq2.ref': 'الرقم المرجعي', 'rq2.job': 'الوظيفة', 'rq2.positions': 'عدد الشواغر',
+  'rq2.reason': 'السبب', 'rq2.r_NEW': 'وظيفة جديدة', 'rq2.r_REPLACEMENT': 'بديل', 'rq2.r_TEMPORARY': 'حاجة مؤقتة',
+  'rq2.replaces': 'بديلاً عن', 'rq2.nat_rule': 'الجنسية', 'rq2.n_ANY': 'أي جنسية', 'rq2.n_OMANI_ONLY': 'عمانيون فقط', 'rq2.n_OMANI_PREFERRED': 'الأفضلية للعمانيين',
+  'rq2.salary_range': 'نطاق الراتب الأساسي (ر.ع)', 'rq2.salary_min': 'الحد الأدنى', 'rq2.salary_max': 'الحد الأعلى', 'rq2.target_date': 'مطلوب بحلول',
+  'rq2.justification': 'لماذا هذه الوظيفة مطلوبة؟', 'rq2.employment_type': 'نوع التوظيف',
+  'rq2.st_PENDING': 'بانتظار الاعتماد', 'rq2.st_APPROVED': 'مفتوح', 'rq2.st_REJECTED': 'مرفوض', 'rq2.st_ON_HOLD': 'معلق',
+  'rq2.st_FILLED': 'مكتمل', 'rq2.st_CANCELLED': 'ملغى', 'rq2.filter_open': 'المفتوحة والمنتظرة',
+  'rq2.none': 'لا توجد طلبات توظيف.', 'rq2.filled_of': 'تم تعيين {h} من {n}', 'rq2.pipeline': '{n} قيد المعالجة', 'rq2.saved': 'أُرسل طلب التوظيف للاعتماد.',
+  'rq2.hold': 'تعليق', 'rq2.reopen': 'إعادة فتح', 'rq2.cancel': 'إلغاء الطلب', 'rq2.approve_title': 'اعتماد طلب التوظيف', 'rq2.reject_title': 'رفض طلب التوظيف',
+  'rq2.omani_only_job': 'هذه الوظيفة مقصورة على العمانيين ({s}).',
+  'rq2.omanisation': 'فحص التعمين', 'rq2.om_now': 'الشركة حالياً', 'rq2.om_target': 'المستهدف', 'rq2.om_if_omani': 'إذا شُغلت بعمانيين', 'rq2.om_if_expat': 'إذا شُغلت بوافدين',
+  'rq2.om_dept': 'القسم حالياً', 'rq2.om_breaks': 'شغل هذه الوظيفة بوافدين سيُنزل الشركة دون نسبة التعمين المستهدفة.',
+  'rq2.om_no_target': 'لا توجد نسبة معتمدة', 'rq2.details': 'التفاصيل', 'rq2.requested': 'طلبه {n} في {d}',
+
+  'cd.new': 'مرشح جديد', 'cd.add': 'إضافة مرشح', 'cd.existing': 'مرشح مسجل', 'cd.search_ph': 'الاسم أو البريد أو الهاتف أو رقم البطاقة',
+  'cd.name_en': 'الاسم (إنجليزي)', 'cd.name_ar': 'الاسم (عربي)', 'cd.nationality': 'الجنسية', 'cd.gender': 'الجنس', 'cd.dob': 'تاريخ الميلاد',
+  'cd.email': 'البريد الإلكتروني', 'cd.phone': 'الهاتف', 'cd.civil': 'رقم البطاقة المدنية / الإقامة', 'cd.passport': 'رقم الجواز', 'cd.in_oman': 'مقيم في عمان حالياً',
+  'cd.employer': 'جهة العمل الحالية', 'cd.experience': 'سنوات الخبرة', 'cd.qualification': 'المؤهل', 'cd.source': 'المصدر', 'cd.notes': 'ملاحظات',
+  'cd.s_REFERRAL': 'ترشيح', 'cd.s_AGENCY': 'مكتب توظيف', 'cd.s_WEBSITE': 'الموقع الإلكتروني', 'cd.s_WALK_IN': 'حضور شخصي', 'cd.s_INTERNAL': 'داخلي', 'cd.s_MOL_PORTAL': 'بوابة وزارة العمل', 'cd.s_OTHER': 'أخرى',
+  'cd.none': 'لا يوجد مرشحون.', 'cd.applications': '{n} طلب', 'cd.abroad': 'خارج عمان', 'cd.prior': 'عمل لدى الشركة سابقاً — لا تجوز فترة تجربة.',
+  'cd.added': 'تمت إضافة المرشح.', 'cd.hired_as': 'تم تعيينه موظفاً',
+  'stg.APPLIED': 'تقدم', 'stg.SHORTLISTED': 'القائمة المختصرة', 'stg.INTERVIEW': 'مقابلة', 'stg.OFFER': 'عرض عمل', 'stg.HIRED': 'تم التعيين', 'stg.REJECTED': 'مرفوض', 'stg.WITHDRAWN': 'انسحب',
+  'ap2.move': 'نقل إلى', 'ap2.reject': 'رفض', 'ap2.withdraw': 'انسحب', 'ap2.closed': 'لم يستمر', 'ap2.stage': 'المرحلة', 'ap2.rating': 'التقييم',
+  'ap2.open_full': 'فتح', 'ap2.back_req': 'طلب التوظيف {r}',
+
+  'iv.schedule': 'تحديد مقابلة', 'iv.when': 'التاريخ والوقت', 'iv.mode': 'النوع', 'iv.m_IN_PERSON': 'حضورياً', 'iv.m_PHONE': 'هاتفياً', 'iv.m_VIDEO': 'مرئياً',
+  'iv.location': 'المكان أو الرابط', 'iv.interviewer': 'المقابِل', 'iv.record': 'تسجيل النتيجة', 'iv.cancel': 'إلغاء المقابلة',
+  'iv.st_SCHEDULED': 'محددة', 'iv.st_DONE': 'تمت', 'iv.st_CANCELLED': 'ملغاة', 'iv.st_NO_SHOW': 'لم يحضر',
+  'iv.rating': 'التقييم (1–5)', 'iv.recommendation': 'التوصية', 'iv.r_HIRE': 'تعيين', 'iv.r_MAYBE': 'ربما', 'iv.r_NO': 'عدم التعيين',
+  'iv.feedback': 'الملاحظات', 'iv.no_show': 'لم يحضر', 'iv.none': 'لا توجد مقابلات.', 'iv.mine': 'مقابلاتي', 'iv.candidate': 'المرشح',
+
+  'of.new': 'إعداد عرض عمل', 'of.edit': 'تعديل العرض', 'of.title': 'عرض العمل', 'of.start': 'تاريخ المباشرة', 'of.contract': 'العقد', 'of.c_FIXED_TERM': 'محدد المدة', 'of.c_INDEFINITE': 'غير محدد المدة',
+  'of.months': 'المدة (أشهر)', 'of.probation': 'فترة التجربة (أشهر)', 'of.probation_max': 'الحد الأقصى {n} شهر لهذه الفئة (قانون العمل).',
+  'of.notice': 'مدة الإخطار (أيام)', 'of.category': 'الفئة', 'of.grade': 'الدرجة', 'of.location': 'مكان العمل', 'of.salary': 'الراتب الشهري (ر.ع)',
+  'of.benefits': 'مزايا أخرى', 'of.benefits_ph': 'مثال: تذكرة سفر كل سنتين، سكن، مواصلات', 'of.valid_until': 'العرض ساري حتى',
+  'of.gross': 'الإجمالي', 'of.st_PENDING': 'بانتظار الاعتماد', 'of.st_APPROVED': 'معتمد — يُرسل للمرشح', 'of.st_REJECTED': 'مرفوض',
+  'of.st_ACCEPTED': 'مقبول', 'of.st_DECLINED': 'اعتذر المرشح', 'of.st_WITHDRAWN': 'مسحوب',
+  'of.approve_title': 'اعتماد عرض العمل', 'of.reject_title': 'رفض عرض العمل', 'of.accepted': 'وافق المرشح', 'of.declined': 'اعتذر المرشح',
+  'of.accept_q': 'تسجيل موافقة المرشح؟ ستُنشأ قائمة مهام التهيئة.', 'of.decline_reason': 'السبب الذي ذكره المرشح',
+  'of.withdraw': 'سحب العرض', 'of.print': 'طباعة العرض', 'of.prepared_by': 'أعده {n}', 'of.approved_by': 'اعتمده {n}', 'of.saved': 'أُرسل العرض للاعتماد.',
+  'of.signature_candidate': 'توقيع المرشح والتاريخ', 'of.signature_company': 'عن الشركة',
+
+  'ob.title': 'قائمة مهام التهيئة', 'ob.due': 'الموعد', 'ob.done': 'تم', 'ob.not_needed': 'غير مطلوب', 'ob.reopen': 'إعادة فتح', 'ob.why_not': 'لماذا هذه الخطوة غير مطلوبة؟',
+  'ob.st_PENDING': 'قيد التنفيذ', 'ob.st_DONE': 'تم', 'ob.st_NOT_NEEDED': 'غير مطلوب', 'ob.progress': 'تم {d} من {t}', 'ob.overdue': '{n} متأخرة', 'ob.next': 'التالي',
+  'ob.none': 'لا يوجد أحد قيد التهيئة.', 'ob.show_all': 'إظهار المكتمل',
+  'hr2.hire': 'إنشاء سجل الموظف', 'hr2.hire_title': 'إنشاء سجل الموظف', 'hr2.hint': 'يُنشأ الموظف من العرض المقبول: تاريخ الالتحاق والوظيفة وفترة التجربة والعقد. ويُرسل الراتب للاعتماد كالمعتاد.',
+  'hr2.manager': 'المدير المباشر', 'hr2.employee_no': 'الرقم الوظيفي (فارغ = تلقائي)', 'hr2.work_email': 'البريد الوظيفي', 'hr2.shift': 'رمز الوردية',
+  'hr2.exception': 'سبب الاستثناء من قصر الوظيفة على العمانيين', 'hr2.duplicate': 'هذا شخص مختلف بنفس الاسم وتاريخ الميلاد',
+  'hr2.done': 'تم إنشاء الموظف {n}. الراتب بانتظار الاعتماد.', 'hr2.open_employee': 'فتح ملف الموظف',
+
+  'pb.title': 'فترة التجربة', 'pb.hint': 'الموظفون في فترة التجربة. ثبّتهم أو أنهِ الخدمة قبل تاريخ الانتهاء.',
+  'pb.ends': 'تنتهي', 'pb.left': 'متبقي {n} يوم', 'pb.overdue': 'انتهت منذ {n} يوم — يجب القرار الآن', 'pb.max': 'الحد القانوني', 'pb.confirm': 'تثبيت',
+  'pb.confirm_q': 'تثبيت {n} موظفاً دائماً؟', 'pb.extend': 'تمديد', 'pb.extend_title': 'تمديد فترة التجربة', 'pb.new_end': 'تاريخ الانتهاء الجديد',
+  'pb.reason': 'السبب', 'pb.none': 'لا يوجد موظفون في فترة التجربة.', 'pb.confirmed': 'تم تثبيت الموظف.', 'pb.extended': 'تم تمديد فترة التجربة.', 'pb.joined': 'تاريخ الالتحاق',
+
+  'rs.title': 'إعدادات التوظيف', 'rs.probation': 'حدود فترة التجربة', 'rs.monthly': 'ذوو الأجر الشهري (حد أقصى 3)', 'rs.other': 'الآخرون (حد أقصى 2)',
+  'rs.reminder': 'التذكير قبل انتهاء فترة التجربة بعدد أيام', 'rs.basis': 'السند القانوني', 'rs.checklists': 'قوائم مهام التهيئة',
+  'rs.k_EXPAT_ABROAD': 'وافد قادم من الخارج', 'rs.k_EXPAT_IN_OMAN': 'وافد مقيم في عمان', 'rs.k_OMANI': 'عماني',
+  'rs.step_code': 'الرمز', 'rs.step_en': 'الخطوة (إنجليزي)', 'rs.step_ar': 'الخطوة (عربي)', 'rs.step_days': 'أيام من المباشرة', 'rs.add_step': 'إضافة خطوة', 'rs.remove': 'حذف',
+
+  'rd.recruitment': 'التوظيف', 'rd.open_positions': 'الشواغر المفتوحة', 'rd.in_pipeline': 'مرشحون قيد المعالجة', 'rd.joining_30': 'ينضمون خلال 30 يوماً',
+  'rd.onboarding_overdue': 'خطوات تهيئة متأخرة', 'rd.probation_30': 'تجربة تنتهي خلال 30 يوماً',
+  'rd.tasks_requisitions': '{n} طلب توظيف للاعتماد', 'rd.tasks_offers': '{n} عرض عمل للاعتماد', 'rd.tasks_interviews': '{n} مقابلة لتسجيل نتيجتها',
+  'rap.requisitions': 'طلبات توظيف للاعتماد', 'rap.offers': 'عروض عمل للاعتماد', 'rap.interviews': 'مقابلات بانتظار ملاحظاتك',
+  'err.PROBATION_LIMIT': 'فترة التجربة أطول مما يسمح به القانون.',
+};

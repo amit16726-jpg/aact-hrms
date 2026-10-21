@@ -46,6 +46,11 @@ const RequestsPage = lazy(() => import('./pages/ss/RequestsPage'));
 const LetterPage = lazy(() => import('./pages/ss/LetterPage'));
 const TeamPage = lazy(() => import('./pages/ss/TeamPage'));
 const VerifyPage = lazy(() => import('./pages/ss/VerifyPage'));
+const RecruitmentPage = lazy(() => import('./pages/rec/RecruitmentPage'));
+const RequisitionPage = lazy(() => import('./pages/rec/RequisitionPage'));
+const ApplicationPage = lazy(() => import('./pages/rec/ApplicationPage'));
+const OfferPage = lazy(() => import('./pages/rec/OfferPage'));
+const ProbationPage = lazy(() => import('./pages/rec/ProbationPage'));
 
 function NotFound() {
   const { t } = useI18n();
@@ -110,6 +115,11 @@ export default function App() {
             <Route path="team" element={<TeamPage />} />
             <Route path="requests" element={<RequestsPage />} />
             <Route path="letters/:id" element={<LetterPage />} />
+            <Route path="recruitment" element={<RecruitmentPage />} />
+            <Route path="recruitment/req/:id" element={<RequisitionPage />} />
+            <Route path="recruitment/app/:id" element={<ApplicationPage />} />
+            <Route path="recruitment/offer/:id" element={<OfferPage />} />
+            <Route path="probation" element={<ProbationPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

@@ -161,3 +161,15 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
   correction requests carry a due date 45 days after the request.
 - Tests: `tests/db/40_selfservice.sql` (requests, separation of duties, bank masking, letter numbering and privacy, anonymous checks,
   mail queue privileges and retry) and unit tests for the bilingual letter wording and the Microsoft Graph sender.
+
+## 10. Phase 5 — recruitment and onboarding (v1.5.0)
+
+- Requisitions and offers are maker-checker (`decided_by <> requested_by`, `approved_by <> prepared_by` checks in the tables).
+- Interviewers and requesting managers see only the applications they are involved in (`hr.can_see_application`), without the
+  candidate's contact details or the offer.
+- Probation limits come from `hr.settings.recruitment` (monthly-paid 3 months, others 2, editable only downwards) and are enforced on
+  the offer, at hire and on extension; probation is refused for a former employee of the same company.
+- Hiring reuses the employee, salary and contract APIs, so numbering, duplicate checks, the Omani-only rule (with exception approval)
+  and salary approval apply unchanged.
+- Open point: confirm the exact Labour Law article for probation before go-live (stored as text in the settings).
+- Tests: `tests/db/50_recruitment.sql`; unit tests for the offer wording.

@@ -246,6 +246,48 @@ export default function ApprovalsPage() {
             </tbody></table></div>
         </section>
       )}
+      {td && (td.requisitions ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('rap.requisitions')}</h2><Link to="/recruitment">{t('rnav.recruitment')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('rq2.job')}</th><th className="r">{t('rq2.positions')}</th><th>{t('c.by')}</th><th /></tr></thead>
+            <tbody>{(td.requisitions ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('rq2.job')}>{L(x.job_en, x.job_ar)}<span className="sub num">{x.ref_no} · {L(x.department_en, x.department_ar)}</span></td>
+                <td data-label={t('rq2.positions')} className="r num">{x.positions}</td>
+                <td data-label={t('c.by')}>{x.requested_by_name}<span className="sub">{fmtDateTime(x.requested_at)}</span></td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/recruitment/req/${x.id}`}>{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.offers ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('rap.offers')}</h2></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('iv.candidate')}</th><th>{t('rq2.job')}</th><th className="r">{t('of.gross')}</th><th /></tr></thead>
+            <tbody>{(td.offers ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('iv.candidate')}>{L(x.full_name_en ?? '', x.full_name_ar)}<span className="sub num">{x.ref_no}</span></td>
+                <td data-label={t('rq2.job')}>{L(x.job_en, x.job_ar)}<span className="sub">{t('of.start')} {fmtDate(x.start_date)}</span></td>
+                <td data-label={t('of.gross')} className="r num">{x.gross != null ? OMR(x.gross) : '—'}</td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/recruitment/app/${x.application_id}`}>{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.interviews ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('rap.interviews')}</h2></div>
+          <div className="table-wrap"><table className="t cards">
+            <tbody>{(td.interviews ?? []).map((x) => (
+              <tr key={x.id}>
+                <td>{L(x.full_name_en ?? '', x.full_name_ar)}<span className="sub num">{fmtDateTime(x.scheduled_at)}</span></td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to={`/recruitment/app/${x.application_id}`}>{t('iv.record')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
       {td && (td.pay_rules ?? []).length > 0 && (
         <section className="panel">
           <div className="panel-head"><h2>{t('pap.rules')}</h2><Link to="/payroll/rules">{t('pnav.rules')}</Link></div>

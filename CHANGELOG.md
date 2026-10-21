@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.5.0 — 24 Oct 2026 — Phase 5: recruitment and onboarding
+
+- **Requisitions** (`Recruitment`): raised by HR or by a line manager for his department; approved by someone else (`REC_APPROVE`).
+  Reason (new, replacement, temporary), positions, salary range, needed-by date. An Omani-only job forces "Omani only".
+- **Omanisation check before hiring:** each requisition shows the company and department ratio, the target, and the ratio if the
+  positions are filled by Omanis or by expatriates, with a warning when expatriates would take the company below its target.
+- **Candidates and pipeline:** candidate register (duplicate check by ID number and e-mail), pipeline per requisition
+  (applied → shortlisted → interview → offer → hired / rejected / withdrawn); non-Omanis cannot be added to Omani-only positions;
+  former employees are recognised.
+- **Interviews:** scheduled with any user as interviewer (notified); the interviewer records rating, recommendation and feedback and sees
+  the candidate without contact details; overdue feedback is a task.
+- **Offers:** prepared by HR, approved by another person; contract type and length, notice, benefits, salary lines. **Probation is
+  limited by law** — at most 3 months for monthly-paid categories and 2 months for others, and none for someone who has worked for the
+  company before (once with the same employer). Printable bilingual offer letter with signature blocks.
+- **Onboarding checklists** created when the offer is accepted, by case: expatriate from abroad (work permit, visa, flight,
+  accommodation, induction, medical, MoL contract, resident card, bank), expatriate already in Oman, Omani (SPF registration);
+  due dates counted from the start date; editable in settings.
+- **Hire in one step:** the accepted offer creates the employee (numbering, duplicate and Omani-only rules as usual), proposes the salary
+  for approval, records the contract and moves the checklist to the employee; the requisition closes when all positions are filled.
+- **Probation tracker** (`Probation`): days left, legal maximum, confirm, extend within the maximum; daily reminders to HR and the line
+  manager before the end date.
+- Approvals page, menu badge and dashboard include requisitions, offers and interview feedback; dashboard shows open positions,
+  candidates in progress, people joining in 30 days, overdue onboarding steps and probations ending.
+- Dummy data `supabase/seed_phase5.sql`: three requisitions, six candidates at different stages, interviews, an accepted offer with
+  onboarding started and an offer waiting for approval.
+
 ## 1.4.0 — 23 Oct 2026 — Phase 4: self-service and letters
 
 - **My HR** (`/me`) for every employee with a login: job, manager, leave balance, next leave, last payslip, documents expiring in 90 days,

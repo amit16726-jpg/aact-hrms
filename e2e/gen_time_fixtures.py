@@ -1,6 +1,6 @@
-"""Dump Phase 2, 3 and 4 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+"""Dump Phase 2–5 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
 
-Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql and seed_phase4.sql into the local test database):
+Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql and seed_phase5.sql into the local test database):
   python3 e2e/gen_time_fixtures.py
 """
 import json, subprocess, pathlib, os
@@ -56,6 +56,17 @@ CALLS = {
     'hr_my_email_pref': "public.hr_my_email_pref()",
     'hr_email_settings': ("public.hr_email_settings()", 'admin@aact.test'),
     'hr_verify_letter': "(select public.hr_verify_letter(ref_no, verify_code) from hr.letters where status = 'ISSUED' limit 1)",
+    # Phase 5 — recruitment & onboarding
+    'hr_list_requisitions': "public.hr_list_requisitions('{}'::jsonb)",
+    'hr_get_requisition': "public.hr_get_requisition((select id from hr.job_requisitions where positions = 3 limit 1))",
+    'hr_get_application': "public.hr_get_application((select a.id from hr.applications a join hr.job_offers o on o.application_id = a.id where o.status = 'ACCEPTED' limit 1))",
+    'hr_get_offer': "public.hr_get_offer((select id from hr.job_offers where status = 'ACCEPTED' limit 1))",
+    'hr_list_candidates': "public.hr_list_candidates('{}'::jsonb)",
+    'hr_my_interviews': "public.hr_my_interviews()",
+    'hr_list_onboarding': "public.hr_list_onboarding('{}'::jsonb)",
+    'hr_recruitment_settings': "public.hr_recruitment_settings()",
+    'hr_list_probation': "public.hr_list_probation()",
+    'hr_rec_interviewers': "public.hr_rec_interviewers()",
 }
 
 out = {}

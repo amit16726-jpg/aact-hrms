@@ -2,6 +2,7 @@ import type { BaseKey, Key } from './en';
 import { arTime } from './ar_time';
 import { arPay } from './ar_pay';
 import { arSs } from './ar_ss';
+import { arRec } from './ar_rec';
 
 const base: Record<BaseKey, string> = {
   'app.name': 'نظام الموارد البشرية AACT',
@@ -232,4 +233,4 @@ const base: Record<BaseKey, string> = {
   'err.UNKNOWN': 'حدث خطأ ما.',
 };
 
-export const ar: Record<Key, string> = { ...base, ...arTime, ...arPay, ...arSs };
+export const ar: Record<Key, string> = { ...base, ...arTime, ...arPay, ...arSs, ...arRec };

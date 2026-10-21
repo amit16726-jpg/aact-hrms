@@ -16,7 +16,8 @@ export function TimePanels() {
     ['adjustments', 'dt.tasks_adjustments', '/approvals'], ['rules', 'dt.tasks_rules', '/approvals'], ['payroll', 'pd.tasks_payroll', '/approvals'],
     ['loans', 'pd.tasks_loans', '/approvals'], ['pay_adjustments', 'pd.tasks_pay_adjustments', '/approvals'],
     ['settlements', 'pd.tasks_settlements', '/approvals'], ['changes', 'sd.tasks_changes', '/requests'],
-    ['letters', 'sd.tasks_letters', '/requests?tab=letters']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
+    ['letters', 'sd.tasks_letters', '/requests?tab=letters'], ['requisitions', 'rd.tasks_requisitions', '/approvals'],
+    ['offers', 'rd.tasks_offers', '/approvals'], ['interviews', 'rd.tasks_interviews', '/recruitment?tab=interviews']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
 
   return (
     <div className="stack">
@@ -60,6 +61,18 @@ export function TimePanels() {
               <div className="tile"><span>{t('pr.net')}</span><b>{OMR(d.payroll.totals.net)}</b></div>
               <div className="tile"><span>{t('pr.employer_cost')}</span><b>{OMR(d.payroll.totals.employer_cost)}</b></div>
             </div>}
+          </section>
+        )}
+        {d.recruitment && (
+          <section className="panel panel-pad stack">
+            <div className="row" style={{ justifyContent: 'space-between' }}><h2>{t('rd.recruitment')}</h2><Link to="/recruitment">{t('rnav.recruitment')}</Link></div>
+            <div className="tile-row">
+              <div className="tile"><span>{t('rd.open_positions')}</span><b>{d.recruitment.open_positions}</b></div>
+              <div className="tile"><span>{t('rd.in_pipeline')}</span><b>{d.recruitment.in_pipeline}</b></div>
+              <div className="tile"><span>{t('rd.joining_30')}</span><b>{d.recruitment.joining_30}</b></div>
+            </div>
+            {d.recruitment.onboarding_overdue > 0 && <div><Link className="bad-text" to="/recruitment?tab=onboarding">{t('rd.onboarding_overdue')}: {d.recruitment.onboarding_overdue}</Link></div>}
+            {d.recruitment.probation_due_30 > 0 && <div><Link to="/probation">{t('rd.probation_30')}: {d.recruitment.probation_due_30}</Link></div>}
           </section>
         )}
         {taskLines.length > 0 && (

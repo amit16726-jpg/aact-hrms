@@ -77,7 +77,7 @@ export default function Layout() {
       { to: '/my', key: 'nav.my_record', show: !!me?.employee_id },
       { to: '/team', key: 'snav.team', show: !!me?.is_manager },
       { to: '/employees', key: 'nav.employees', show: can('EMP_READ') || !!me?.is_manager },
-      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
+      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || can('REC_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
       { to: '/requests', key: 'snav.requests', show: can('SS_APPROVE') || can('LETTER_PREPARE') || can('LETTER_APPROVE') },
     ] },
     { title: 'tnav.group', items: [
@@ -100,6 +100,10 @@ export default function Layout() {
       { to: '/payroll/gratuity', key: 'pnav.gratuity', show: can('PAY_READ') },
       { to: '/payroll/rules', key: 'pnav.rules', show: can('PAY_READ') || can('RULES_PROPOSE') },
       { to: '/payroll/setup', key: 'pnav.setup', show: can('PAY_READ') },
+    ] },
+    { title: 'rnav.group', items: [
+      { to: '/recruitment', key: 'rnav.recruitment', show: can('REC_READ') || can('REC_WRITE') || !!me?.is_manager },
+      { to: '/probation', key: 'rnav.probation', show: can('REC_READ') || can('EMP_READ') || !!me?.is_manager },
     ] },
     { title: 'nav.compliance', items: [
       { to: '/compliance/expiries', key: 'nav.expiries', show: can('COMPLIANCE_READ') || !!me?.is_manager },

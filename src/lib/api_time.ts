@@ -1,5 +1,6 @@
 import { rpc, type Json } from './api';
 import type { ChangeReq, Letter } from './api_ss';
+import type { Interview, Offer, Requisition } from './api_rec';
 import type { Loan, PayAdjustment, PayRule, PayrollRun, Settlement } from './api_pay';
 
 // ---------------------------------------------------------------------------
@@ -137,7 +138,7 @@ export interface Adjustment extends EmpBrief {
 export interface MyTasks {
   leave: LeaveReq[]; corrections: Correction[]; overtime: Overtime[]; adjustments: Adjustment[]; rules: TimeRule[]; count: number;
   pay_rules: PayRule[]; payroll: PayrollRun[]; loans: Loan[]; pay_adjustments: PayAdjustment[]; settlements: Settlement[];
-  changes?: ChangeReq[]; letters?: Letter[];
+  changes?: ChangeReq[]; letters?: Letter[]; requisitions?: Requisition[]; offers?: Offer[]; interviews?: Interview[];
 }
 export interface TimeDash {
   today?: { date: string; present: number; absent: number; missing: number; late: number; leave: number; off: number; scope: 'ALL' | 'TEAM' };
@@ -146,8 +147,10 @@ export interface TimeDash {
     next_leave: { leave_type: string; name_en: string; name_ar: string; start_date: string; end_date: string; status: ReqStatus } | null;
     last_payslip?: { id: string; month: string; net: number } | null; requests_open?: number; letters_ready?: number };
   tasks: { leave: number; corrections: number; overtime: number; adjustments: number; rules: number; count: number;
-    payroll?: number; loans?: number; pay_adjustments?: number; settlements?: number; changes?: number; letters?: number };
+    payroll?: number; loans?: number; pay_adjustments?: number; settlements?: number; changes?: number; letters?: number;
+    requisitions?: number; offers?: number; interviews?: number };
   payroll?: PayrollRun | null;
+  recruitment?: { open_requisitions: number; open_positions: number; in_pipeline: number; joining_30: number; onboarding_overdue: number; probation_due_30: number };
 }
 
 // ---------------------------------------------------------------------------
