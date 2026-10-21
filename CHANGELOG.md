@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.7.0 — 26 Oct 2026 — Phase 7: data protection, statutory reports, executive view, server package
+
+- **Data protection (PDPL)** (`Data protection`, permissions `PDPL_READ` / `PDPL_MANAGE`):
+  - versioned **privacy notice** in English and Arabic (template included); published by a person other than the one who prepared it;
+    everyone is asked to read and acknowledge it in *My HR → Privacy*;
+  - optional **consents** (photo directory, publicity, biometric attendance, health data, transfer abroad), each withdrawable;
+  - **data-subject requests** (access, correction, erasure, restriction, objection, portability, withdraw consent, complaint) from
+    the employee or recorded by HR, **due in 45 days**, overdue flag, identity check before completion, employee told when answered;
+  - **breach log** with the **72-hour** notification clock to the Ministry (MTCIT), containment, notification of affected people
+    for high-risk breaches, late-notification flag;
+  - **register of processing activities** (pre-filled for HR, payroll, attendance, recruitment, safety, discipline);
+  - **retention rules** with counts of records past retention and **anonymisation of candidates** not hired.
+- **Localisation report (MoL)**: workforce by MoL profession code with Omani/expatriate counts and %, expatriates in Omani-only
+  jobs, full employee list with civil/passport/resident-card numbers and contract details; CSV export and print; every opening logged.
+- **SPF contributions report**: monthly schedule from the payroll run — contribution wage and each employee/employer item per
+  person, Omanis and expatriates separately, totals payable; CSV export.
+- **Executive dashboard** (`EXEC_VIEW`): head-count, Omanisation %, 12-month turnover, absence, average service and age, payroll
+  cost (approved runs), overtime, breakdown by department and nationality, risks (expired documents, open positions, injuries,
+  cases, exits, end-of-service liability).
+- **Data import** (`DATA_IMPORT`): employees, documents and opening salaries from CSV templates; trial run that saves nothing;
+  per-row results with clear messages; all normal rules (duplicates, Omani-only jobs, approvals) apply; import history.
+- **Server package** (`deploy/`): Dockerfile and nginx (TLS, app + API on one address, security headers), self-hosted Supabase
+  release `self-hosted/v0.8.3` with the API gateway and database bound to the server only, installer, migration runner with
+  history and checksums, nightly backup with checksums and off-site copy, verified restore test and full restore, upgrade script,
+  cron schedule; tested with `npm run deploy:test`.
+- Documents: `deploy/README-SERVER.md` (installation and operations), `docs/DATA-MIGRATION.md`, `docs/UAT-PLAN.md`.
+- Dummy data `supabase/seed_phase7.sql`.
+
 ## 1.6.0 — 25 Oct 2026 — Phase 6: people operations
 
 - **Performance** (`Performance`): appraisal cycles per company (draft → open → closed). Opening a cycle creates a review for everyone

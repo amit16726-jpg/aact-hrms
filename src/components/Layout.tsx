@@ -114,6 +114,13 @@ export default function Layout() {
       { to: '/injuries', key: 'wnav.injuries', show: can('HSE_WRITE') || can('EMP_READ') },
       { to: '/exits', key: 'wnav.exits', show: can('EXIT_MANAGE') },
     ] },
+    { title: 'gnav.group', items: [
+      { to: '/executive', key: 'gnav.exec', show: can('EXEC_VIEW') },
+      { to: '/reports/mol', key: 'gnav.mol', show: can('COMPLIANCE_READ') },
+      { to: '/reports/spf', key: 'gnav.spf', show: can('PAY_READ') },
+      { to: '/privacy', key: 'gnav.privacy', show: can('PDPL_READ') },
+      { to: '/admin/import', key: 'gnav.import', show: can('DATA_IMPORT') },
+    ] },
     { title: 'nav.compliance', items: [
       { to: '/compliance/expiries', key: 'nav.expiries', show: can('COMPLIANCE_READ') || !!me?.is_manager },
       { to: '/compliance/missing', key: 'nav.missing', show: can('COMPLIANCE_READ') },

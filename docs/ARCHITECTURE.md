@@ -192,3 +192,18 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
   with a manual separation.
 - Open points: confirm the discipline limits against the company's MoL-approved regulation and the SPF work-injury reporting deadline.
 - Tests: `tests/db/60_workforce.sql`; unit tests in `src/lib/api_wf.test.ts`.
+
+## 12. Phase 7 — governance, reports and the server (v1.7.0)
+
+- New tables: `privacy_notices` (versioned; one published), `consents` (one current row per user and purpose), `dsr_requests`,
+  `data_breaches`, `processing_activities`, `import_batches`. Deadlines come from `hr.settings.pdpl` (45 days, 72 hours) with the
+  legal basis stored beside them.
+- Maker-checker: a privacy notice is published by someone other than its preparer; data-subject requests can be completed only after
+  the identity is confirmed; breaches close only with containment and either the Ministry notification time or a reason.
+- Statutory reports read the same functions as the Omanisation page (`hr.omanisation_population`) and the payslip lines written by
+  the payroll calculation (`SPF_EE_*`, `SPF_ER_*`), so figures always agree with payroll.
+- `hr_import` calls the normal API (`hr_save_employee`, `hr_save_document`, `hr_propose_compensation`) row by row inside
+  sub-transactions; a trial run rolls the whole batch back but keeps the per-row results.
+- Server: see `deploy/README-SERVER.md`. Migrations on the server are applied by `deploy/scripts/apply-migrations.sh`, recorded in
+  `aact_admin.migrations` with a checksum.
+- Tests: `tests/db/70_governance.sql`, `tests/deploy/test-scripts.sh`, `src/lib/api_gov.test.ts`.

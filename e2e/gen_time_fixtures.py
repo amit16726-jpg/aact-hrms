@@ -1,6 +1,6 @@
-"""Dump Phase 2–6 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+"""Dump Phase 2–7 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
 
-Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql, seed_phase5.sql and seed_phase6.sql into the local test database):
+Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql, seed_phase5.sql, seed_phase6.sql and seed_phase7.sql into the local test database):
   python3 e2e/gen_time_fixtures.py
 """
 import json, subprocess, pathlib, os
@@ -84,6 +84,20 @@ CALLS = {
     'hr_list_exits': "public.hr_list_exits('{}'::jsonb)",
     'hr_get_exit': "public.hr_get_exit((select id from hr.exit_cases limit 1))",
     'hr_hr_policies': "public.hr_hr_policies()",
+    # Phase 7 — privacy, statutory reports, executive dashboard, import
+    'hr_pdpl_overview': "public.hr_pdpl_overview()",
+    'hr_list_notices': "public.hr_list_notices()",
+    'hr_my_privacy': ("public.hr_my_privacy()", 'employee@aact.test'),
+    'hr_list_consents': "public.hr_list_consents()",
+    'hr_list_dsr': "public.hr_list_dsr('{}'::jsonb)",
+    'hr_list_breaches': "public.hr_list_breaches()",
+    'hr_list_activities': "public.hr_list_activities()",
+    'hr_retention_report': "public.hr_retention_report()",
+    'hr_pdpl_settings': "public.hr_pdpl_settings()",
+    'hr_mol_report': "public.hr_mol_report((select id from hr.legal_entities order by created_at limit 1), null)",
+    'hr_spf_report': "public.hr_spf_report((select id from hr.payroll_runs where status in ('APPROVED','PAID') order by period_start desc limit 1))",
+    'hr_exec_dashboard': "public.hr_exec_dashboard((select id from hr.legal_entities order by created_at limit 1))",
+    'hr_list_imports': "public.hr_list_imports()",
 }
 
 out = {}

@@ -501,3 +501,24 @@ progress { width: 100%; max-width: 200px; height: 8px; accent-color: var(--petro
 .quote { margin: 0; padding: 8px 12px; border-inline-start: 3px solid var(--line); background: var(--panel-2, rgba(0,0,0,.02)); white-space: pre-wrap; overflow-wrap: anywhere; }
 .wrap-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 .quote, .wrap-text { unicode-bidi: plaintext; text-align: start; }
+
+/* Phase 7 — reports and governance */
+.mchart { margin: 0; min-width: 0; }
+.mchart svg { width: 100%; height: 200px; display: block; overflow: visible; }
+.mchart-grid { stroke: var(--line-soft); stroke-width: 1; }
+.mchart-axis { fill: var(--ink-3); font-size: 11px; }
+.mchart-bar { fill: var(--petrol); opacity: .85; }
+.mchart-bar.on { opacity: 1; }
+.mchart-line { fill: none; stroke: var(--petrol); stroke-width: 2; }
+.mchart-dot { fill: var(--petrol); stroke: var(--panel); stroke-width: 2; }
+.mchart-tip { font-size: 13px; min-height: 1.4em; }
+.hbars { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hbars li { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) 3rem; gap: 8px; align-items: center; }
+.hbars-name { min-width: 0; overflow-wrap: anywhere; font-size: 13.5px; }
+.hbars-track { height: 10px; background: var(--line-soft); border-radius: 999px; overflow: hidden; }
+.hbars-fill { display: block; height: 100%; background: var(--petrol); border-radius: 999px; }
+.hbars b { text-align: end; }
+.kpi b { font-size: 1.5rem; display: block; }
+.notice-text { white-space: pre-wrap; line-height: 1.7; overflow-wrap: anywhere; unicode-bidi: plaintext; }
+.report-head { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: var(--ink-2); }
+@media print { .side, .top, .no-print { display: none !important; } .main { margin: 0 !important; } }

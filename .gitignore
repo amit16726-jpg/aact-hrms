@@ -8,3 +8,6 @@ dist
 *.tsbuildinfo
 supabase/.temp
 supabase/.branches
+
+# company server secrets
+deploy/.env

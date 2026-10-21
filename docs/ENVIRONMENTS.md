@@ -23,6 +23,7 @@
 - `supabase/seed_phase4.sql` — local/test only (letters, change requests). It stops if letters exist.
 - `supabase/seed_phase5.sql` — local/test only (requisitions, candidates, offers, onboarding). It stops if requisitions exist.
 - `supabase/seed_phase6.sql` — local/test only (appraisal cycle, training, cases, assets, housing, injuries, an exit). It stops if appraisal cycles exist.
+- `supabase/seed_phase7.sql` — local/test only (published privacy notice, consents, requests, breaches). It stops if a notice is already published.
 - `.env.development.local` — local only, written by `npm run env:local`, never committed.
 - Production secrets (database password, JWT secret, SMTP password) — only on the company server, never in git.
 
@@ -30,15 +31,15 @@
 
 1. Al Anwar IT provides the server (Ubuntu 24.04, Docker, fixed IP, ports 80/443), the DNS name from the web vendor,
    and the M365 mail relay.
-2. Install self-hosted Supabase (Docker Compose) and the web front end; set the production secrets.
-3. Apply `supabase/migrations` in order. Do **not** load `seed.sql` or any `seed_phase*.sql`.
-4. Run the security checks; test a backup **and a restore**.
-5. Create the real administrator, HR and Finance accounts. Turn off public sign-up.
-6. Enter the real master data (company, departments, grades, job titles, Omanisation targets with their sources).
-7. Import the real employees, then upload documents.
-8. HR checks a sample of records against the source files, then go live.
+2. `sudo bash deploy/scripts/install.sh` — installs self-hosted Supabase, applies `supabase/migrations`, builds the web app with
+   TLS and schedules backups (full guide: `deploy/README-SERVER.md`). Do **not** load `seed.sql` or any `seed_phase*.sql`.
+3. Test a backup **and a restore** (`restore.sh --verify`).
+4. Create the real administrator (first sign-up), then invite HR and Finance. Public sign-up is off.
+5. Enter the real master data (company, departments, grades, job titles, Omanisation targets with their sources).
+6. Import employees, documents and opening salaries (*Import data*; see `docs/DATA-MIGRATION.md`).
+7. Parallel payroll for at least one month; user acceptance test (`docs/UAT-PLAN.md`) signed; then go live.
 
-A separate deployment package (Docker Compose, nginx, backup/restore scripts, install guide) will be prepared before step 1.
+The deployment package (Docker Compose, nginx, backup/restore scripts) is in `deploy/`; the install guide is `deploy/README-SERVER.md`.
 
 ## E-mail through Microsoft 365
 

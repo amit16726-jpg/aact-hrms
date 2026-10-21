@@ -1,0 +1,24 @@
+# AACT HRMS web container. Joins the network of the self-hosted Supabase stack (compose project "supabase").
+name: aact-hrms
+services:
+  web:
+    container_name: aact-hrms-web
+    build:
+      context: ..
+      dockerfile: deploy/app/Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${PUBLIC_URL:?set PUBLIC_URL in deploy/.env}
+        VITE_SUPABASE_ANON_KEY: ${ANON_KEY:?set ANON_KEY in deploy/.env}
+        VITE_ENV_LABEL: ${ENV_LABEL:-}
+    image: aact-hrms-web:${APP_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${CERT_DIR:-/opt/aact-hrms/certs}:/etc/nginx/certs:ro
+    networks: [supabase]
+networks:
+  supabase:
+    name: supabase_default
+    external: true

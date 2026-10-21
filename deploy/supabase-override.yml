@@ -1,0 +1,18 @@
+# Applied on top of the official Supabase docker-compose.yml: the API gateway and the database pooler
+# listen only on the server itself. The public entry point is the aact-hrms-web container (TLS).
+# Requires Docker Compose 2.24 or later (for !override).
+services:
+  kong:
+    ports: !override
+      - "127.0.0.1:${KONG_HTTP_PORT}:8000/tcp"
+  supavisor:
+    ports: !override
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
+      - "127.0.0.1:${POOLER_PROXY_PORT_TRANSACTION}:6543"
+  functions:
+    environment:
+      MAIL_CRON_SECRET: ${MAIL_CRON_SECRET:-}
+      M365_TENANT_ID: ${M365_TENANT_ID:-}
+      M365_CLIENT_ID: ${M365_CLIENT_ID:-}
+      M365_CLIENT_SECRET: ${M365_CLIENT_SECRET:-}
+      M365_SENDER: ${M365_SENDER:-}

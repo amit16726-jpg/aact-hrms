@@ -32,6 +32,6 @@ Database tests on plain PostgreSQL (developer/CI machine with PostgreSQL 16+ on 
 ## Database
 
 Migrations are in `supabase/migrations`, in order. They are idempotent (safe to re-run) and contain no destructive statements.
-New change → `npm run db:new <name>`. Dummy data → `scripts/gen-seed.py` → `supabase/seed.sql`, plus `supabase/seed_phase2.sql` (attendance and leave) `supabase/seed_phase3.sql` (payroll) and `supabase/seed_phase4.sql` (letters and requests) and `supabase/seed_phase5.sql` (recruitment) and `supabase/seed_phase6.sql` (performance, training, discipline, assets, injuries, exits) — local/test only.
+New change → `npm run db:new <name>`. Dummy data → `scripts/gen-seed.py` → `supabase/seed.sql`, plus `supabase/seed_phase2.sql` (attendance and leave) `supabase/seed_phase3.sql` (payroll) and `supabase/seed_phase4.sql` (letters and requests) and `supabase/seed_phase5.sql` (recruitment) and `supabase/seed_phase6.sql` (performance, training, discipline, assets, injuries, exits) and `supabase/seed_phase7.sql` (privacy notice, requests, breaches) — local/test only. Company server: `deploy/README-SERVER.md`.
 
 E-mail: `supabase/functions/send-mail` (Microsoft Graph). Set-up: [docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md#e-mail-through-microsoft-365).

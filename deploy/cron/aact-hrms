@@ -1,0 +1,7 @@
+# /etc/cron.d/aact-hrms — installed by deploy/scripts/install.sh
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# nightly backup at 02:00 (server time)
+0 2 * * * root bash __REPO__/deploy/scripts/backup.sh >> /var/log/aact-hrms-backup.log 2>&1
+# restore test on the 1st of each month at 03:30, using the newest backup
+30 3 1 * * root bash __REPO__/deploy/scripts/restore.sh --verify "$(ls -1d __BACKUPS__/20* | tail -1)" >> /var/log/aact-hrms-backup.log 2>&1

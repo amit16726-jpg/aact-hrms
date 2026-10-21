@@ -61,6 +61,11 @@ const FacilitiesPage = lazy(() => import('./pages/wf/FacilitiesPage'));
 const InjuriesPage = lazy(() => import('./pages/wf/InjuriesPage'));
 const ExitsPage = lazy(() => import('./pages/wf/ExitsPage'));
 const ExitPage = lazy(() => import('./pages/wf/ExitPage'));
+const ExecutivePage = lazy(() => import('./pages/gov/ExecutivePage'));
+const MolReportPage = lazy(() => import('./pages/gov/MolReportPage'));
+const SpfReportPage = lazy(() => import('./pages/gov/SpfReportPage'));
+const PrivacyPage = lazy(() => import('./pages/gov/PrivacyPage'));
+const ImportDataPage = lazy(() => import('./pages/gov/ImportPage'));
 
 function NotFound() {
   const { t } = useI18n();
@@ -140,6 +145,11 @@ export default function App() {
             <Route path="injuries" element={<InjuriesPage />} />
             <Route path="exits" element={<ExitsPage />} />
             <Route path="exits/:id" element={<ExitPage />} />
+            <Route path="executive" element={<ExecutivePage />} />
+            <Route path="reports/mol" element={<MolReportPage />} />
+            <Route path="reports/spf" element={<SpfReportPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="admin/import" element={<ImportDataPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

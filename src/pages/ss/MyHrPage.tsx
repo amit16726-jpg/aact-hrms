@@ -10,6 +10,8 @@ import { ReqBadge } from '../../components/time';
 import { ChangeBadge, ChangeSummary, LetterBadge, LetterLine, LetterRequestDialog, downloadJson, fieldLabel } from '../../components/ss';
 import { fmtDate, fmtDateTime, todayMuscat } from '../../lib/format';
 import type { ReqStatus } from '../../lib/api_time';
+import { CONSENT_PURPOSES, DSR_KINDS, govapi, type ConsentPurpose, type DsrKind } from '../../lib/api_gov';
+import { DsrBadge } from '../../components/gov';
 
 type Tab = 'overview' | 'details' | 'letters' | 'requests' | 'privacy';
 type Dialog = null | 'profile' | 'contacts' | 'bank' | 'correction' | 'letter';
@@ -217,21 +219,72 @@ function Requests({ p, reload }: { p: Portal; reload: () => void }) {
 }
 
 function Privacy({ open }: { open: (d: Dialog) => void }) {
-  const { t } = useI18n();
+  const { t, L, lang } = useI18n();
   const { push } = useToast();
   const { busy, run } = useAction();
+  const { data: mp, error, reload, setData } = useAsync(() => govapi.myPrivacy(), []);
+  const [req, setReq] = useState({ kind: '' as DsrKind | '', details: '' });
   const download = async () => {
     const d = await run(() => ssapi.dataExport());
     if (d) { downloadJson(`my-hr-data-${todayMuscat()}.json`, d); push(t('pv.downloaded')); }
   };
+  const ack = async () => { const r = await run(() => govapi.ackNotice(), t('mp.saved')); if (r) setData(r); };
+  const consent = async (p: ConsentPurpose, given: boolean) => { const r = await run(() => govapi.setConsent(p, given), t('mp.saved')); if (r) setData(r); };
+  const submit = async () => {
+    if (!req.kind) return;
+    const r = await run(() => govapi.submitDsr(req.kind as DsrKind, req.details), t('mp.sent'));
+    if (r) { setData(r); setReq({ kind: '', details: '' }); }
+  };
   return (
-    <section className="panel panel-pad stack" style={{ maxWidth: 720 }}>
-      <h2 style={{ margin: 0 }}>{t('pv.title')}</h2>
-      <p style={{ margin: 0 }}>{t('pv.hint')}</p>
-      <p className="muted" style={{ margin: 0 }}>{t('pv.what')}</p>
-      <div className="row"><Button kind="primary" busy={busy} onClick={() => void download()}>{t('pv.download')}</Button>
-        <Button onClick={() => open('correction')}>{t('pv.correct')}</Button></div>
-    </section>
+    <div className="stack" style={{ maxWidth: 820 }}>
+      <ErrorNote error={error} onRetry={reload} />
+      <section className="panel panel-pad stack">
+        <h2 style={{ margin: 0 }}>{t('mp.notice')}</h2>
+        {!mp ? null : !mp.notice ? <div className="muted">{t('mp.none')}</div> : <>
+          <b>{L(mp.notice.title_en, mp.notice.title_ar)} <span className="muted num">v{mp.notice.version}</span></b>
+          <div className="notice-text" dir={lang === 'ar' ? 'rtl' : 'ltr'}>{lang === 'ar' ? mp.notice.body_ar : mp.notice.body_en}</div>
+          {mp.acknowledged_at ? <div className="note">{t('mp.acked', { v: mp.notice.version, d: fmtDate(mp.acknowledged_at) })}</div>
+            : <div><Button kind="primary" busy={busy} onClick={() => void ack()}>{t('mp.ack')}</Button></div>}
+        </>}
+      </section>
+      {mp?.notice && <section className="panel panel-pad stack">
+        <h2 style={{ margin: 0 }}>{t('mp.consents')}</h2>
+        <p className="muted" style={{ margin: 0 }}>{t('mp.consent_hint')}</p>
+        {CONSENT_PURPOSES.map((p) => {
+          const c = mp.consents.find((x) => x.purpose === p);
+          return (
+            <div key={p} className="row" style={{ justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+              <span>{t(`pc.${p}` as Key)}{c && <span className="sub num">{fmtDate(c.given_at)}</span>}</span>
+              <div className="lang-switch" role="group" aria-label={t(`pc.${p}` as Key)}>
+                <button type="button" aria-pressed={c?.given === true} disabled={busy} onClick={() => void consent(p, true)}>{t('mp.yes')}</button>
+                <button type="button" aria-pressed={c?.given === false} disabled={busy} onClick={() => void consent(p, false)}>{t('mp.no')}</button>
+              </div>
+            </div>);
+        })}
+      </section>}
+      <section className="panel panel-pad stack">
+        <h2 style={{ margin: 0 }}>{t('pv.title')}</h2>
+        <p style={{ margin: 0 }}>{t('pv.hint')}</p>
+        <p className="muted" style={{ margin: 0 }}>{t('pv.what')}</p>
+        <div className="row"><Button kind="primary" busy={busy} onClick={() => void download()}>{t('pv.download')}</Button>
+          <Button onClick={() => open('correction')}>{t('pv.correct')}</Button></div>
+      </section>
+      <section className="panel panel-pad stack">
+        <h2 style={{ margin: 0 }}>{t('mp.request')}</h2>
+        <p className="muted" style={{ margin: 0 }}>{t('mp.request_hint', { n: mp?.dsr_days ?? 45 })}</p>
+        <Select label={t('dr.kind')} value={req.kind} onChange={(e) => setReq({ ...req, kind: e.target.value as DsrKind })}>
+          <option value="">{t('c.select')}</option>{DSR_KINDS.map((k) => <option key={k} value={k}>{t(`dk.${k}` as Key)}</option>)}
+        </Select>
+        <Textarea label={t('dr.details')} value={req.details} onChange={(e) => setReq({ ...req, details: e.target.value })} />
+        <div><Button kind="primary" busy={busy} disabled={!req.kind || req.details.trim().length < 10} onClick={() => void submit()}>{t('c.save')}</Button></div>
+        {mp && mp.requests.length > 0 && <>
+          <b>{t('mp.my_requests')}</b>
+          <ul className="plain">{mp.requests.map((r) => (
+            <li key={r.id}><span className="num">{r.ref_no}</span> · {t(`dk.${r.kind}` as Key)} · <DsrBadge s={r.status} />
+              <span className="sub">{t('dr.received')} {fmtDate(r.received_on)} · {t('dr.due')} {fmtDate(r.due_on)}{r.outcome ? ` · ${r.outcome}` : ''}</span></li>))}
+          </ul></>}
+      </section>
+    </div>
   );
 }
 
