@@ -5,6 +5,7 @@ import { useSession } from '../lib/session';
 import { DateText, DaysLeft, Empty, ErrorNote, Loading, useAsync } from '../components/ui';
 import { PageHead } from '../components/Layout';
 import { Runway } from '../components/Runway';
+import { TimePanels } from '../components/TimePanels';
 import { fmtPct } from '../lib/format';
 
 function ExpiryTable({ rows, showEmployee = true }: { rows: ExpiryRow[]; showEmployee?: boolean }) {
@@ -51,6 +52,7 @@ export function DashboardPage() {
   return (
     <div className="stack">
       <PageHead title={t('dash.welcome', { name })} />
+      <TimePanels />
 
       {c && (
         <section className="stack" aria-labelledby="runway-h">

@@ -71,3 +71,41 @@ export function initials(name: string | null | undefined): string {
   const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
   return (first + last).toUpperCase();
 }
+
+/** Same rule as Supabase Auth (minimum_password_length 10, lower_upper_letters_digits). */
+export function passwordOk(p: string): boolean {
+  return p.length >= 10 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /[0-9]/.test(p);
+}
+
+/** 485 → '8:05' (hours:minutes); 0 → '—'. */
+export function fmtDuration(minutes: number | null | undefined): string {
+  if (!minutes) return '—';
+  const sign = minutes < 0 ? '-' : '';
+  const m = Math.abs(Math.round(minutes));
+  return `${sign}${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+}
+
+/** 'YYYY-MM' of an ISO date. */
+export function monthOf(iso: string): string { return iso.slice(0, 7); }
+
+/** 'YYYY-MM' moved by n months. */
+export function addMonths(month: string, n: number): string {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(Date.UTC(y, m - 1 + n, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
+/** Days 1..n of a 'YYYY-MM' month with their ISO weekday (1 = Monday … 7 = Sunday). */
+export function monthDays(month: string): { day: number; iso: string; dow: number }[] {
+  const [y, m] = month.split('-').map(Number);
+  const n = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(Date.UTC(y, m - 1, i + 1));
+    return { day: i + 1, iso: d.toISOString().slice(0, 10), dow: d.getUTCDay() === 0 ? 7 : d.getUTCDay() };
+  });
+}
+
+/** Days between two ISO dates, inclusive. */
+export function daysInclusive(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86400000) + 1;
+}

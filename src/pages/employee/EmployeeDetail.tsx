@@ -12,8 +12,9 @@ import { PayTab } from './PayTab';
 import { BankTab } from './BankTab';
 import { DocumentsTab } from './DocumentsTab';
 import { HistoryTab } from './HistoryTab';
+import { TimeTab } from './TimeTab';
 
-type TabId = 'profile' | 'job' | 'contract' | 'pay' | 'bank' | 'documents' | 'history';
+type TabId = 'profile' | 'job' | 'contract' | 'time' | 'pay' | 'bank' | 'documents' | 'history';
 
 export function Avatar({ path, name, small }: { path: string | null; name: string; small?: boolean }) {
   const [url, setUrl] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export default function EmployeeDetailPage() {
   const { id = '' } = useParams();
   const [params, setParams] = useSearchParams();
   const { t, L, lang } = useI18n();
-  const { can } = useSession();
+  const { can, me } = useSession();
   const { data, error, loading, reload, setData } = useAsync(() => api.getEmployee(id), [id]);
   const tab = (params.get('tab') ?? 'profile') as TabId;
   const setTab = (v: TabId) => { const p = new URLSearchParams(params); p.set('tab', v); setParams(p, { replace: true }); };
@@ -65,6 +66,7 @@ export default function EmployeeDetailPage() {
   const tabs: { id: TabId; label: string }[] = [
     { id: 'profile', label: t('ed.tab_profile') },
     ...(!team ? [{ id: 'job' as TabId, label: t('ed.tab_job') }, { id: 'contract' as TabId, label: t('ed.tab_contract') }] : []),
+    ...(can('ATT_READ') || can('LEAVE_READ') || team || me?.employee_id === e.id ? [{ id: 'time' as TabId, label: t('et.tab') }] : []),
     ...(f.caps.salary_read ? [{ id: 'pay' as TabId, label: t('ed.tab_pay') }] : []),
     ...(f.caps.bank_read ? [{ id: 'bank' as TabId, label: t('ed.tab_bank') }] : []),
     ...(f.caps.docs_read ? [{ id: 'documents' as TabId, label: t('ed.tab_documents') }] : []),
@@ -119,6 +121,7 @@ export default function EmployeeDetailPage() {
         {active === 'profile' && <ProfileTab file={f} onChange={setData} confirm={confirm.ask} />}
         {active === 'job' && <JobTab file={f} onChange={setData} />}
         {active === 'contract' && <ContractTab file={f} onChange={setData} />}
+        {active === 'time' && <TimeTab employeeId={e.id} />}
         {active === 'pay' && <PayTab file={f} confirm={confirm.ask} />}
         {active === 'bank' && <BankTab file={f} confirm={confirm.ask} />}
         {active === 'documents' && <DocumentsTab file={f} confirm={confirm.ask} />}

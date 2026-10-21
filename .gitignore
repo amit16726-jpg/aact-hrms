@@ -6,3 +6,5 @@ dist
 *.log
 .DS_Store
 *.tsbuildinfo
+supabase/.temp
+supabase/.branches

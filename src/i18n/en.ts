@@ -1,4 +1,6 @@
-export const en = {
+import { enTime } from './en_time';
+
+const base = {
   'app.name': 'AACT HRMS',
   'app.tagline': 'People, documents and Omanisation in one place',
 
@@ -25,13 +27,14 @@ export const en = {
   'nav.notifications': 'Notifications', 'nav.menu': 'Menu',
 
   // auth
+  'env.local': 'LOCAL – dummy data', 'env.test': 'not live data',
   'auth.signin': 'Sign in', 'auth.signup': 'Create account', 'auth.email': 'E-mail', 'auth.password': 'Password',
   'auth.full_name': 'Full name', 'auth.forgot': 'Forgot password?', 'auth.reset_send': 'Send reset link',
   'auth.reset_sent': 'If an account exists for that e-mail, a reset link is on its way.',
   'auth.signup_done': 'Account created. Check your e-mail to confirm it, then sign in.',
   'auth.have_account': 'Already have an account? Sign in', 'auth.no_account': 'New here? Create an account',
   'auth.new_password': 'New password', 'auth.set_password': 'Set password', 'auth.password_set': 'Password changed.',
-  'auth.password_rule': 'At least 10 characters.',
+  'auth.password_rule': 'At least 10 characters, with upper-case and lower-case letters and a number.',
   'auth.config_missing': 'The app is not connected to its database. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY and rebuild.',
 
   // setup / no access
@@ -252,4 +255,6 @@ export const en = {
   'err.UNKNOWN': 'Something went wrong.',
 };
 
+export type BaseKey = keyof typeof base;
+export const en = { ...base, ...enTime };
 export type Key = keyof typeof en;

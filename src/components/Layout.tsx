@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useI18n, type Key } from '../i18n';
 import { useSession } from '../lib/session';
 import { api } from '../lib/api';
+import { tapi } from '../lib/api_time';
 
 interface Item { to: string; key: Key; show: boolean; count?: number }
 
@@ -29,9 +30,18 @@ export function Brand() {
       <div>
         <div className="brand-name">{t('app.name')}</div>
         <div className="brand-sub">{t('app.tagline')}</div>
+        <EnvBadge />
       </div>
     </div>
   );
+}
+
+/** Shows which environment this is (LOCAL / TEST). Production leaves VITE_ENV_LABEL unset → nothing shown. */
+export function EnvBadge() {
+  const { t } = useI18n();
+  const env = String(import.meta.env.VITE_ENV_LABEL ?? '').trim().toUpperCase();
+  if (!env || env === 'PRODUCTION') return null;
+  return <div className={`env-badge env-${env === 'LOCAL' ? 'local' : 'test'}`}>{env === 'LOCAL' ? t('env.local') : `${env} – ${t('env.test')}`}</div>;
 }
 
 export default function Layout() {
@@ -47,9 +57,11 @@ export default function Layout() {
     let alive = true;
     const load = () => {
       api.listNotifications(true).then((r) => alive && setUnread(r.unread)).catch(() => undefined);
-      if (can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE')) {
-        api.dashboard().then((d) => alive && setApprovals(d.approvals.salary + d.approvals.bank + d.approvals.targets)).catch(() => undefined);
-      }
+      const hr = can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE');
+      Promise.all([
+        hr ? api.dashboard().then((d) => d.approvals.salary + d.approvals.bank + d.approvals.targets).catch(() => 0) : Promise.resolve(0),
+        tapi.myTasks().then((x) => x.count).catch(() => 0),
+      ]).then(([a, b]) => { if (alive) setApprovals(a + b); }).catch(() => undefined);
     };
     load();
     const id = window.setInterval(load, 120000);
@@ -63,7 +75,18 @@ export default function Layout() {
       { to: '/', key: 'nav.dashboard', show: true },
       { to: '/my', key: 'nav.my_record', show: !!me?.employee_id },
       { to: '/employees', key: 'nav.employees', show: can('EMP_READ') || !!me?.is_manager },
-      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE'), count: approvals },
+      { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
+    ] },
+    { title: 'tnav.group', items: [
+      { to: '/attendance', key: 'tnav.attendance', show: can('ATT_READ') || !!me?.is_manager || !!me?.employee_id },
+      { to: '/overtime', key: 'tnav.overtime', show: can('ATT_READ') || !!me?.is_manager || !!me?.employee_id },
+      { to: '/leave', key: 'tnav.leave', show: can('LEAVE_READ') || !!me?.is_manager || !!me?.employee_id },
+      { to: '/leave/admin', key: 'tnav.leave_admin', show: can('LEAVE_READ') },
+      { to: '/time/shifts', key: 'tnav.shifts', show: can('ATT_READ') },
+      { to: '/time/calendar', key: 'tnav.calendar', show: can('ATT_READ') },
+      { to: '/time/import', key: 'tnav.import', show: can('ATT_WRITE') },
+      { to: '/time/periods', key: 'tnav.periods', show: can('ATT_READ') },
+      { to: '/time/rules', key: 'tnav.rules', show: can('ATT_READ') || can('RULES_PROPOSE') },
     ] },
     { title: 'nav.compliance', items: [
       { to: '/compliance/expiries', key: 'nav.expiries', show: can('COMPLIANCE_READ') || !!me?.is_manager },

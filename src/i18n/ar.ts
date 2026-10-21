@@ -1,6 +1,7 @@
-import type { Key } from './en';
+import type { BaseKey, Key } from './en';
+import { arTime } from './ar_time';
 
-export const ar: Record<Key, string> = {
+const base: Record<BaseKey, string> = {
   'app.name': 'نظام الموارد البشرية AACT',
   'app.tagline': 'الموظفون والمستندات والتعمين في مكان واحد',
 
@@ -24,13 +25,14 @@ export const ar: Record<Key, string> = {
   'nav.admin': 'الإدارة', 'nav.users': 'المستخدمون والأدوار', 'nav.settings': 'الإعدادات', 'nav.audit': 'سجل التدقيق',
   'nav.notifications': 'التنبيهات', 'nav.menu': 'القائمة',
 
+  'env.local': 'محلي – بيانات تجريبية', 'env.test': 'ليست بيانات حقيقية',
   'auth.signin': 'تسجيل الدخول', 'auth.signup': 'إنشاء حساب', 'auth.email': 'البريد الإلكتروني', 'auth.password': 'كلمة المرور',
   'auth.full_name': 'الاسم الكامل', 'auth.forgot': 'نسيت كلمة المرور؟', 'auth.reset_send': 'إرسال رابط إعادة التعيين',
   'auth.reset_sent': 'إذا كان هناك حساب بهذا البريد، فسيصلك رابط إعادة التعيين.',
   'auth.signup_done': 'تم إنشاء الحساب. أكّد بريدك الإلكتروني ثم سجّل الدخول.',
   'auth.have_account': 'لديك حساب؟ سجّل الدخول', 'auth.no_account': 'مستخدم جديد؟ أنشئ حساباً',
   'auth.new_password': 'كلمة المرور الجديدة', 'auth.set_password': 'تعيين كلمة المرور', 'auth.password_set': 'تم تغيير كلمة المرور.',
-  'auth.password_rule': '10 أحرف على الأقل.',
+  'auth.password_rule': '10 أحرف على الأقل، تشمل حروفًا كبيرة وصغيرة ورقمًا.',
   'auth.config_missing': 'التطبيق غير متصل بقاعدة البيانات. عيّن VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY ثم أعد البناء.',
 
   'setup.title': 'بانتظار الصلاحيات',
@@ -227,3 +229,5 @@ export const ar: Record<Key, string> = {
   'err.ADMIN_EXISTS': 'يوجد مسؤول للنظام مسبقاً.', 'err.NETWORK': 'لا يوجد اتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.',
   'err.UNKNOWN': 'حدث خطأ ما.',
 };
+
+export const ar: Record<Key, string> = { ...base, ...arTime };

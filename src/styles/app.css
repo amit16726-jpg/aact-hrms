@@ -72,6 +72,9 @@ small, .muted { color: var(--ink-3); }
 }
 .brand-name { font-weight: 600; font-size: 15px; line-height: 1.2; }
 .brand-sub { font-size: 12px; color: var(--ink-3); }
+.env-badge { display: inline-block; margin-block-start: 4px; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.env-local { background: #FBE8CC; color: #7A4A0B; }
+.env-test { background: #E3EEF0; color: #0E5A6B; }
 .nav-group { margin-top: 14px; }
 .nav-group-title { font-size: 12.5px; color: var(--ink-3); padding: 4px 10px; }
 .nav a {
@@ -313,3 +316,65 @@ dl.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---------------------------------------------------------------------------
+   Phase 2 — attendance & leave
+   --------------------------------------------------------------------------- */
+.linklike { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--petrol); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.linklike:hover { color: var(--petrol-ink); }
+.linklike:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ok-text { color: var(--ok); }
+.bad-text { color: var(--expired); }
+.small { font-size: 12.5px; }
+.sub { display: block; font-size: 12.5px; color: var(--ink-3); }
+.row-sel > td, .row-sel > th { background: var(--petrol-wash); }
+
+/* month grid */
+.mgrid-wrap { max-width: 100%; overflow-x: auto; }
+.mgrid { border-collapse: separate; border-spacing: 0; font-size: 12.5px; min-width: 100%; }
+.mgrid th, .mgrid td { border-bottom: 1px solid var(--line-soft); padding: 0; text-align: center; }
+.mgrid thead th { font-weight: 500; color: var(--ink-2); padding: 4px 0; min-width: 26px; background: var(--panel); }
+.mgrid thead th .num { display: block; font-weight: 600; color: var(--ink); }
+.mg-dow { display: block; font-size: 10.5px; color: var(--ink-3); }
+.mgrid thead th.we { background: var(--line-soft); }
+.mgrid thead th.hol { background: var(--mid-wash); }
+.mgrid thead th.now { box-shadow: inset 0 -3px 0 var(--petrol); }
+.mg-name { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--panel); text-align: start !important; padding: 4px 10px !important;
+  min-width: 180px; max-width: 240px; font-weight: 500; border-inline-end: 1px solid var(--line); }
+.mg-tail { padding: 4px 8px !important; font-weight: 600; white-space: nowrap; }
+.mgrid td.g { height: 28px; min-width: 26px; font-weight: 600; font-size: 11.5px; border-inline-end: 1px solid var(--panel); }
+.g-P { background: var(--ok-wash); color: #1F5536; }
+.g-L { background: var(--soon-wash); color: #6E420C; }
+.g-A { background: var(--expired-wash); color: #7A1810; }
+.g-M { background: #F6D9D5; color: #7A1810; }
+.g-V { background: var(--petrol-wash); color: var(--petrol-ink); }
+.g-H { background: var(--mid-wash); color: #6B5410; }
+.g-R { background: var(--line-soft); color: var(--ink-3); }
+.g-W { background: #D9EEE0; color: #1F5536; box-shadow: inset 0 0 0 1px var(--ok); }
+.g-N { background: var(--page); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
+.mg-legend { gap: 14px; font-size: 12.5px; color: var(--ink-2); }
+.mg-key { display: inline-block; min-width: 22px; padding: 1px 4px; border-radius: var(--radius-s); text-align: center; font-weight: 600; font-size: 11.5px; }
+
+/* leave balances */
+.bal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.bal { border: 1px solid var(--line); border-radius: var(--radius-m); padding: 12px 14px; background: var(--panel); }
+.bal-name { font-weight: 600; font-size: 14px; }
+.bal-num { margin: 4px 0; }
+.bal-num b { font-size: 1.6rem; font-weight: 600; }
+.bal-sub { font-size: 12.5px; color: var(--ink-3); }
+
+/* key/value lists, chips, rule cards */
+.kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 16px; margin: 6px 0; }
+.kv > div { min-width: 0; }
+.kv dt { font-size: 12.5px; color: var(--ink-3); }
+.kv dd { margin: 0; font-weight: 600; }
+.chips { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { background: var(--petrol-wash); color: var(--petrol-ink); border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+.chips .linklike { text-decoration: none; margin-inline-start: 4px; font-weight: 700; }
+.rule-card { border: 1px solid var(--line-soft); border-radius: var(--radius-m); padding: 10px 12px; }
+details > summary { cursor: pointer; color: var(--petrol); }
+
+@media print {
+  .mgrid-wrap { overflow: visible; }
+  .mg-name { position: static; }
+}

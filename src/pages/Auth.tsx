@@ -4,6 +4,7 @@ import { useI18n } from '../i18n';
 import { useSession } from '../lib/session';
 import { Button, Input } from '../components/ui';
 import { Brand, LangSwitch } from '../components/Layout';
+import { passwordOk } from '../lib/format';
 
 type Mode = 'signin' | 'signup' | 'reset';
 
@@ -24,7 +25,7 @@ export function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (error) throw error;
       } else if (mode === 'signup') {
-        if (password.length < 10) { setMsg({ text: t('auth.password_rule'), bad: true }); return; }
+        if (!passwordOk(password)) { setMsg({ text: t('auth.password_rule'), bad: true }); return; }
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(), password, options: { data: { full_name: name.trim() }, emailRedirectTo: window.location.origin },
         });
@@ -83,7 +84,7 @@ export function SetPasswordPage() {
   const [msg, setMsg] = useState<{ text: string; bad?: boolean } | null>(null);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (pw.length < 10) { setMsg({ text: t('auth.password_rule'), bad: true }); return; }
+    if (!passwordOk(pw)) { setMsg({ text: t('auth.password_rule'), bad: true }); return; }
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setBusy(false);

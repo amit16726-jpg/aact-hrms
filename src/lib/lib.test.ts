@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, bucketOf, fmtDate, fmtMoney, fmtPct, initials, parseMoney, todayMuscat } from './format';
+import { addDays, bucketOf, fmtDate, fmtMoney, fmtPct, initials, parseMoney, passwordOk, todayMuscat } from './format';
 import { csvCell, toCsv } from './csv';
 import { omanisNeeded, project, ratio } from './omanisation';
 import { diffRows } from './diff';
@@ -125,5 +125,16 @@ describe('translations', () => {
       'INVALID_AMOUNT', 'INVALID_NUMBER', 'INVALID_ID', 'DUPLICATE', 'DUPLICATE_DOCUMENT', 'POSSIBLE_DUPLICATE', 'OMANI_ONLY',
       'SELF_APPROVAL', 'PENDING_EXISTS', 'OVERLAP', 'ADMIN_EXISTS'];
     for (const c of codes) expect(`err.${c}` in en, c).toBe(true);
+  });
+});
+
+describe('passwordOk (matches Supabase Auth policy)', () => {
+  it('needs 10+ characters with upper, lower and a digit', () => {
+    expect(passwordOk('Demo@AACT2026')).toBe(true);
+    expect(passwordOk('Abcdefgh12')).toBe(true);
+    expect(passwordOk('Abcdefg12')).toBe(false);   // 9 characters
+    expect(passwordOk('abcdefgh12')).toBe(false);  // no upper case
+    expect(passwordOk('ABCDEFGH12')).toBe(false);  // no lower case
+    expect(passwordOk('Abcdefghij')).toBe(false);  // no digit
   });
 });

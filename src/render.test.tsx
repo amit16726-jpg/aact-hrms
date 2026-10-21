@@ -107,11 +107,11 @@ describe('dashboard', () => {
 });
 
 describe('employee file for a line manager', () => {
-  it('shows only the profile tab and the limited-view note', async () => {
+  it('shows only the profile and time tabs and the limited-view note', async () => {
     wrap(<EmployeeDetailPage />, 'en', '/employees/e-w');
     await waitFor(() => expect(screen.getAllByText('Ravi Kumar').length).toBeGreaterThan(0));
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map((x) => x.textContent)).toEqual(['Profile']);
+    expect(tabs.map((x) => x.textContent)).toEqual(['Profile', 'Time and leave']);
     expect(screen.getByText(/line manager needs/)).toBeTruthy();
     expect(screen.queryByText('Edit personal details')).toBeNull();
     expect(screen.queryByText('Employment actions')).toBeNull();

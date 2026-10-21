@@ -78,7 +78,7 @@ Nothing historic is deleted: leavers keep their records; corrections are recorde
 
 ## 5. Tests run (20 Oct 2026)
 
-- **Database:** `supabase/tests/10_priority1.sql`, about 120 assertions, run as the real `authenticated` role switching between 8 users. Covers:
+- **Database:** `tests/db/10_priority1.sql`, about 120 assertions, run as the real `authenticated` role switching between 8 users. Covers:
   - bootstrap and roles;
   - direct table access refused;
   - masters and the department-cycle guard;

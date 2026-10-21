@@ -21,6 +21,15 @@ const UsersPage = lazy(() => import('./pages/Users'));
 const AuditPage = lazy(() => import('./pages/Audit'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
 const NotificationsPage = lazy(() => import('./pages/Notifications'));
+const AttendancePage = lazy(() => import('./pages/time/AttendancePage'));
+const OvertimePage = lazy(() => import('./pages/time/OvertimePage'));
+const LeavePage = lazy(() => import('./pages/time/LeavePage'));
+const LeaveAdminPage = lazy(() => import('./pages/time/LeaveAdminPage'));
+const ShiftsPage = lazy(() => import('./pages/time/ShiftsPage'));
+const CalendarPage = lazy(() => import('./pages/time/CalendarPage'));
+const ImportPage = lazy(() => import('./pages/time/ImportPage'));
+const PeriodsPage = lazy(() => import('./pages/time/PeriodsPage'));
+const RulesPage = lazy(() => import('./pages/time/RulesPage'));
 
 function NotFound() {
   const { t } = useI18n();
@@ -59,6 +68,15 @@ export default function App() {
             <Route path="admin/audit" element={<AuditPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="attendance" element={<AttendancePage />} />
+            <Route path="overtime" element={<OvertimePage />} />
+            <Route path="leave" element={<LeavePage />} />
+            <Route path="leave/admin" element={<LeaveAdminPage />} />
+            <Route path="time/shifts" element={<ShiftsPage />} />
+            <Route path="time/calendar" element={<CalendarPage />} />
+            <Route path="time/import" element={<ImportPage />} />
+            <Route path="time/periods" element={<PeriodsPage />} />
+            <Route path="time/rules" element={<RulesPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
