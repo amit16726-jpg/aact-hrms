@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.4.0 — 23 Oct 2026 — Phase 4: self-service and letters
+
+- **My HR** (`/me`) for every employee with a login: job, manager, leave balance, next leave, last payslip, documents expiring in 90 days,
+  quick actions, letters ready, and all their requests in one place.
+- **Change requests HR approves** (maker-checker, never by the person concerned):
+  - personal and contact details (preferred name, mobile, phones, personal e-mail, marital status, address) — old and new values shown;
+  - emergency contacts (the new list replaces the old one on approval);
+  - salary bank account — HR checks it, then Finance approves it as for any bank change;
+  - correction of anything else (name, date of birth, ID number …) with the **45-day answer date** of the Personal Data Protection Law.
+  Approved details are written to the employee record with a history entry; the employee is notified.
+- **Letters:** salary certificate, employment letter (salary optional), no-objection certificate (travel or another activity) and
+  experience letter. Requested by the employee or started by HR → prepared by an HR officer → approved by someone else who may see salaries.
+  Issued letters get a running reference (e.g. `AACT/HR/2026/0001`), a 12-character verification code and a frozen snapshot of what they
+  state; printable in English, Arabic or both side by side; can be withdrawn with a reason.
+- **Public letter check** (`/verify`, no login): a bank or embassy enters the reference and code and sees whether the letter is genuine or
+  withdrawn — no salary or ID number is shown.
+- **My team** (`/team`) for line managers: today's attendance, who is on leave, items waiting for them, expiring documents, probation dates.
+- **Requests and letters** page for HR, with letter settings (signatory, footer, verification address). Approvals page, menu badge and
+  dashboard include change requests and letters.
+- **PDPL:** employees can download a copy of all data held about them (logged in the access log) and ask for corrections.
+- **E-mail through Microsoft 365:** every notification can also be e-mailed (per-company switch, per-user opt-out in Settings). Messages are
+  queued in the database and sent by the `send-mail` edge function through Microsoft Graph; failures are retried and shown to the
+  administrator with a test button.
+- Dummy data `supabase/seed_phase4.sql`: an issued salary certificate, a NOC waiting for approval, letter requests and change requests.
+
 ## 1.3.0 — 22 Oct 2026 — Phase 3: payroll and end of service
 
 - **Payroll rules, dated with their legal source** (`Payroll rules`; changes need a second person's approval):

@@ -142,3 +142,22 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
 - E-mail notifications are not sent yet; notifications are in-app. Needs an e-mail provider key.
 - No integration with Ministry of Labour or ROP systems: documents and statuses are entered and uploaded by HR, by design.
 - Employee self-service changes (an employee correcting his own details) are P4. Today HR edits on the employee's behalf.
+
+## 9. Phase 4 — self-service and letters (v1.4.0)
+
+- **Employees never write to their own record.** Every self-service change is a `hr.change_requests` row decided by someone with
+  `SS_APPROVE` who is neither the requester nor the employee (database check `decided_by <> requested_by`). Only ten contact fields can be
+  changed this way (`hr.ss_profile_fields()`); anything else is a free-text correction that HR handles and closes with a note.
+- **Bank changes keep two checks:** HR approves the request, which creates a *pending* bank row with the employee as requester; Finance
+  (`BANK_APPROVE`) gives the final approval exactly as before.
+- **Letters:** prepared (`LETTER_PREPARE`) and approved (`LETTER_APPROVE`) by different people (database check), never for oneself; a
+  letter that states a salary can only be approved by someone with `EMP_SALARY_READ`, and the salary is hidden from other HR viewers.
+  The issued content is frozen in `hr.letters.snapshot` so later changes never alter an issued letter.
+- **Public verification** `hr_verify_letter(ref, code)` is the only function granted to `anon` (kept by `hr.secure_api()`); it needs
+  the reference *and* a 12-character random code and returns only type, date, company and name.
+- **E-mail queue** `hr.email_outbox` is filled by a trigger on notifications and read only by `mail_claim_batch` / `mail_mark`, which
+  are executable by `service_role` only (the edge function); signed-in users and `anon` cannot read it.
+- **PDPL:** `hr_my_data_export()` returns everything held about the signed-in employee and is written to `hr.access_log`;
+  correction requests carry a due date 45 days after the request.
+- Tests: `tests/db/40_selfservice.sql` (requests, separation of duties, bank masking, letter numbering and privacy, anonymous checks,
+  mail queue privileges and retry) and unit tests for the bilingual letter wording and the Microsoft Graph sender.

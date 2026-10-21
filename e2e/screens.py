@@ -17,7 +17,7 @@ E1, E2, E3 = ('bbbbbbbb-0000-0000-0000-00000000000%d' % i for i in (1, 2, 3))
 perms = ['ORG_READ','ORG_WRITE','EMP_READ','EMP_WRITE','EMP_SALARY_READ','EMP_SALARY_WRITE','SALARY_APPROVE','EMP_BANK_READ',
          'EMP_BANK_WRITE','DOC_READ','DOC_WRITE','DOC_SENSITIVE','COMPLIANCE_READ','RULES_PROPOSE','RULES_APPROVE','EXCEPTION_APPROVE','AUDIT_READ',
          'ATT_READ','ATT_WRITE','ATT_APPROVE','ATT_LOCK','LEAVE_READ','LEAVE_WRITE','LEAVE_APPROVE',
-         'PAY_READ','PAY_PREPARE','PAY_VERIFY','PAY_APPROVE']
+         'PAY_READ','PAY_PREPARE','PAY_VERIFY','PAY_APPROVE','SS_APPROVE','LETTER_PREPARE','LETTER_APPROVE','EMAIL_ADMIN']
 ME = {'user_id': 'u1', 'email': 'hr.manager@aact.om', 'display_name': 'Maryam Al Hinai', 'language': 'en', 'is_active': True,
       'employee_id': None, 'employee_no': None, 'employee_name': None, 'employee_name_ar': None, 'roles': ['HR_MANAGER'],
       'permissions': perms, 'is_manager': False, 'admin_exists': True, 'settings': {'employee_no_prefix': 'AACT-', 'employee_no_digits': 5, 'leave_opening_date': '2026-07-01'},
@@ -148,7 +148,12 @@ SCREENS = [('dashboard', '/'), ('employees', '/employees'), ('employee', f'/empl
            ('payroll', '/payroll'), ('payroll-run', '/payroll/run-1'), ('payslip', '/payslips/slip-1'), ('my-payslips', '/payslips'),
            ('loans', '/payroll/loans'), ('pay-items', '/payroll/items'), ('settlements', '/payroll/settlements'),
            ('settlement', '/payroll/settlements/st-1'), ('gratuity', '/payroll/gratuity'), ('pay-rules', '/payroll/rules'),
-           ('pay-setup', '/payroll/setup'), ('employee-pay', f'/employees/{E2}?tab=pay')]
+           ('pay-setup', '/payroll/setup'), ('employee-pay', f'/employees/{E2}?tab=pay'),
+           ('my-hr', '/me'), ('my-hr-details', '/me?tab=details'), ('my-hr-letters', '/me?tab=letters'), ('my-hr-requests', '/me?tab=requests'),
+           ('my-hr-privacy', '/me?tab=privacy'), ('requests', '/requests'), ('requests-letters', '/requests?tab=letters'),
+           ('requests-setup', '/requests?tab=setup'), ('letter', f"/letters/{RPC['hr_get_letter']['id']}"), ('team', '/team'),
+           ('settings', '/settings'),
+           ('verify', f"/verify?ref={RPC['hr_verify_letter']['ref_no']}&code=ABCDEFGHJKLM")]
 
 with sync_playwright() as p:
     br = p.chromium.launch()

@@ -2,7 +2,7 @@
 
 The laptop runs the **same Supabase stack** (in Docker) that will later run on the company server,
 with the **same database files** (`supabase/migrations`). Only the data differs: the laptop holds
-**dummy data only** (`supabase/seed.sql`, then `supabase/seed_phase2.sql` for attendance and leave and `supabase/seed_phase3.sql` for payroll).
+**dummy data only** (`supabase/seed.sql`, then `supabase/seed_phase2.sql` for attendance and leave `supabase/seed_phase3.sql` for payroll and `supabase/seed_phase4.sql` for letters and requests).
 
 ## One-time setup (Windows 10/11)
 

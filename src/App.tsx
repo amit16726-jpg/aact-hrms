@@ -41,6 +41,11 @@ const PayRulesPage = lazy(() => import('./pages/pay/PayRulesPage'));
 const PayrollSetupPage = lazy(() => import('./pages/pay/PayrollSetupPage'));
 const PayslipPage = lazy(() => import('./pages/pay/PayslipPages').then((m) => ({ default: m.PayslipPage })));
 const MyPayslipsPage = lazy(() => import('./pages/pay/PayslipPages').then((m) => ({ default: m.MyPayslipsPage })));
+const MyHrPage = lazy(() => import('./pages/ss/MyHrPage'));
+const RequestsPage = lazy(() => import('./pages/ss/RequestsPage'));
+const LetterPage = lazy(() => import('./pages/ss/LetterPage'));
+const TeamPage = lazy(() => import('./pages/ss/TeamPage'));
+const VerifyPage = lazy(() => import('./pages/ss/VerifyPage'));
 
 function NotFound() {
   const { t } = useI18n();
@@ -54,6 +59,8 @@ function MyRecord() {
 
 export default function App() {
   const { ready, session, me, hasAnyRole, recovery } = useSession();
+  // public letter check: works with or without signing in
+  if (window.location.pathname === '/verify') return <Suspense fallback={<Loading />}><VerifyPage /></Suspense>;
   if (!ready) return <Loading />;
   if (recovery && session) return <SetPasswordPage />;
   if (!session) return <AuthPage />;
@@ -99,6 +106,10 @@ export default function App() {
             <Route path="payroll/:id" element={<PayrollRunPage />} />
             <Route path="payslips" element={<MyPayslipsPage />} />
             <Route path="payslips/:id" element={<PayslipPage />} />
+            <Route path="me" element={<MyHrPage />} />
+            <Route path="team" element={<TeamPage />} />
+            <Route path="requests" element={<RequestsPage />} />
+            <Route path="letters/:id" element={<LetterPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

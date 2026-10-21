@@ -15,7 +15,8 @@ export function TimePanels() {
   const taskLines = ([['leave', 'dt.tasks_leave', '/approvals'], ['corrections', 'dt.tasks_corrections', '/approvals'], ['overtime', 'dt.tasks_overtime', '/approvals'],
     ['adjustments', 'dt.tasks_adjustments', '/approvals'], ['rules', 'dt.tasks_rules', '/approvals'], ['payroll', 'pd.tasks_payroll', '/approvals'],
     ['loans', 'pd.tasks_loans', '/approvals'], ['pay_adjustments', 'pd.tasks_pay_adjustments', '/approvals'],
-    ['settlements', 'pd.tasks_settlements', '/approvals']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
+    ['settlements', 'pd.tasks_settlements', '/approvals'], ['changes', 'sd.tasks_changes', '/requests'],
+    ['letters', 'sd.tasks_letters', '/requests?tab=letters']] as const).filter(([k]) => (tk[k] ?? 0) > 0);
 
   return (
     <div className="stack">
@@ -46,6 +47,8 @@ export function TimePanels() {
             {d.mine.pending > 0 && <div className="muted">{t('dt.waiting_requests', { n: d.mine.pending })}</div>}
             {d.mine.last_payslip && <div><Link to={`/payslips/${d.mine.last_payslip.id}`}>{t('pd.my_last', { m: monthName(d.mine.last_payslip.month, lang) })}</Link>
               {' '}<b className="num">OMR {OMR(d.mine.last_payslip.net)}</b></div>}
+            {(d.mine.requests_open ?? 0) > 0 && <div><Link to="/me?tab=requests">{t('sd.my_requests', { n: d.mine.requests_open ?? 0 })}</Link></div>}
+            {(d.mine.letters_ready ?? 0) > 0 && <div><Link to="/me?tab=letters">{t('sd.letters_ready', { n: d.mine.letters_ready ?? 0 })}</Link></div>}
           </section>
         )}
         {d.payroll && (

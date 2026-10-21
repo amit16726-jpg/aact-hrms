@@ -73,9 +73,12 @@ export default function Layout() {
   const groups: { title?: Key; items: Item[] }[] = [
     { items: [
       { to: '/', key: 'nav.dashboard', show: true },
+      { to: '/me', key: 'snav.my_hr', show: !!me?.employee_id },
       { to: '/my', key: 'nav.my_record', show: !!me?.employee_id },
+      { to: '/team', key: 'snav.team', show: !!me?.is_manager },
       { to: '/employees', key: 'nav.employees', show: can('EMP_READ') || !!me?.is_manager },
       { to: '/approvals', key: 'nav.approvals', show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || !!me?.is_manager || approvals > 0, count: approvals },
+      { to: '/requests', key: 'snav.requests', show: can('SS_APPROVE') || can('LETTER_PREPARE') || can('LETTER_APPROVE') },
     ] },
     { title: 'tnav.group', items: [
       { to: '/attendance', key: 'tnav.attendance', show: can('ATT_READ') || !!me?.is_manager || !!me?.employee_id },

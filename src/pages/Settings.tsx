@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { ssapi, type EmailAdmin } from '../lib/api_ss';
+import { Badge, Check, Empty, useAsync } from '../components/ui';
+import { fmtDateTime } from '../lib/format';
 import { useI18n } from '../i18n';
 import { useSession } from '../lib/session';
 import { Button, Input, Select, useAction } from '../components/ui';
@@ -42,6 +45,9 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      <EmailPrefPanel />
+      {can('EMAIL_ADMIN') && <EmailAdminPanel />}
+
       {can('USERS_ADMIN') && (
         <section className="panel panel-pad stack" style={{ maxWidth: 640 }}>
           <h2>{t('set.numbering')}</h2>
@@ -58,5 +64,60 @@ export default function SettingsPage() {
         </section>
       )}
     </div>
+  );
+}
+
+function EmailPrefPanel() {
+  const { t } = useI18n();
+  const { data, reload } = useAsync(() => ssapi.myEmailPref(), []);
+  const { busy, run } = useAction();
+  if (!data) return null;
+  return (
+    <section className="panel panel-pad stack" style={{ maxWidth: 640 }}>
+      <h2>{t('em.my_pref')}</h2>
+      <Check label={t('em.my_pref_hint', { e: data.email ?? '—' })} checked={data.email_opt_in} disabled={busy}
+        onChange={async (v) => { if (await run(() => ssapi.setMyEmailPref(v), t('c.saved'))) void reload(); }} />
+      {!data.sending_enabled && <div className="muted">{t('em.off_globally')}</div>}
+    </section>
+  );
+}
+
+function EmailAdminPanel() {
+  const { t } = useI18n();
+  const { data, reload } = useAsync(() => ssapi.emailSettings(), []);
+  const [f, setF] = useState<EmailAdmin['settings'] | null>(null);
+  const { busy, run } = useAction();
+  useEffect(() => { if (data) setF({ ...data.settings }); }, [data]);
+  if (!data || !f) return null;
+  const save = async () => { if (await run(() => ssapi.saveEmailSettings({ ...f }), t('c.saved'))) void reload(); };
+  const test = async () => { if (await run(() => ssapi.emailTest(), t('em.test_sent'))) void reload(); };
+  return (
+    <section className="panel panel-pad stack" style={{ maxWidth: 820 }}>
+      <h2>{t('em.title')}</h2>
+      <p className="muted" style={{ margin: 0 }}>{t('em.hint')}</p>
+      <Check label={t('em.enabled')} checked={f.enabled} onChange={(v) => setF({ ...f, enabled: v })} />
+      <div className="form-grid">
+        <Input label={t('em.app_url')} ltr value={f.app_url} placeholder="https://hr.aact.om" onChange={(e) => setF({ ...f, app_url: e.target.value })} />
+        <Input label={t('em.sender_name')} value={f.sender_name} maxLength={80} onChange={(e) => setF({ ...f, sender_name: e.target.value })} />
+      </div>
+      <div className="row row-end"><Button busy={busy} onClick={() => void test()}>{t('em.test')}</Button><Button kind="primary" busy={busy} onClick={() => void save()}>{t('c.save')}</Button></div>
+      <div className="tile-row">
+        <div className="tile"><span>{t('em.queued')}</span><b>{data.queue.queued}</b></div>
+        <div className="tile"><span>{t('em.sent')}</span><b>{data.queue.sent}</b></div>
+        <div className="tile"><span>{t('em.failed')}</span><b className={data.queue.failed ? 'bad-text' : ''}>{data.queue.failed}</b></div>
+      </div>
+      <h3 style={{ margin: 0 }}>{t('em.recent')}</h3>
+      {!data.recent.length ? <Empty>{t('em.none')}</Empty> : (
+        <div className="table-wrap"><table className="t cards">
+          <thead><tr><th>{t('em.to')}</th><th>{t('em.subject')}</th><th>{t('c.status')}</th></tr></thead>
+          <tbody>{data.recent.map((r) => (
+            <tr key={r.id}>
+              <td data-label={t('em.to')} className="ltr-inline">{r.to_email}<span className="sub num">{fmtDateTime(r.created_at)}</span></td>
+              <td data-label={t('em.subject')}>{r.subject}</td>
+              <td data-label={t('c.status')}><Badge tone={r.status === 'SENT' ? 'ok' : r.status === 'FAILED' ? 'bad' : 'warn'}>{r.status}</Badge>
+                {r.last_error && <span className="sub">{r.last_error}</span>}</td>
+            </tr>))}
+          </tbody></table></div>)}
+    </section>
   );
 }

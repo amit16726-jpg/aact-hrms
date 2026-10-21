@@ -1,6 +1,6 @@
-"""Dump Phase 2 and 3 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+"""Dump Phase 2, 3 and 4 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
 
-Usage (after loading supabase/seed.sql, seed_phase2.sql and seed_phase3.sql into the local test database):
+Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql and seed_phase4.sql into the local test database):
   python3 e2e/gen_time_fixtures.py
 """
 import json, subprocess, pathlib, os
@@ -46,11 +46,22 @@ CALLS = {
     'hr_get_compensation': "public.hr_get_compensation((select id from hr.employees where employee_no = 'AACT-00003'))",
     'hr_list_pay_components': "public.hr_list_pay_components()",
     'hr_parallel_report': "public.hr_parallel_report((select id from hr.payroll_runs order by period_start desc limit 1))",
+    # Phase 4 — self-service & letters (some as the demo employee or line manager)
+    'hr_my_portal': ("public.hr_my_portal()", 'employee@aact.test'),
+    'hr_my_team': ("public.hr_my_team()", 'manager@aact.test'),
+    'hr_get_letter': ("public.hr_get_letter((select id from hr.letters where status = 'ISSUED' limit 1))", 'employee@aact.test'),
+    'hr_list_change_requests': "public.hr_list_change_requests(null, null)",
+    'hr_list_letters': "public.hr_list_letters(null, null)",
+    'hr_letter_settings': "public.hr_letter_settings()",
+    'hr_my_email_pref': "public.hr_my_email_pref()",
+    'hr_email_settings': ("public.hr_email_settings()", 'admin@aact.test'),
+    'hr_verify_letter': "(select public.hr_verify_letter(ref_no, verify_code) from hr.letters where status = 'ISSUED' limit 1)",
 }
 
 out = {}
 for name, call in CALLS.items():
-    sql = ("select set_config('request.jwt.claim.sub', (select id::text from auth.users where email = 'hr.manager@aact.test'), false);"
+    call, who = call if isinstance(call, tuple) else (call, 'hr.manager@aact.test')
+    sql = (f"select set_config('request.jwt.claim.sub', (select id::text from auth.users where email = '{who}'), false);"
            f"select {call}::text;")
     res = subprocess.run(PSQL + ['-c', sql], capture_output=True, text=True, check=True).stdout.strip().split('\n')
     out[name] = json.loads(res[-1])

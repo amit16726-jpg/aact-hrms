@@ -216,6 +216,36 @@ export default function ApprovalsPage() {
             </tbody></table></div>
         </section>
       )}
+      {td && (td.changes ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('sap.changes')}</h2><Link to="/requests">{t('snav.requests')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('c.employee')}</th><th>{t('c.type')}</th><th>{t('rq.due')}</th><th /></tr></thead>
+            <tbody>{(td.changes ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('c.employee')}><EmpLink id={x.employee_id} no={x.employee_no} en={x.full_name_en} ar={x.full_name_ar} /></td>
+                <td data-label={t('c.type')}>{t(`rq.k_${x.kind}` as Key)}<span className="sub">{fmtDateTime(x.requested_at)}</span></td>
+                <td data-label={t('rq.due')} className={`num${x.overdue ? ' bad-text' : ''}`}>{fmtDate(x.due_date)}</td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to="/requests">{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
+      {td && (td.letters ?? []).length > 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('sap.letters')}</h2><Link to="/requests?tab=letters">{t('snav.requests')}</Link></div>
+          <div className="table-wrap"><table className="t cards">
+            <thead><tr><th>{t('c.employee')}</th><th>{t('lt.type')}</th><th>{t('c.status')}</th><th /></tr></thead>
+            <tbody>{(td.letters ?? []).map((x) => (
+              <tr key={x.id}>
+                <td data-label={t('c.employee')}><EmpLink id={x.employee_id} no={x.employee_no} en={x.full_name_en} ar={x.full_name_ar} /></td>
+                <td data-label={t('lt.type')}>{t(`lt.${x.letter_type}` as Key)}<span className="sub">{fmtDateTime(x.requested_at)}</span></td>
+                <td data-label={t('c.status')}>{t(`lt.st_${x.status}` as Key)}</td>
+                <td className="r"><Link className="btn btn-sm btn-primary" to="/requests?tab=letters">{t('sap.open')}</Link></td>
+              </tr>))}
+            </tbody></table></div>
+        </section>
+      )}
       {td && (td.pay_rules ?? []).length > 0 && (
         <section className="panel">
           <div className="panel-head"><h2>{t('pap.rules')}</h2><Link to="/payroll/rules">{t('pnav.rules')}</Link></div>
