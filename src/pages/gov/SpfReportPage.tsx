@@ -7,6 +7,7 @@ import { EntitySelect, useEntity } from '../../components/time';
 import { PageHead } from '../../components/Layout';
 import { OMR, RunBadge, monthName } from '../../components/pay';
 import { downloadCsv } from '../../lib/csv';
+import { canPrint } from '../../lib/native';
 
 export default function SpfReportPage() {
   const { t, L, lang } = useI18n();
@@ -46,7 +47,7 @@ export default function SpfReportPage() {
   return (
     <div className="stack">
       <PageHead title={t('sp.title')} sub={t('sp.hint')} actions={<><Button kind="primary" disabled={!r || !r.rows.length} onClick={exportCsv}>{t('sp.export')}</Button>
-        <Button onClick={() => window.print()}>{t('c.print')}</Button></>} />
+        {canPrint() && <Button onClick={() => window.print()}>{t('c.print')}</Button>}</>} />
       <div className="panel panel-pad row no-print">
         <EntitySelect value={entity} onChange={setEntity} />
         <div className="field" style={{ minWidth: 220 }}><label htmlFor="sp-run">{t('sp.run')}</label>

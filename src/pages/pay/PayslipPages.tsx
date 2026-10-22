@@ -6,6 +6,7 @@ import { Button, Empty, ErrorNote, Loading, useAsync } from '../../components/ui
 import { PageHead } from '../../components/Layout';
 import { OMR, PayslipView, RunBadge, monthName } from '../../components/pay';
 import { fmtDate } from '../../lib/format';
+import { canPrint } from '../../lib/native';
 
 export function PayslipPage() {
   const { id = '' } = useParams();
@@ -20,7 +21,7 @@ export function PayslipPage() {
     <div className="stack">
       <div className="row no-print" style={{ justifyContent: 'space-between' }}>
         <Button onClick={() => nav(-1)}>{t('c.back')}</Button>
-        <Button kind="primary" onClick={() => window.print()}>{t('ps.print')}</Button>
+        {canPrint() && <Button kind="primary" onClick={() => window.print()}>{t('ps.print')}</Button>}
       </div>
       <PayslipView slip={data} back={can('PAY_READ') ? <Link to={`/payroll/${data.run_id}`}>{t('pr.title')}</Link> : <Link to="/payslips">{t('ps.my_title')}</Link>} />
     </div>

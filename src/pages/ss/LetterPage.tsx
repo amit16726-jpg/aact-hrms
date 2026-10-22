@@ -3,6 +3,7 @@ import { letterText, ssapi, verifyUrl, type LetterFull, type LetterSnapshot } fr
 import { useI18n, type Key } from '../../i18n';
 import { Button, ErrorNote, Loading, useAsync } from '../../components/ui';
 import { LetterBadge } from '../../components/ss';
+import { canPrint } from '../../lib/native';
 
 const dmy = (iso: string | null | undefined) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : '');
 
@@ -18,7 +19,7 @@ export default function LetterPage() {
     <div className="stack">
       <div className="row no-print" style={{ justifyContent: 'space-between' }}>
         <div className="row"><Button onClick={() => window.history.back()}>{t('c.back')}</Button><LetterBadge l={data} /></div>
-        {data.status === 'ISSUED' && !data.revoked && <Button kind="primary" onClick={() => window.print()}>{t('c.print')}</Button>}
+        {canPrint() && data.status === 'ISSUED' && !data.revoked && <Button kind="primary" onClick={() => window.print()}>{t('c.print')}</Button>}
       </div>
       {data.revoked && <div className="note note-bad no-print">{t('lt.withdrawn_banner', { r: data.revoke_reason ?? '' })}</div>}
       {data.salary_hidden && <div className="note no-print">{t('lt.salary_hidden')}</div>}

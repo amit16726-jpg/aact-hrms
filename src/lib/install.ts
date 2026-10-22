@@ -1,3 +1,5 @@
+import { isNative } from './native';
+
 /** Installing the web app on a phone or computer (Android/Chrome/Edge prompt, iPhone/iPad "Add to Home Screen"). */
 export interface InstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -17,7 +19,7 @@ export function initInstall(): void {
 
 /** Registers the service worker in production builds only (never on the dev server). */
 export function registerServiceWorker(prod: boolean): void {
-  if (!prod || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+  if (!prod || isNative() || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
   window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => undefined); });
 }
 
@@ -35,7 +37,7 @@ export function isStandalone(): boolean {
 
 /** 'prompt' = the browser can install it now; 'ios' = show the Share → Add to Home Screen steps; null = nothing to offer. */
 export function installMode(): 'prompt' | 'ios' | null {
-  if (typeof window === 'undefined' || isStandalone()) return null;
+  if (typeof window === 'undefined' || isNative() || isStandalone()) return null;
   if (deferred) return 'prompt';
   if (isIos(navigator.userAgent, navigator.maxTouchPoints ?? 0)) return 'ios';
   return null;

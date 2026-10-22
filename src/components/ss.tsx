@@ -5,6 +5,7 @@ import { useI18n, type Key } from '../i18n';
 import { Badge, Button, Check, Input, Modal, Select, useAction, useToast } from './ui';
 import { EmployeePicker } from './pickers';
 import { fmtDate } from '../lib/format';
+import { saveFile } from '../lib/native';
 
 const FIELD_KEY: Record<string, Key> = {
   preferred_name: 'ef.preferred_name', mobile: 'ef.mobile', alt_phone: 'ef.alt_phone', personal_email: 'ef.personal_email',
@@ -122,8 +123,5 @@ export function LetterLine({ l, showEmployee }: { l: Letter; showEmployee?: bool
 
 export function downloadJson(name: string, data: unknown) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  void saveFile(name, blob);
 }

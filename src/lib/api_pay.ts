@@ -1,5 +1,6 @@
 import { rpc, type Json } from './api';
 import type { EmpBrief, TimeRule } from './api_time';
+import { saveFile } from './native';
 
 // ---------------------------------------------------------------------------
 // Phase 3 — payroll & end of service: types returned by the server
@@ -191,8 +192,5 @@ export function buildWpsSif(d: WpsData): { name: string; text: string; skipped: 
 /** Bank files are sent without a byte-order mark (some bank portals reject it). */
 export function downloadText(name: string, text: string, bom = false): void {
   const blob = new Blob([(bom ? '\ufeff' : '') + text], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  void saveFile(name, blob);
 }

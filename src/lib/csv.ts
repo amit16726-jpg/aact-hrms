@@ -1,3 +1,5 @@
+import { saveFile } from './native';
+
 /** CSV export that opens correctly in Excel (UTF-8 BOM for Arabic) and never lets a cell run as a formula. */
 export function csvCell(v: unknown): string {
   if (v === null || v === undefined) return '';
@@ -13,12 +15,5 @@ export function toCsv(headers: string[], rows: unknown[][]): string {
 
 export function downloadCsv(filename: string, headers: string[], rows: unknown[][]): void {
   const blob = new Blob(['﻿' + toCsv(headers, rows)], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  void saveFile(filename, blob);
 }

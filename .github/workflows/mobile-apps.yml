@@ -1,0 +1,184 @@
+# Builds the Android APK and the iPhone app from this repository.
+# Run it from GitHub → Actions → "Mobile apps" → Run workflow, choose the server, then download the files
+# from the run's "Artifacts" section.
+#
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   TEST_SUPABASE_URL, TEST_SUPABASE_ANON_KEY   cloud test site
+#   PROD_SUPABASE_URL, PROD_SUPABASE_ANON_KEY   company server (public HTTPS address)
+# Optional secrets for a signed Android release (Play Store):
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+# Optional secrets for an installable iPhone app (needs an Apple Developer account):
+#   IOS_CERTIFICATE_P12_BASE64, IOS_CERTIFICATE_PASSWORD, IOS_PROVISION_PROFILE_BASE64, IOS_TEAM_ID,
+#   IOS_EXPORT_METHOD (app-store-connect | ad-hoc | enterprise; default app-store-connect)
+name: Mobile apps
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Server the apps connect to
+        type: choice
+        options: [test, production]
+        default: test
+
+permissions:
+  contents: read
+
+env:
+  TARGET: ${{ inputs.target }}
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Choose server
+        shell: bash
+        env:
+          TEST_URL: ${{ vars.TEST_SUPABASE_URL }}
+          TEST_KEY: ${{ vars.TEST_SUPABASE_ANON_KEY }}
+          PROD_URL: ${{ vars.PROD_SUPABASE_URL }}
+          PROD_KEY: ${{ vars.PROD_SUPABASE_ANON_KEY }}
+        run: |
+          if [ "$TARGET" = production ]; then url="$PROD_URL"; key="$PROD_KEY"; label=""; else url="$TEST_URL"; key="$TEST_KEY"; label="TEST"; fi
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            echo "::error::Set the repository variables for the $TARGET server (see the top of this file)."; exit 1
+          fi
+          case "$url" in https://*) ;; *) echo "::error::The server address must start with https://"; exit 1;; esac
+          { echo "VITE_SUPABASE_URL=$url"; echo "VITE_SUPABASE_ANON_KEY=$key"; echo "VITE_ENV_LABEL=$label"; } >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm run build -- --mode mobile
+      - run: npx cap sync android
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+          mv app/build/outputs/apk/debug/app-debug.apk "app/build/outputs/apk/debug/AACT-HR-${TARGET}-debug.apk"
+      - name: Build signed release APK and bundle
+        if: ${{ env.HAS_KEYSTORE == 'true' }}
+        working-directory: android
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.keystore"
+          ./gradlew --no-daemon assembleRelease bundleRelease
+          rm -f "$RUNNER_TEMP/release.keystore"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ inputs.target }}
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+  ios:
+    name: iPhone app
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      HAS_IOS_SIGNING: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 != '' && secrets.IOS_PROVISION_PROFILE_BASE64 != '' && secrets.IOS_TEAM_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Choose server
+        shell: bash
+        env:
+          TEST_URL: ${{ vars.TEST_SUPABASE_URL }}
+          TEST_KEY: ${{ vars.TEST_SUPABASE_ANON_KEY }}
+          PROD_URL: ${{ vars.PROD_SUPABASE_URL }}
+          PROD_KEY: ${{ vars.PROD_SUPABASE_ANON_KEY }}
+        run: |
+          if [ "$TARGET" = production ]; then url="$PROD_URL"; key="$PROD_KEY"; label=""; else url="$TEST_URL"; key="$TEST_KEY"; label="TEST"; fi
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            echo "::error::Set the repository variables for the $TARGET server (see the top of this file)."; exit 1
+          fi
+          { echo "VITE_SUPABASE_URL=$url"; echo "VITE_SUPABASE_ANON_KEY=$key"; echo "VITE_ENV_LABEL=$label"; } >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm run build -- --mode mobile
+      - run: npx cap sync ios
+      - name: Build for the iPhone simulator (checks the project; no Apple account needed)
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/sim" CODE_SIGNING_ALLOWED=NO build
+          mkdir -p out
+          (cd "$RUNNER_TEMP/sim/Build/Products/Release-iphonesimulator" && zip -qry "$GITHUB_WORKSPACE/out/AACT-HR-${TARGET}-simulator.app.zip" App.app)
+      - name: Install signing certificate and profile
+        if: ${{ env.HAS_IOS_SIGNING == 'true' }}
+        env:
+          P12_B64: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          PROFILE_B64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"; KC_PASS="$(uuidgen)"
+          echo "$P12_B64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          echo "$PROFILE_B64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          security create-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KC_PASS" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/profile.plist")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$RUNNER_TEMP/profile.plist")
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          rm -f "$RUNNER_TEMP/cert.p12"
+      - name: Build signed iPhone app (.ipa)
+        if: ${{ env.HAS_IOS_SIGNING == 'true' }}
+        env:
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
+        run: |
+          METHOD="${EXPORT_METHOD:-app-store-connect}"
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" archive
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>${METHOD}</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key><dict><key>om.aact.hrms</key><string>${PROFILE_NAME}</string></dict>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export"
+          mkdir -p out && cp "$RUNNER_TEMP"/export/*.ipa "out/AACT-HR-${TARGET}.ipa"
+      - name: Remove signing keychain
+        if: ${{ always() && env.HAS_IOS_SIGNING == 'true' }}
+        run: security delete-keychain "$RUNNER_TEMP/build.keychain-db" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ inputs.target }}
+          path: out/*
+          if-no-files-found: error

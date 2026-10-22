@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.12.0 — 2026-10-22 — Android and iPhone apps
+
+- **Native apps** built with Capacitor 8 from the same code: Android (`android/`, APK for direct install and AAB for Google Play) and
+  iPhone / iPad (`ios/`, IPA for TestFlight / App Store). App id `om.aact.hrms`, name *AACT HR*, AACT icons and splash screens.
+- **GitHub Actions workflow** *Mobile apps* (`.github/workflows/mobile-apps.yml`): choose the test or production server and download
+  the APK and the iPhone build; signed Android releases and signed iPhone apps when the signing secrets are added.
+- Local builds: `npm run mobile:android` / `npm run mobile:ios` with `.env.mobile.local` (see `.env.mobile.example`).
+- Inside the apps, exports (CSV, bank file, my-data copy) open the phone's share sheet; print buttons are hidden; the install menu
+  item and the service worker are not used.
+- Guide: `docs/MOBILE-APPS.md`.
+
 ## 1.11.0 — 2026-10-22 — installable app for Android and iPhone
 
 - The HRMS can be **installed as an app** on Android phones and tablets (Chrome, Edge, Samsung Internet), iPhone and iPad

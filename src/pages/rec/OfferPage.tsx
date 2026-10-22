@@ -3,6 +3,7 @@ import { offerText, recapi, type OfferFull } from '../../lib/api_rec';
 import { useI18n } from '../../i18n';
 import { Button, ErrorNote, Loading, useAsync } from '../../components/ui';
 import { OfferBadge } from '../../components/rec';
+import { canPrint } from '../../lib/native';
 
 const dmy = (iso: string | null | undefined) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : '');
 
@@ -17,7 +18,7 @@ export default function OfferPage() {
     <div className="stack">
       <div className="row no-print" style={{ justifyContent: 'space-between' }}>
         <div className="row"><Button onClick={() => window.history.back()}>{t('c.back')}</Button><OfferBadge s={data.status} /></div>
-        <Button kind="primary" onClick={() => window.print()}>{t('c.print')}</Button>
+        {canPrint() && <Button kind="primary" onClick={() => window.print()}>{t('c.print')}</Button>}
       </div>
       <OfferSheet o={data} />
     </div>

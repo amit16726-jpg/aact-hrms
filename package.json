@@ -1,7 +1,7 @@
 {
   "name": "aact-hrms",
   "private": true,
-  "version": "1.11.0",
+  "version": "1.12.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,9 +17,18 @@
     "env:local": "node scripts/local-env.mjs",
     "local:setup": "supabase start && node scripts/local-env.mjs",
     "db:test": "bash scripts/local-db-reset.sh && psql -h ${PGHOST:-/tmp} -p ${PGPORT:-5433} -U postgres -d aact_test -q -v ON_ERROR_STOP=1 -f tests/db/10_priority1.sql -f tests/db/20_phase2.sql -f tests/db/30_payroll.sql -f tests/db/40_selfservice.sql -f tests/db/50_recruitment.sql -f tests/db/60_workforce.sql -f tests/db/70_governance.sql -f tests/db/80_mg_pay.sql -f tests/db/90_masters.sql",
-    "deploy:test": "bash tests/deploy/test-scripts.sh"
+    "deploy:test": "bash tests/deploy/test-scripts.sh",
+    "mobile:sync": "npm run build -- --mode mobile && cap sync",
+    "mobile:android": "npm run mobile:sync && cap open android",
+    "mobile:ios": "npm run mobile:sync && cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/share": "^8.0.3",
     "@fontsource/ibm-plex-sans": "^5.1.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.1.0",
     "@supabase/supabase-js": "^2.45.4",
@@ -29,6 +38,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
     "@types/react": "^18.3.12",

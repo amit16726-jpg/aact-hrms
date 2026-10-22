@@ -8,6 +8,7 @@ import { EmployeePicker } from '../../components/pickers';
 import { PageHead } from '../../components/Layout';
 import { EmpLink, OMR } from '../../components/pay';
 import { fmtDate, fmtDateTime, todayMuscat } from '../../lib/format';
+import { canPrint } from '../../lib/native';
 
 const REASONS: SettlementReason[] = ['RESIGNATION', 'TERMINATION', 'END_OF_CONTRACT', 'RETIREMENT', 'DEATH', 'OTHER'];
 const tone = (s: Settlement['status']) => s === 'PAID' ? 'ok' : s === 'APPROVED' ? 'info' : s === 'PREPARED' ? 'warn' : undefined;
@@ -170,7 +171,7 @@ export function SettlementPage() {
           }}>{t('c.reject')}</Button></>}
           {s.can_cancel && !s.can_decide && <Button busy={busy} onClick={async () => { const r = await run(() => papi.cancelSettlement(s.id, null)); if (r) setData(r); }}>{t('st.withdraw')}</Button>}
           {s.can_pay && <Button busy={busy} onClick={async () => { const r = await run(() => papi.markSettlementPaid(s.id), t('st.paid_done')); if (r) setData(r); }}>{t('st.mark_paid')}</Button>}
-          <Button kind="primary" onClick={() => window.print()}>{t('st.print')}</Button>
+          {canPrint() && <Button kind="primary" onClick={() => window.print()}>{t('st.print')}</Button>}
         </div>
       </div>
       <article className="slip panel panel-pad stack">

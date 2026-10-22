@@ -35,3 +35,5 @@ Migrations are in `supabase/migrations`, in order. They are idempotent (safe to 
 New change → `npm run db:new <name>`. Masters (company, departments, designations, categories, pay components) → `supabase/seed_masters.sql`, used everywhere; no dummy employees. Cloud test reset → `scripts/reset-test-data.sql`. Company server: `deploy/README-SERVER.md`.
 
 E-mail: `supabase/functions/send-mail` (Microsoft Graph). Set-up: [docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md#e-mail-through-microsoft-365).
+
+Phone apps (Android APK / iPhone): `docs/MOBILE-APPS.md` — built by the *Mobile apps* GitHub Actions workflow or with `npm run mobile:android` / `npm run mobile:ios`.

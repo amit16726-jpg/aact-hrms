@@ -8,6 +8,7 @@ import { PageHead } from '../../components/Layout';
 import { OMR } from '../../components/pay';
 import { downloadCsv } from '../../lib/csv';
 import { fmtDate, todayMuscat } from '../../lib/format';
+import { canPrint } from '../../lib/native';
 
 export default function MolReportPage() {
   const { t, L, tk } = useI18n();
@@ -25,7 +26,7 @@ export default function MolReportPage() {
   return (
     <div className="stack">
       <PageHead title={t('ml.title')} sub={t('ml.hint')} actions={<><Button onClick={exportProf} disabled={!r}>{t('ml.export_prof')}</Button>
-        <Button kind="primary" onClick={exportEmp} disabled={!r}>{t('ml.export')}</Button><Button onClick={() => window.print()}>{t('c.print')}</Button></>} />
+        <Button kind="primary" onClick={exportEmp} disabled={!r}>{t('ml.export')}</Button>{canPrint() && <Button onClick={() => window.print()}>{t('c.print')}</Button>}</>} />
       <div className="panel panel-pad row no-print">
         <EntitySelect value={entity} onChange={setEntity} />
         <Input label={t('ml.as_of')} type="date" ltr value={asOf} max={todayMuscat()} onChange={(e) => setAsOf(e.target.value)} />
