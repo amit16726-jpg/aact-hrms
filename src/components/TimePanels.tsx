@@ -37,7 +37,7 @@ export function TimePanels() {
           </div>
         </section>
       )}
-      <div className="grid-2" style={{ alignItems: 'start' }}>
+      <div className="dash-cols">
         {d.mine && (
           <section className="panel panel-pad stack">
             <div className="row" style={{ justifyContent: 'space-between' }}><h2>{t('dt.my_leave')}</h2><Link to="/leave">{t('tnav.leave')}</Link></div>

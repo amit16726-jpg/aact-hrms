@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.1 — 2026-10-22
+
+- Pages use the full width of the screen (the 1480 px limit is removed); figure boxes stretch to fill their panel.
+- Dashboard panels flow in two columns without empty gaps.
+
 ## 1.8.0 — 2026-10-21 — new interface
 
 - New design system for every page: colour tokens, IBM Plex Sans / Plex Sans Arabic type scale, consistent panels, tables,
