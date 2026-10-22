@@ -3,7 +3,7 @@ import { ArrowLeft, CircleCheck, Pin, Users } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { eapi } from '../../lib/api_eng';
 import { Button, ErrorNote, Loading, useAction, useAsync } from '../../components/ui';
-import { AnnCategoryChip, EngStatus, audienceText } from '../../components/eng';
+import { AnnCategoryChip, EngStatus, PdfChip, audienceText, openAnnPdf } from '../../components/eng';
 import { fmtDate, fmtDateTime } from '../../lib/format';
 
 export default function AnnouncementPage() {
@@ -11,6 +11,7 @@ export default function AnnouncementPage() {
   const { t, L } = useI18n();
   const { data: a, error, loading, reload, setData } = useAsync(() => eapi.getAnnouncement(id), [id]);
   const { busy, run } = useAction();
+  const pdf = useAction();
   const ack = async () => {
     const r = await run(() => eapi.ackAnnouncement(id), t('eg.acked_ok'));
     if (r) setData(r);
@@ -33,6 +34,13 @@ export default function AnnouncementPage() {
             <span><Users size={13} aria-hidden="true" /> {audienceText(a, t, L)}</span>
           </div>
           <div className="eg-body">{L(a.body_en, a.body_ar)}</div>
+          {a.attachment_path && (
+            <div className="eg-article-pdf">
+              <div className="eg-article-pdf-head">{t('eg.has_pdf')}</div>
+              <PdfChip name={a.attachment_name} bytes={a.attachment_bytes} busy={pdf.busy}
+                onOpen={() => void pdf.run(() => openAnnPdf(a.attachment_path as string, a.attachment_name))} />
+            </div>
+          )}
           {a.require_ack && a.in_audience && (
             a.acknowledged_at
               ? <div className="note note-ok eg-ack-box"><CircleCheck size={18} aria-hidden="true" />{t('eg.acked', { d: fmtDateTime(a.acknowledged_at) })}</div>

@@ -55,4 +55,16 @@ export const enEng = {
   'err.NOT_PENDING': 'This is no longer waiting for approval.',
   'eg.s_unread': 'Unread news', 'eg.s_confirm': 'To confirm', 'eg.s_surveys': 'Surveys to answer', 'eg.s_recognised': 'Times you were recognised',
   'eg.one_question': '1 question',
+  // 1.15.0 — signed PDF and translation
+  'ea.translate': 'Translate', 'ea.tr_en_ar': 'English → Arabic', 'ea.tr_ar_en': 'Arabic → English',
+  'ea.tr_hint': 'Translates the title and the message together, in the Arabic used in official Omani circulars. Check the result before sending for approval.',
+  'ea.tr_done_ar': 'Arabic text filled in — please check it.', 'ea.tr_done_en': 'English text filled in — please check it.',
+  'ea.tr_undo': 'Undo', 'ea.tr_need_en': 'Write the English title or message first.', 'ea.tr_need_ar': 'Write the Arabic title or message first.',
+  'ea.pdf': 'Signed PDF', 'ea.pdf_hint': 'Optional — attach the signed circular (PDF, up to 10 MB). Readers can open it from the announcement.',
+  'ea.pdf_choose': 'Attach PDF', 'ea.pdf_replace': 'Replace', 'ea.pdf_remove': 'Remove', 'ea.pdf_open': 'Open',
+  'ea.pdf_type': 'Choose a PDF file.', 'ea.pdf_size': 'The PDF is larger than 10 MB.', 'ea.pdf_uploading': 'Uploading the PDF…',
+  'eg.pdf_open': 'Open the signed PDF', 'eg.has_pdf': 'Signed PDF attached',
+  'err.TRANSLATE_OFF': 'Translation is not set up on this server yet. Ask IT to add the translation key.',
+  'err.TRANSLATE_FAILED': 'The translation did not work. Please try again.',
+  'err.LIMIT': 'You have reached the limit for today.',
 };

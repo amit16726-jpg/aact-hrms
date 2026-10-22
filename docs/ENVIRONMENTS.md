@@ -63,6 +63,21 @@ when **Settings → E-mail notifications** is switched on; the `send-mail` edge 
 
 Employees can switch e-mails off for themselves in Settings. Real employee e-mails are sent only from the company server.
 
+## Translation of announcements (1.15.0)
+
+The **Translate** buttons in the announcement form call the `translate` edge function, which uses the Claude API (Anthropic).
+Only the announcement title and message are sent — no employee data. Each request is logged in `hr.translation_log` (who, when,
+direction, length) and limited per person per day (`engagement.translate_daily_limit`, default 100).
+
+1. Create an API key at console.anthropic.com (company account) and note it.
+2. Set the secrets (self-hosted: in the functions `.env`; cloud: Project → Edge Functions → Secrets, or `supabase secrets set`):
+   `ANTHROPIC_API_KEY=<key>` and optionally `TRANSLATE_MODEL` (default `claude-sonnet-5-5`).
+3. Deploy the function: `npx supabase functions deploy translate` (sign-in is checked; keep JWT verification on).
+4. The server must reach `https://api.anthropic.com` over HTTPS (port 443).
+5. Test: Engagement admin → New announcement → write an English title → **English → Arabic**.
+
+Without the key the buttons show "Translation is not set up on this server yet"; everything else works.
+
 ## Letter verification address
 
 Letters print an address of the form `https://<server>/verify?ref=…&code=…`. Set the public address once in

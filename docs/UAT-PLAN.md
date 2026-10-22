@@ -127,3 +127,7 @@ Go-live needs **no open A or B items**.
 | 9.8 | An employee recognises a colleague; the colleague and their manager check notifications | Both notified; post on the wall of the same company only; a sixth post in a day is refused |
 | 9.9 | HR hides an unsuitable post with a reason | Gone from the wall; reason visible to HR only |
 | 9.10 | HR proposes "Employee of the month"; the proposer tries to approve; a second person approves | Proposer cannot approve; after approval the winner is notified and the award appears on the wall |
+| 9.11 | HR officer writes an English announcement, presses **English → Arabic** | Arabic title and message filled in formal Omani Arabic (Omani terms used, numbers kept); Undo restores the old Arabic text |
+| 9.12 | HR writes only Arabic text and presses **Arabic → English** | English title and message filled in; the announcement can then be saved |
+| 9.13 | HR attaches a signed PDF (try a JPG and a 12 MB PDF first) and sends for approval | JPG and the large file are refused; the PDF shows name and size; the approver can open it |
+| 9.14 | Before approval an employee tries to open the PDF link; after approval opens it on the phone | Refused before approval; after approval opens (share sheet on the phone app) |

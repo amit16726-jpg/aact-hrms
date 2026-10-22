@@ -1,4 +1,6 @@
 import { rpc, type Json } from './api';
+import { ApiError, parseError } from './errors';
+import { supabase } from './supabase';
 import type { EmpBrief } from './api_time';
 
 // ---------------------------------------------------------------------------
@@ -18,6 +20,7 @@ export interface Announcement {
   read_at: string | null; acknowledged_at: string | null; in_audience?: boolean;
   can_edit: boolean; can_decide: boolean; can_archive: boolean;
   stats: { audience: number; read: number; acknowledged: number } | null;
+  attachment_path: string | null; attachment_name: string | null; attachment_bytes: number | null;
 }
 export interface Reader extends EmpBrief { read_at: string | null; acknowledged_at: string | null }
 
@@ -102,4 +105,77 @@ export function collectAnswers(questions: Question[], vals: Record<string, numbe
 /** Share of a count in a total as a whole percent (0 when the total is 0). */
 export function pct(n: number, total: number): number {
   return total > 0 ? Math.round((100 * n) / total) : 0;
+}
+
+// ---------------------------------------------------------------------------
+// 1.15.0 — signed PDF attached to an announcement (private bucket hr-engage, path ann/<uuid>.pdf)
+// ---------------------------------------------------------------------------
+export const ENGAGE_BUCKET = 'hr-engage';
+export const MAX_PDF_BYTES = 10 * 1024 * 1024;
+
+/** 'FILE_TYPE' / 'FILE_SIZE' when the file cannot be attached, otherwise null. */
+export function checkPdf(f: { name: string; type: string; size: number }): 'FILE_TYPE' | 'FILE_SIZE' | null {
+  const isPdf = f.type === 'application/pdf' || (f.type === '' && /\.pdf$/i.test(f.name));
+  if (!isPdf) return 'FILE_TYPE';
+  if (f.size <= 0 || f.size > MAX_PDF_BYTES) return 'FILE_SIZE';
+  return null;
+}
+
+export function annPdfPath(): string {
+  return `ann/${crypto.randomUUID().toLowerCase()}.pdf`;
+}
+
+export async function uploadAnnPdf(f: File): Promise<string> {
+  const path = annPdfPath();
+  const { error } = await supabase.storage.from(ENGAGE_BUCKET).upload(path, f, { contentType: 'application/pdf', upsert: false });
+  if (error) throw parseError(error);
+  return path;
+}
+
+export async function annPdfUrl(path: string, seconds = 300): Promise<string> {
+  const { data, error } = await supabase.storage.from(ENGAGE_BUCKET).createSignedUrl(path, seconds);
+  if (error) throw parseError(error);
+  return data.signedUrl;
+}
+
+/** "245 KB" / "1.4 MB" */
+export function fileSize(bytes: number | null | undefined): string {
+  if (!bytes || bytes < 0) return '';
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// ---------------------------------------------------------------------------
+// 1.15.0 — English <-> Arabic translation (edge function `translate`)
+// ---------------------------------------------------------------------------
+export type TranslateDirection = 'en-ar' | 'ar-en';
+export interface Translation { title: string; body: string; model?: string }
+
+/** Turns an edge-function failure into an ApiError ("CODE: message" from the function, or TRANSLATE_OFF when it is not deployed). */
+export async function functionError(error: unknown): Promise<ApiError> {
+  const ctx = (error as { context?: unknown } | null)?.context;
+  if (ctx && typeof (ctx as Response).text === 'function') {
+    const res = ctx as Response;
+    let text = '';
+    try { text = await res.clone().text(); } catch { text = ''; }
+    let msg = '';
+    try { msg = String((JSON.parse(text) as { error?: unknown }).error ?? ''); } catch { msg = ''; }
+    if (msg) return parseError(msg);
+    if (res.status === 404) return new ApiError('TRANSLATE_OFF', 'The translation service is not installed on this server.');
+    return new ApiError('TRANSLATE_FAILED', `The translation service answered ${res.status}.`);
+  }
+  const name = (error as { name?: string } | null)?.name ?? '';
+  if (name === 'FunctionsFetchError' || name === 'FunctionsRelayError') {
+    return new ApiError('TRANSLATE_OFF', 'The translation service could not be reached.');
+  }
+  return parseError(error);
+}
+
+export async function translateAnn(direction: TranslateDirection, title: string, body: string): Promise<Translation> {
+  const { data, error } = await supabase.functions.invoke('translate', { body: { direction, title, body } });
+  if (error) throw await functionError(error);
+  const d = (data ?? {}) as Partial<Translation> & { error?: string };
+  if (d.error) throw parseError(d.error);
+  if (typeof d.title !== 'string' || typeof d.body !== 'string') throw new ApiError('TRANSLATE_FAILED', 'The translation could not be read.');
+  return { title: d.title, body: d.body, model: d.model };
 }

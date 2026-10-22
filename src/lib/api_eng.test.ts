@@ -38,3 +38,36 @@ describe('pct', () => {
     expect(pct(0, 0)).toBe(0);
   });
 });
+
+describe('1.15.0 PDF and translation helpers', () => {
+  it('accepts only PDFs up to 10 MB', async () => {
+    const { checkPdf } = await import('./api_eng');
+    expect(checkPdf({ name: 'circular.pdf', type: 'application/pdf', size: 1000 })).toBeNull();
+    expect(checkPdf({ name: 'circular.PDF', type: '', size: 1000 })).toBeNull();
+    expect(checkPdf({ name: 'photo.jpg', type: 'image/jpeg', size: 1000 })).toBe('FILE_TYPE');
+    expect(checkPdf({ name: 'big.pdf', type: 'application/pdf', size: 10 * 1024 * 1024 + 1 })).toBe('FILE_SIZE');
+    expect(checkPdf({ name: 'empty.pdf', type: 'application/pdf', size: 0 })).toBe('FILE_SIZE');
+  });
+  it('builds storage paths the database accepts', async () => {
+    const { annPdfPath } = await import('./api_eng');
+    expect(annPdfPath()).toMatch(/^ann\/[0-9a-f-]{36}\.pdf$/);
+  });
+  it('formats file sizes', async () => {
+    const { fileSize } = await import('./api_eng');
+    expect(fileSize(null)).toBe('');
+    expect(fileSize(300)).toBe('1 KB');
+    expect(fileSize(250 * 1024)).toBe('250 KB');
+    expect(fileSize(1.5 * 1024 * 1024)).toBe('1.5 MB');
+  });
+  it('reads edge-function errors', async () => {
+    const { functionError } = await import('./api_eng');
+    const withBody = (status: number, body: string) => ({ name: 'FunctionsHttpError', context: new Response(body, { status }) });
+    const e1 = await functionError(withBody(503, '{"error":"TRANSLATE_OFF: Translation is not set up."}'));
+    expect([e1.code, e1.detail]).toEqual(['TRANSLATE_OFF', 'Translation is not set up.']);
+    const e2 = await functionError(withBody(400, '{"error":"LIMIT: You have reached today\'s translation limit (100)."}'));
+    expect(e2.code).toBe('LIMIT');
+    expect((await functionError(withBody(404, 'Not found'))).code).toBe('TRANSLATE_OFF');
+    expect((await functionError(withBody(500, 'oops'))).code).toBe('TRANSLATE_FAILED');
+    expect((await functionError({ name: 'FunctionsFetchError', message: 'Failed to send a request' })).code).toBe('TRANSLATE_OFF');
+  });
+});

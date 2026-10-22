@@ -1,4 +1,4 @@
-"""Dump 1.14.0 engagement RPC responses into e2e/fixtures_eng.json for screens.py.
+"""Dump 1.14.0 / 1.15.0 engagement RPC responses into e2e/fixtures_eng.json for screens.py.
 
 Run after `npm run db:test` (it uses the test users and employees that the database tests create).
 Everything is done inside one transaction that is rolled back, so the test database is left as it was.
@@ -19,6 +19,7 @@ declare a1 uuid; a2 uuid; a3 uuid; a4 uuid; s1 uuid; s2 uuid; aw uuid; aw2 uuid;
 begin
   perform tst.as_user('hro');
   a1 := (public.hr_save_announcement(jsonb_build_object('entity_id', v_ent, 'category', 'SAFETY', 'pinned', true, 'require_ack', true,
+          'attachment_path', 'ann/5b0e7c1e-2f4a-4d7b-9c1e-8a6f3d2b1c0e.pdf', 'attachment_name', 'Safety circular 14-2026 (signed).pdf', 'attachment_bytes', 248000,
           'title_en', 'New safety shoes for the production floor', 'title_ar', 'أحذية سلامة جديدة لأرضية الإنتاج',
           'body_en', E'From Sunday, safety shoes with a steel toe cap are required on the production floor.\nCollect your pair from the store, 7:00–15:00, by Thursday.',
           'body_ar', E'اعتباراً من يوم الأحد، يلزم ارتداء أحذية السلامة ذات المقدمة الفولاذية في أرضية الإنتاج.\nاستلم حذاءك من المخزن من 7:00 إلى 15:00 قبل يوم الخميس.'))->>'id')::uuid;

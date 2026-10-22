@@ -1,4 +1,4 @@
-# Employee engagement (1.14.0)
+# Employee engagement (1.14.0, announcements updated in 1.15.0)
 
 Menu: **Engagement** (everyone) and **Engagement admin** (HR: `ENGAGE_MANAGE` prepares, `ENGAGE_APPROVE` approves).
 Works the same in the browser and in the Android / iPhone apps, in English and Arabic.
@@ -8,6 +8,12 @@ Works the same in the browser and in the Android / iPhone apps, in English and A
 - Audience: all companies, one company, or one department (sub-departments included).
 - Pin to the top; optionally ask everyone to **confirm they have read it** (safety and policy notices).
 - Draft → sent for approval → approved by **another person** → published. Rejection needs a reason; the preparer edits and sends again.
+- **Signed PDF (1.15.0):** optionally attach the signed circular (PDF, up to 10 MB). Stored in the private bucket `hr-engage`
+  (`ann/<random>.pdf`); HR can open it at any time, employees only while the announcement is live for them. Replacing or removing the PDF
+  changes the draft (it goes through approval again); old files are kept, never overwritten.
+- **Translate (1.15.0):** *English → Arabic* / *Arabic → English* fill the other language's title and message in one step.
+  Arabic follows official Omani circulars and a glossary of Omani terms; *Undo* restores the previous text. Always read the result
+  before sending for approval. Set-up: `docs/ENVIRONMENTS.md` → *Translation*.
 - Everyone in the audience is notified on the publish date (high priority when confirmation is asked). HR sees read and confirmed counts and the list of who has / has not.
 
 ## Surveys
@@ -26,4 +32,6 @@ Works the same in the browser and in the Android / iPhone apps, in English and A
 - "Most recognised this month" shows the top five.
 
 ## Settings
-`hr.settings` key `engagement`: `{"survey_min_responses": 5, "peer_daily_limit": 5}`.
+`hr.settings` key `engagement`: `{"survey_min_responses": 5, "peer_daily_limit": 5}`; optional `"translate_daily_limit": 100` (translations per person per day).
+`hr.settings` key `translation_glossary`: company terms used by the translator, e.g. `[{"en": "Rusayl plant", "ar": "مصنع الرسيل"}]`
+(they take priority over the built-in Omani glossary in `supabase/functions/_shared/translate.ts`).

@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.15.0 — 2026-10-22
+
+### Added — Announcements: translation and signed PDF
+- **Translate** buttons in the announcement form: *English → Arabic* and *Arabic → English*. Each translates the title and the message together,
+  in the formal Arabic of official Omani circulars (built-in glossary of Omani terms: Ministry of Labour, Social Protection Fund, Omanisation,
+  end-of-service gratuity, National Day, ر.ع. …), or clear British English. *Undo* puts back the text it replaced. The person must still check
+  the text, and the second-person approval is unchanged.
+- Runs in the new edge function `translate` (Claude API, key `ANTHROPIC_API_KEY` on the server). The database checks the `ENGAGE_MANAGE`
+  permission, applies a daily limit per person (`engagement.translate_daily_limit`, default 100) and logs each request (who, when, direction,
+  length — not the text) in `hr.translation_log`. Extra company terms: `hr.settings` key `translation_glossary`.
+- **Signed PDF** on an announcement (optional, PDF only, up to 10 MB): attach, replace, remove and open in the form; readers see
+  "Signed PDF attached" with an Open button (the phone apps open it through the share sheet). Private bucket `hr-engage`; employees can open
+  the file only while the announcement is live for them. Files are never overwritten; replacing stores a new file.
+- Tests: `tests/db/98_ann_pdf_translate.sql`, `supabase/functions/_shared/translate.test.ts`, more in `src/lib/api_eng.test.ts` and `e2e/flows.py`.
+- Phone app version 1.15.0 (Android versionCode 11500).
+
 ## 1.14.0 — 2026-10-22
 
 ### Added — Employee engagement (web and phone apps, English and Arabic)

@@ -1119,3 +1119,25 @@ progress { width: 100%; max-width: 200px; height: 8px; accent-color: var(--petro
   .eg-scale-label { font-size: 10.5px; }
   .eg-sum { padding: 12px; gap: 8px; }
 }
+
+/* 1.15.0 — announcement translate bar and signed PDF */
+.eg-tr-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 10px 12px; border: 1px solid var(--line-soft);
+  border-radius: var(--radius-m); background: var(--panel-2); }
+.eg-tr-label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); margin-inline-end: 2px; }
+.eg-tr-label svg { color: var(--petrol); }
+.eg-tr-hint { flex: 1 1 260px; font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+.field > .field-label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.eg-pdf { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-m);
+  background: var(--panel); min-width: 0; }
+.eg-pdf-ico { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: var(--expired-wash); color: var(--expired); }
+.eg-pdf-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.eg-pdf-name { font-size: 14px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eg-pdf-size { font-size: 12px; color: var(--ink-3); }
+.eg-pdf-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.eg-article-pdf { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+.eg-article-pdf-head { font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+:root[dir='rtl'] .eg-article-pdf-head { text-transform: none; letter-spacing: 0; }
+@media (max-width: 560px) {
+  .eg-pdf { flex-wrap: wrap; }
+  .eg-pdf-actions { width: 100%; justify-content: flex-start; }
+}

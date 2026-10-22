@@ -1,18 +1,18 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowDown, ArrowUp, ChartColumn, Eye, Plus, Trash2, Users } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChartColumn, Eye, Languages, Paperclip, Plus, Trash2, Undo2, Users, X } from 'lucide-react';
 import { useI18n, type Key } from '../../i18n';
 import { useSession } from '../../lib/session';
 import {
-  ANN_CATEGORIES, RECOG_CATEGORIES, eapi, type AnnCategory, type Announcement, type Question, type QuestionKind, type RecogCategory,
+  ANN_CATEGORIES, RECOG_CATEGORIES, checkPdf, eapi, translateAnn, uploadAnnPdf, type AnnCategory, type TranslateDirection, type Announcement, type Question, type QuestionKind, type RecogCategory,
   type Recognition, type Survey,
 } from '../../lib/api_eng';
 import {
-  Button, Check, Empty, ErrorNote, Input, Loading, Modal, Select, Tabs, Textarea, useAction, useAsync, useConfirm,
+  Button, Check, Empty, ErrorNote, Input, Loading, Modal, Select, Tabs, Textarea, useAction, useAsync, useConfirm, useToast,
 } from '../../components/ui';
 import { PageHead } from '../../components/Layout';
 import { MasterSelect, EmployeePicker } from '../../components/pickers';
-import { AnnCategoryChip, Bar, EngStatus, RecogCategoryChip, audienceText } from '../../components/eng';
+import { AnnCategoryChip, Bar, EngStatus, PdfChip, RecogCategoryChip, audienceText, openAnnPdf } from '../../components/eng';
 import { fmtDate, fmtDateTime, todayMuscat, addDays } from '../../lib/format';
 
 type Tab = 'news' | 'surveys' | 'awards';
@@ -110,7 +110,11 @@ function NewsAdmin() {
 function AnnouncementEditor({ base, onClose, onDone }: { base: Announcement | null; onClose: () => void; onDone: (a: Announcement) => void }) {
   const { t, L } = useI18n();
   const { me } = useSession();
+  const { push } = useToast();
   const { busy, run } = useAction();
+  const tr = useAction();
+  const pdf = useAction();
+  const fileRef = useRef<HTMLInputElement>(null);
   const today = todayMuscat();
   const [f, setF] = useState({
     entity_id: base ? base.entity_id : (me?.entities.length === 1 ? me.entities[0].id : null) as string | null,
@@ -118,23 +122,84 @@ function AnnouncementEditor({ base, onClose, onDone }: { base: Announcement | nu
     title_en: base?.title_en ?? '', title_ar: base?.title_ar ?? '', body_en: base?.body_en ?? '', body_ar: base?.body_ar ?? '',
     pinned: base?.pinned ?? false, require_ack: base?.require_ack ?? false,
     publish_on: base && base.publish_on >= today ? base.publish_on : today, expires_on: base?.expires_on ?? '',
+    attachment_path: base?.attachment_path ?? null as string | null, attachment_name: base?.attachment_name ?? null as string | null,
+    attachment_bytes: base?.attachment_bytes ?? null as number | null,
   });
+  // the text a translation replaced, so it can be put back
+  const [undo, setUndo] = useState<{ title_en: string; title_ar: string; body_en: string; body_ar: string } | null>(null);
+  const [trDir, setTrDir] = useState<TranslateDirection | null>(null);
+
   const save = async (submit: boolean) => {
     const a = await run(() => eapi.saveAnnouncement({ ...f, id: base?.id ?? null, expires_on: f.expires_on || null }), submit ? undefined : t('ea.saved'));
     if (!a) return;
     if (submit) { const s = await run(() => eapi.submitAnnouncement(a.id), t('ea.submitted')); onDone(s ?? a); } else onDone(a);
   };
+
+  const hasEn = !!(f.title_en.trim() || f.body_en.trim());
+  const hasAr = !!(f.title_ar.trim() || f.body_ar.trim());
+  const translate = async (dir: TranslateDirection) => {
+    const src = dir === 'en-ar' ? { title: f.title_en, body: f.body_en } : { title: f.title_ar, body: f.body_ar };
+    if (!src.title.trim() && !src.body.trim()) { push(t(dir === 'en-ar' ? 'ea.tr_need_en' : 'ea.tr_need_ar'), true); return; }
+    setTrDir(dir);
+    const r = await tr.run(() => translateAnn(dir, src.title, src.body));
+    setTrDir(null);
+    if (!r) return;
+    setUndo({ title_en: f.title_en, title_ar: f.title_ar, body_en: f.body_en, body_ar: f.body_ar });
+    setF((x) => dir === 'en-ar'
+      ? { ...x, title_ar: src.title.trim() ? r.title : x.title_ar, body_ar: src.body.trim() ? r.body : x.body_ar }
+      : { ...x, title_en: src.title.trim() ? r.title : x.title_en, body_en: src.body.trim() ? r.body : x.body_en });
+    push(t(dir === 'en-ar' ? 'ea.tr_done_ar' : 'ea.tr_done_en'));
+  };
+  const doUndo = () => { if (undo) { setF((x) => ({ ...x, ...undo })); setUndo(null); } };
+
+  const pickPdf = async (file: File | undefined) => {
+    if (fileRef.current) fileRef.current.value = '';
+    if (!file) return;
+    const bad = checkPdf(file);
+    if (bad) { push(t(bad === 'FILE_SIZE' ? 'ea.pdf_size' : 'ea.pdf_type'), true); return; }
+    const path = await pdf.run(() => uploadAnnPdf(file));
+    if (path) setF((x) => ({ ...x, attachment_path: path, attachment_name: file.name.slice(0, 200), attachment_bytes: file.size }));
+  };
+  const removePdf = () => setF((x) => ({ ...x, attachment_path: null, attachment_name: null, attachment_bytes: null }));
+
   const ok = f.title_en.trim().length >= 3 && f.body_en.trim().length >= 3 && !!f.publish_on && (!f.expires_on || f.expires_on >= f.publish_on);
+  const working = busy || pdf.busy || tr.busy;
   return (
     <Modal open wide title={base ? t('ea.edit_ann') : t('ea.new_ann')} onClose={onClose}
       footer={<><Button onClick={onClose}>{t('c.cancel')}</Button>
-        <Button busy={busy} disabled={!ok} onClick={() => void save(false)}>{t('ea.save_draft')}</Button>
-        <Button kind="primary" busy={busy} disabled={!ok} onClick={() => void save(true)}>{t('ea.submit')}</Button></>}>
+        <Button busy={busy} disabled={!ok || working} onClick={() => void save(false)}>{t('ea.save_draft')}</Button>
+        <Button kind="primary" busy={busy} disabled={!ok || working} onClick={() => void save(true)}>{t('ea.submit')}</Button></>}>
       <div className="form-grid">
+        <div className="span-2 eg-tr-bar" role="group" aria-label={t('ea.translate')}>
+          <span className="eg-tr-label"><Languages size={16} aria-hidden="true" />{t('ea.translate')}</span>
+          <Button small busy={trDir === 'en-ar'} disabled={tr.busy || !hasEn} onClick={() => void translate('en-ar')}>
+            {t('ea.tr_en_ar')}
+          </Button>
+          <Button small busy={trDir === 'ar-en'} disabled={tr.busy || !hasAr} onClick={() => void translate('ar-en')}>
+            {t('ea.tr_ar_en')}
+          </Button>
+          {undo && !tr.busy && <Button small kind="ghost" onClick={doUndo}><Undo2 size={14} aria-hidden="true" /> {t('ea.tr_undo')}</Button>}
+          <span className="eg-tr-hint">{t('ea.tr_hint')}</span>
+        </div>
         <Input label={t('ea.title_en')} required maxLength={150} value={f.title_en} onChange={(e) => setF({ ...f, title_en: e.target.value })} />
         <Input label={t('ea.title_ar')} dir="rtl" lang="ar" maxLength={150} value={f.title_ar} onChange={(e) => setF({ ...f, title_ar: e.target.value })} />
         <Textarea label={t('ea.body_en')} required rows={6} maxLength={5000} value={f.body_en} onChange={(e) => setF({ ...f, body_en: e.target.value })} />
         <Textarea label={t('ea.body_ar')} dir="rtl" lang="ar" rows={6} maxLength={5000} value={f.body_ar} onChange={(e) => setF({ ...f, body_ar: e.target.value })} />
+        <div className="span-2 field">
+          <span className="field-label">{t('ea.pdf')}</span>
+          {f.attachment_path ? (
+            <PdfChip name={f.attachment_name} bytes={f.attachment_bytes}
+              onOpen={() => void pdf.run(() => openAnnPdf(f.attachment_path as string, f.attachment_name))}>
+              <Button small busy={pdf.busy} onClick={() => fileRef.current?.click()}>{t('ea.pdf_replace')}</Button>
+              <Button small kind="ghost" disabled={pdf.busy} onClick={removePdf}><X size={14} aria-hidden="true" /> {t('ea.pdf_remove')}</Button>
+            </PdfChip>
+          ) : (
+            <div><Button busy={pdf.busy} onClick={() => fileRef.current?.click()}><Paperclip size={15} aria-hidden="true" /> {pdf.busy ? t('ea.pdf_uploading') : t('ea.pdf_choose')}</Button></div>
+          )}
+          <input ref={fileRef} type="file" accept="application/pdf,.pdf" hidden aria-label={t('ea.pdf_choose')}
+            onChange={(e) => void pickPdf(e.target.files?.[0])} />
+          <span className="hint">{t('ea.pdf_hint')}</span>
+        </div>
         <Select label={t('ea.category')} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as AnnCategory })}>
           {ANN_CATEGORIES.map((c) => <option key={c} value={c}>{t(`eg.cat_${c}` as Key)}</option>)}
         </Select>

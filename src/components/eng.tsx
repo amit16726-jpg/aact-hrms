@@ -1,13 +1,16 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Award, CalendarDays, CircleCheck, Cpu, EyeOff, HandHeart, Lightbulb, Megaphone, PartyPopper, Pin, Scale, ShieldCheck, Sparkles, Star,
+  Award, CalendarDays, CircleCheck, Cpu, EyeOff, FileText, HandHeart, Lightbulb, Megaphone, Paperclip, PartyPopper, Pin, Scale, ShieldCheck,
+  Sparkles, Star,
   Trophy, Users, HeartHandshake, Smile, type LucideIcon,
 } from 'lucide-react';
 import { useI18n, type Key } from '../i18n';
-import { eapi, type AnnCategory, type Announcement, type RecogCategory, type Recognition } from '../lib/api_eng';
+import { annPdfUrl, eapi, fileSize, type AnnCategory, type Announcement, type RecogCategory, type Recognition } from '../lib/api_eng';
+import { ApiError } from '../lib/errors';
+import { isNative, saveFile } from '../lib/native';
 import type { EmpBrief } from '../lib/api_time';
-import { Badge, Field } from './ui';
+import { Badge, Button, Field } from './ui';
 import { fmtDate } from '../lib/format';
 import { initials } from './Layout';
 
@@ -54,6 +57,7 @@ export function AnnouncementCard({ a }: { a: Announcement }) {
         <AnnCategoryChip c={a.category} />
         {a.pinned && <span className="eg-flag"><Pin size={12} aria-hidden="true" />{t('eg.pinned')}</span>}
         {unread && <span className="eg-flag is-new">{t('eg.new')}</span>}
+        {a.attachment_path && <span className="eg-flag" title={t('eg.has_pdf')}><Paperclip size={12} aria-hidden="true" />PDF</span>}
         <span className="eg-ann-date">{t('eg.posted', { d: fmtDate(a.publish_on) })}</span>
       </div>
       <h3>{L(a.title_en, a.title_ar)}</h3>
@@ -173,6 +177,50 @@ export function Bar({ value, total, label, strong }: { value: number; total: num
       <span className="eg-bar-label">{label}</span>
       <span className="eg-bar" aria-hidden="true"><span className={strong ? 'is-strong' : undefined} style={{ width: `${p}%` }} /></span>
       <span className="eg-bar-val num">{value} <span className="muted">({p}%)</span></span>
+    </div>
+  );
+}
+
+/**
+ * Opens an announcement PDF. In a browser: a new tab pointed at a short-lived signed link (the tab is opened inside the
+ * click, before any waiting, so pop-up blockers allow it). In the phone app: downloads it and opens the share sheet
+ * (open in a PDF viewer, save to Files, send …), because app web views cannot show PDFs.
+ */
+export async function openAnnPdf(path: string, name: string | null): Promise<void> {
+  const fname = name && /\.pdf$/i.test(name) ? name : `${name || 'announcement'}.pdf`;
+  if (isNative()) {
+    const url = await annPdfUrl(path, 300);
+    const res = await fetch(url);
+    if (!res.ok) throw new ApiError('NOT_FOUND', 'The PDF could not be downloaded.');
+    await saveFile(fname, await res.blob());
+    return;
+  }
+  const w = window.open('', '_blank');
+  if (w) w.opener = null;
+  try {
+    const url = await annPdfUrl(path, 300);
+    if (w) w.location.href = url; else window.location.assign(url);
+  } catch (e) {
+    if (w) w.close();
+    throw e;
+  }
+}
+
+/** The attached signed PDF: icon, file name, size and an Open button. */
+export function PdfChip({ name, bytes, onOpen, busy, children }:
+  { name: string | null; bytes: number | null; onOpen: () => void; busy?: boolean; children?: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <div className="eg-pdf">
+      <span className="eg-pdf-ico" aria-hidden="true"><FileText size={20} /></span>
+      <span className="eg-pdf-text">
+        <span className="eg-pdf-name" dir="auto">{name || 'announcement.pdf'}</span>
+        <span className="eg-pdf-size">PDF{bytes ? ` · ${fileSize(bytes)}` : ''}</span>
+      </span>
+      <span className="eg-pdf-actions">
+        <Button small busy={busy} onClick={onOpen}>{t('ea.pdf_open')}</Button>
+        {children}
+      </span>
     </div>
   );
 }

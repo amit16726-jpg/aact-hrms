@@ -2,6 +2,8 @@
   * answering a survey sends exactly the chosen answers; incomplete forms are not sent
   * posting a recognition from the colleague picker
   * typing a reason in a confirm dialog keeps it open (bug fixed in 1.14.0)
+  * announcement editor (1.15.0): English -> Arabic translation fills the Arabic fields, Undo restores them,
+    Arabic -> English works, a signed PDF is uploaded to hr-engage and sent with the announcement
 Usage:  VITE_SUPABASE_URL=https://mockref.supabase.co VITE_SUPABASE_ANON_KEY=test npx vite build --outDir <dist> && python3 e2e/flows.py <dist>
 """
 import json, sys, threading, time, http.server, functools, pathlib
@@ -66,6 +68,63 @@ with sync_playwright() as p:
     pg2.get_by_role('button', name='Reject').first.click(); pg2.wait_for_timeout(300)
     pg2.locator('dialog[open] textarea').type('Not agreed yet', delay=20); pg2.wait_for_timeout(400)
     assert pg2.locator('dialog[open]').count() == 1, 'dialog closed while typing'
+
+    # 1.15.0: announcement editor — translation and signed PDF
+    ctx3 = br.new_context(viewport={'width': 1280, 'height': 900}, service_workers='block')
+    ctx3.add_init_script(f"localStorage.setItem('sb-mockref-auth-token', {json.dumps(SESSION)});")
+    ENT = {'id': FX['hr_list_announcements'][0].get('entity_id') or 'e1', 'code': 'DEMO', 'name_en': 'Demo Tiles LLC', 'name_ar': 'شركة ديمو للبلاط'}
+    HRO = {**ME, 'roles': ['HR_OFFICER'], 'permissions': ['ENGAGE_MANAGE'], 'entities': [ENT]}
+    tr_calls, up_calls, saved = [], [], []
+    def handle3(route):
+        fn = route.request.url.split('/rpc/')[-1].split('?')[0]; body = route.request.post_data_json or {}
+        if fn == 'hr_save_announcement':
+            saved.append(body['p']); a = dict(FX['hr_list_announcements'][0]); a.update(body['p']); a['id'] = 'new-ann'; a['status'] = 'DRAFT'
+            route.fulfill(status=200, content_type='application/json', body=json.dumps(a)); return
+        out = {'hr_me': HRO, 'hr_list_notifications': {'items': [], 'unread': 0}, 'hr_list_my_tasks': {'count': 0},
+               'hr_list_master': [{'id': 'd1', 'code': 'PROD', 'name_en': 'Production', 'name_ar': 'الإنتاج', 'is_active': True}]}.get(fn, FX.get(fn, {}))
+        route.fulfill(status=200, content_type='application/json', body=json.dumps(out))
+    def handle_tr(route):
+        if route.request.method == 'OPTIONS': route.fulfill(status=200, body='ok'); return
+        b = route.request.post_data_json; tr_calls.append(b)
+        out = {'title': 'إجازة العيد الوطني', 'body': 'سيغلق المكتب والمصنع بمناسبة إجازة العيد الوطني.'} if b['direction'] == 'en-ar' \
+              else {'title': 'National Day holiday', 'body': 'The office and plant will be closed for the National Day holiday.'}
+        route.fulfill(status=200, content_type='application/json', body=json.dumps({**out, 'model': 'test'}), headers={'Access-Control-Allow-Origin': '*'})
+    def handle_up(route):
+        if route.request.method == 'OPTIONS': route.fulfill(status=200, body='ok', headers={'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*'}); return
+        up_calls.append(route.request.url)
+        route.fulfill(status=200, content_type='application/json', body=json.dumps({'Key': 'hr-engage/' + route.request.url.split('/hr-engage/')[-1], 'Id': 'x'}),
+                      headers={'Access-Control-Allow-Origin': '*'})
+    ctx3.route('**/rest/v1/rpc/**', handle3); ctx3.route('**/auth/v1/**', lambda r: r.fulfill(status=200, content_type='application/json', body='{}'))
+    ctx3.route('**/functions/v1/translate', handle_tr); ctx3.route('**/storage/v1/object/hr-engage/**', handle_up)
+    pg3 = ctx3.new_page(); pg3.on('pageerror', lambda e: errors.append(str(e)))
+    pg3.goto('http://127.0.0.1:4311/engage/admin'); pg3.wait_for_load_state('networkidle')
+    pg3.get_by_role('button', name='New announcement').click(); pg3.wait_for_timeout(300)
+    dlg = pg3.locator('dialog[open]')
+    assert dlg.get_by_role('button', name='English → Arabic').is_disabled(), 'translate enabled with no English text'
+    dlg.get_by_label('Title (English)').fill('National Day holiday')
+    dlg.get_by_label('Message (English)').fill('The office and plant will be closed for the National Day holiday.')
+    dlg.get_by_role('button', name='English → Arabic').click(); pg3.wait_for_timeout(500)
+    assert tr_calls and tr_calls[-1] == {'direction': 'en-ar', 'title': 'National Day holiday', 'body': 'The office and plant will be closed for the National Day holiday.'}, tr_calls
+    assert dlg.get_by_label('Title (Arabic)').input_value() == 'إجازة العيد الوطني'
+    assert dlg.get_by_label('Message (Arabic)').input_value().startswith('سيغلق المكتب')
+    pg3.screenshot(path='/tmp/claude-0/-home-claude/7be0054e-dbd1-5fae-b93a-fc6575da434a/scratchpad/flow-translate.png')
+    dlg.get_by_role('button', name='Undo').click(); pg3.wait_for_timeout(200)
+    assert dlg.get_by_label('Title (Arabic)').input_value() == '', 'undo did not restore'
+    dlg.get_by_role('button', name='English → Arabic').click(); pg3.wait_for_timeout(500)
+    dlg.get_by_label('Title (English)').fill('')
+    dlg.get_by_role('button', name='Arabic → English').click(); pg3.wait_for_timeout(500)
+    assert tr_calls[-1]['direction'] == 'ar-en' and dlg.get_by_label('Title (English)').input_value() == 'National Day holiday', tr_calls[-1]
+    # a non-PDF is refused without uploading; a PDF is uploaded
+    fi = dlg.locator('input[type=file]')
+    fi.set_input_files(files=[{'name': 'photo.png', 'mimeType': 'image/png', 'buffer': b'png'}]); pg3.wait_for_timeout(300)
+    assert not up_calls, 'non-PDF uploaded'
+    fi.set_input_files(files=[{'name': 'Circular 15-2026 signed.pdf', 'mimeType': 'application/pdf', 'buffer': b'%PDF-1.4 test'}]); pg3.wait_for_timeout(600)
+    assert len(up_calls) == 1 and '/hr-engage/ann/' in up_calls[0], up_calls
+    assert dlg.get_by_text('Circular 15-2026 signed.pdf').is_visible()
+    pg3.screenshot(path='/tmp/claude-0/-home-claude/7be0054e-dbd1-5fae-b93a-fc6575da434a/scratchpad/flow-pdf.png')
+    dlg.get_by_role('button', name='Save draft').click(); pg3.wait_for_timeout(500)
+    assert saved and saved[-1]['attachment_name'] == 'Circular 15-2026 signed.pdf' and saved[-1]['attachment_bytes'] == 13 \
+        and saved[-1]['attachment_path'].startswith('ann/') and saved[-1]['title_ar'] == 'إجازة العيد الوطني', saved[-1]
     br.close()
 srv.shutdown()
 print('ERRORS', errors) if errors else print('FLOW OK')
