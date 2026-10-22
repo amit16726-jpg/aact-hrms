@@ -37,7 +37,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const loadMe = useCallback(async () => {
     try {
       setMeError(null);
-      setMe(await api.me());
+      const m = await api.me();
+      // no profile for this sign-in (its account was removed): sign out instead of showing an empty page
+      if (!m) { setMeState(null); await supabase.auth.signOut(); return; }
+      setMe(m);
     } catch (e) {
       setMeState(null);
       setMeError(e);

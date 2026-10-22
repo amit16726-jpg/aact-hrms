@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.1 — 2026-10-22
+
+- A browser still signed in to an account that no longer exists (for example after the test database reset) is now signed
+  out automatically and sees the sign-in page, instead of an empty page with only *Check again* and *Sign out*.
+- Database: migration `20261028000200_stale_session`.
+
 ## 1.10.0 — 2026-10-22 — AACT masters, dummy data removed
 
 - **All dummy data removed**: the demo employee seeds (`seed.sql`, `seed_phase2…8.sql`) and their generator are deleted.
