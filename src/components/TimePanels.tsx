@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { tapi } from '../lib/api_time';
 import { useI18n, type Key } from '../i18n';
 import { OMR, monthName } from './pay';
@@ -90,9 +91,11 @@ export function TimePanels() {
           </section>
         )}
         {taskLines.length > 0 && (
-          <section className="panel panel-pad stack">
-            <h2>{t('dt.tasks')}</h2>
-            <ul style={{ margin: 0, paddingInlineStart: 18 }}>{taskLines.map(([k, key, to]) => <li key={k}><Link to={to}>{t(key, { n: tk[k] ?? 0 })}</Link></li>)}</ul>
+          <section className="panel">
+            <div className="panel-head"><h2>{t('dt.tasks')}</h2></div>
+            <ul className="todo">{taskLines.map(([k, key, to]) => (
+              <li key={k}><Link to={to}><span className="todo-n num">{tk[k] ?? 0}</span><span className="todo-t">{t(key, { n: tk[k] ?? 0 }).replace(/^\s*\d+\s*/, '')}</span>
+                <ChevronRight size={16} aria-hidden="true" /></Link></li>))}</ul>
           </section>
         )}
         {d.away_next_14 && (

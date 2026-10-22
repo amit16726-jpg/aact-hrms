@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { useI18n, type Key } from '../i18n';
 import { bucketOf, fmtDate } from '../lib/format';
+import { ArrowDown, ArrowUp, ChevronsUpDown, X } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Buttons and fields
@@ -183,7 +184,7 @@ export function Modal({ open, title, onClose, children, footer, wide }:
         <>
           <div className="dlg-head">
             <h2>{title}</h2>
-            <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label={t('c.close')}>✕</button>
+            <button type="button" className="icon-btn" onClick={onClose} aria-label={t('c.close')}><X size={18} aria-hidden="true" /></button>
           </div>
           <div className="dlg-body">{children}</div>
           {footer && <div className="dlg-foot">{footer}</div>}
@@ -245,7 +246,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {items.map((x) => (
           <div key={x.id} className={`toast ${x.bad ? 'toast-bad' : ''}`} role={x.bad ? 'alert' : 'status'}>
             <span>{x.text}</span>
-            <button type="button" aria-label={t('c.close')} onClick={() => setItems((s) => s.filter((y) => y.id !== x.id))}>✕</button>
+            <button type="button" aria-label={t('c.close')} onClick={() => setItems((s) => s.filter((y) => y.id !== x.id))}><X size={15} aria-hidden="true" /></button>
           </div>
         ))}
       </div>
@@ -314,7 +315,7 @@ export function Pager({ total, limit, offset, onChange }: { total: number; limit
   const pages = Math.max(1, Math.ceil(total / limit));
   const page = Math.floor(offset / limit) + 1;
   return (
-    <div className="row" style={{ padding: '10px 12px' }}>
+    <div className="row pager">
       <span className="muted">{t('c.rows', { n: total })}</span>
       <span className="spacer" />
       <Button small disabled={page <= 1} onClick={() => onChange(Math.max(0, offset - limit))}>{t('c.previous')}</Button>
@@ -329,7 +330,7 @@ export function SortHead({ id, label, sort, dir, onSort, className }:
   const active = sort === id;
   return (
     <th className={className} aria-sort={active ? (dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-      <button type="button" onClick={() => onSort(id)}>{label}{active ? (dir === 'asc' ? ' ▲' : ' ▼') : ''}</button>
+      <button type="button" onClick={() => onSort(id)}>{label}{active ? (dir === 'asc' ? <ArrowUp size={13} aria-hidden="true" /> : <ArrowDown size={13} aria-hidden="true" />) : <ChevronsUpDown size={13} aria-hidden="true" className="sort-idle" />}</button>
     </th>
   );
 }

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.8.0 — 2026-10-21 — new interface
+
+- New design system for every page: colour tokens, IBM Plex Sans / Plex Sans Arabic type scale, consistent panels, tables,
+  forms, buttons, status badges (with a dot, not colour alone), tabs, dialogs and toasts. Arabic mirrors automatically.
+- New app shell: dark sidebar with an icon for every page, groups that open and close (remembered per browser), page path
+  in the top bar, employee search from any page, account menu (My HR, Settings, Sign out), skip-to-content link.
+  Pages now load inside the shell, so the menu stays in place while a page opens.
+- New sign-in page (brand panel and form; phone layout shows the form only).
+- Dashboard: date under the greeting; "Waiting for your decision" is a clickable list with counts.
+- Tables: sort arrows as icons, sticky light header, row hover, quieter dividers. Payslip numbers no longer wrap on phones.
+- Added `lucide-react` 0.468.0 (icons). No database change.
+
 ## 1.7.0 — 26 Oct 2026 — Phase 7: data protection, statutory reports, executive view, server package
 
 - **Data protection (PDPL)** (`Data protection`, permissions `PDPL_READ` / `PDPL_MANAGE`):

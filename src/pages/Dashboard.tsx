@@ -7,6 +7,7 @@ import { PageHead } from '../components/Layout';
 import { Runway } from '../components/Runway';
 import { TimePanels } from '../components/TimePanels';
 import { fmtPct } from '../lib/format';
+import { ChevronRight } from 'lucide-react';
 
 function ExpiryTable({ rows, showEmployee = true }: { rows: ExpiryRow[]; showEmployee?: boolean }) {
   const { t, L } = useI18n();
@@ -35,7 +36,7 @@ function ExpiryTable({ rows, showEmployee = true }: { rows: ExpiryRow[]; showEmp
 }
 
 export function DashboardPage() {
-  const { t, L } = useI18n();
+  const { t, L, lang } = useI18n();
   const { me } = useSession();
   const { data: d, error, loading, reload } = useAsync(() => api.dashboard(), []);
 
@@ -51,7 +52,8 @@ export function DashboardPage() {
 
   return (
     <div className="stack">
-      <PageHead title={t('dash.welcome', { name })} />
+      <PageHead title={t('dash.welcome', { name })}
+        sub={new Intl.DateTimeFormat(lang === 'ar' ? 'ar-OM-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())} />
       <TimePanels />
 
       {c && (
@@ -172,15 +174,14 @@ export function DashboardPage() {
           {me?.permissions.some((p) => ['SALARY_APPROVE', 'BANK_APPROVE', 'RULES_APPROVE'].includes(p)) && (
             <section className="panel">
               <div className="panel-head"><h2>{t('dash.approvals')}</h2></div>
-              <div className="panel-body">
-                {apTotal === 0 ? <p className="muted">{t('dash.approvals_none')}</p> : (
-                  <ul style={{ margin: 0, paddingInlineStart: 18 }}>
-                    {ap.salary > 0 && <li><Link to="/approvals">{t('dash.salary_approvals', { n: ap.salary })}</Link></li>}
-                    {ap.bank > 0 && <li><Link to="/approvals">{t('dash.bank_approvals', { n: ap.bank })}</Link></li>}
-                    {ap.targets > 0 && <li><Link to="/approvals">{t('dash.target_approvals', { n: ap.targets })}</Link></li>}
-                  </ul>
-                )}
-              </div>
+              {apTotal === 0 ? <div className="panel-body"><p className="muted" style={{ margin: 0 }}>{t('dash.approvals_none')}</p></div> : (
+                <ul className="todo">
+                  {([['salary', ap.salary, 'dash.salary_approvals'], ['bank', ap.bank, 'dash.bank_approvals'], ['targets', ap.targets, 'dash.target_approvals']] as const)
+                    .filter(([, n]) => n > 0).map(([k, n, key]) => (
+                      <li key={k}><Link to="/approvals"><span className="todo-n num">{n}</span><span className="todo-t">{t(key, { n }).replace(/^\s*\d+\s*/, '')}</span><ChevronRight size={16} aria-hidden="true" /></Link></li>
+                    ))}
+                </ul>
+              )}
             </section>
           )}
 

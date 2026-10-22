@@ -30,6 +30,11 @@ const base = {
   'nav.omanisation': 'Omanisation', 'nav.targets': 'Omanisation targets', 'nav.organisation': 'Organisation',
   'nav.admin': 'Administration', 'nav.users': 'Users and roles', 'nav.settings': 'Settings', 'nav.audit': 'Audit trail',
   'nav.notifications': 'Notifications', 'nav.menu': 'Menu',
+  'shell.search': 'Search employees', 'shell.search_ph': 'Search by name or employee number', 'shell.account': 'Account',
+  'shell.home': 'Home', 'c.skip_to_content': 'Skip to content', 'shell.open_group': 'Show or hide {g}',
+  'auth.hero_title': 'Human resources for AACT', 'auth.hero_sub': 'One place for the people who run the factory — from joining day to final settlement.',
+  'auth.hero_1': 'Payroll with SPF contributions and the WPS bank file', 'auth.hero_2': 'Attendance, leave, overtime and Ramadan hours',
+  'auth.hero_3': 'Omanisation, document expiries and data protection', 'auth.secure': 'Access is by invitation. Your session is encrypted.',
 
   // auth
   'env.local': 'LOCAL – dummy data', 'env.test': 'not live data',

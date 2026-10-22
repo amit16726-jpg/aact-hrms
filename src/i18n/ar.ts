@@ -29,6 +29,11 @@ const base: Record<BaseKey, string> = {
   'nav.omanisation': 'التعمين', 'nav.targets': 'أهداف التعمين', 'nav.organisation': 'الهيكل التنظيمي',
   'nav.admin': 'الإدارة', 'nav.users': 'المستخدمون والأدوار', 'nav.settings': 'الإعدادات', 'nav.audit': 'سجل التدقيق',
   'nav.notifications': 'التنبيهات', 'nav.menu': 'القائمة',
+  'shell.search': 'البحث عن موظف', 'shell.search_ph': 'ابحث بالاسم أو الرقم الوظيفي', 'shell.account': 'الحساب',
+  'shell.home': 'الرئيسية', 'c.skip_to_content': 'انتقل إلى المحتوى', 'shell.open_group': 'إظهار أو إخفاء {g}',
+  'auth.hero_title': 'الموارد البشرية لشركة AACT', 'auth.hero_sub': 'مكان واحد لكل من يدير المصنع — من يوم الالتحاق حتى التسوية النهائية.',
+  'auth.hero_1': 'الرواتب مع اشتراكات صندوق الحماية الاجتماعية وملف نظام حماية الأجور', 'auth.hero_2': 'الحضور والإجازات والعمل الإضافي وساعات رمضان',
+  'auth.hero_3': 'التعمين وانتهاء المستندات وحماية البيانات', 'auth.secure': 'الدخول بدعوة فقط، والجلسة مشفّرة.',
 
   'env.local': 'محلي – بيانات تجريبية', 'env.test': 'ليست بيانات حقيقية',
   'auth.signin': 'تسجيل الدخول', 'auth.signup': 'إنشاء حساب', 'auth.email': 'البريد الإلكتروني', 'auth.password': 'كلمة المرور',

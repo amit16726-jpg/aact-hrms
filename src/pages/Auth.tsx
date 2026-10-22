@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { supabase, configMissing } from '../lib/supabase';
 import { useI18n } from '../i18n';
 import { useSession } from '../lib/session';
 import { Button, Input } from '../components/ui';
 import { Brand, LangSwitch } from '../components/Layout';
+import { CircleCheck, Lock } from 'lucide-react';
 import { passwordOk } from '../lib/format';
 
 type Mode = 'signin' | 'signup' | 'reset';
@@ -43,35 +44,63 @@ export function AuthPage() {
     }
   };
 
+  const title = t(mode === 'signup' ? 'auth.signup' : mode === 'reset' ? 'auth.forgot' : 'auth.signin');
   return (
-    <div className="auth-wrap">
-      <div className="auth-card">
-        <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Brand />
+    <AuthFrame>
+      <form className="stack" onSubmit={submit} noValidate>
+        <div>
+          <h2>{title}</h2>
+          <p className="lead">{t('app.tagline')}</p>
+        </div>
+        {configMissing && <div className="note note-bad">{t('auth.config_missing')}</div>}
+        {msg && <div className={`note ${msg.bad ? 'note-bad' : 'note-ok'}`} role={msg.bad ? 'alert' : 'status'}>{msg.text}</div>}
+        {mode === 'signup' && <Input label={t('auth.full_name')} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />}
+        <Input label={t('auth.email')} type="email" ltr value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+        {mode !== 'reset' && (
+          <Input label={t('auth.password')} type="password" ltr value={password} onChange={(e) => setPassword(e.target.value)}
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required
+            hint={mode === 'signup' ? t('auth.password_rule') : undefined} />
+        )}
+        <button type="submit" className="btn btn-primary" disabled={busy || configMissing || !email.trim() || (mode !== 'reset' && !password)}>
+          {busy ? t('c.loading') : t(mode === 'signup' ? 'auth.signup' : mode === 'reset' ? 'auth.reset_send' : 'auth.signin')}
+        </button>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          {mode === 'signin'
+            ? <><Button kind="ghost" small onClick={() => { setMode('signup'); setMsg(null); }}>{t('auth.no_account')}</Button>
+                <Button kind="ghost" small onClick={() => { setMode('reset'); setMsg(null); }}>{t('auth.forgot')}</Button></>
+            : <Button kind="ghost" small onClick={() => { setMode('signin'); setMsg(null); }}>{t('auth.have_account')}</Button>}
+        </div>
+        <div className="auth-secure"><Lock size={14} aria-hidden="true" />{t('auth.secure')}</div>
+      </form>
+    </AuthFrame>
+  );
+}
+
+/** Split sign-in frame: brand panel (hidden on phones) and the form side. */
+function AuthFrame({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <div className="auth-split">
+      <section className="auth-hero">
+        <Brand dark />
+        <div className="auth-hero-body">
+          <h1>{t('auth.hero_title')}</h1>
+          <p>{t('auth.hero_sub')}</p>
+          <ul className="auth-points">
+            {(['auth.hero_1', 'auth.hero_2', 'auth.hero_3'] as const).map((k) => (
+              <li key={k}><CircleCheck size={18} aria-hidden="true" /><span>{t(k)}</span></li>
+            ))}
+          </ul>
+        </div>
+        <div className="auth-hero-foot">© {new Date().getFullYear()} AACT</div>
+      </section>
+      <section className="auth-side">
+        <div className="auth-side-top">
+          <div className="auth-mobile-brand"><Brand /></div>
           <LangSwitch />
         </div>
-        <form className="panel panel-pad stack" onSubmit={submit} noValidate>
-          <h1 style={{ fontSize: '1.3rem' }}>{t(mode === 'signup' ? 'auth.signup' : mode === 'reset' ? 'auth.forgot' : 'auth.signin')}</h1>
-          {configMissing && <div className="note note-bad">{t('auth.config_missing')}</div>}
-          {msg && <div className={`note ${msg.bad ? 'note-bad' : 'note-ok'}`} role={msg.bad ? 'alert' : 'status'}>{msg.text}</div>}
-          {mode === 'signup' && <Input label={t('auth.full_name')} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />}
-          <Input label={t('auth.email')} type="email" ltr value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-          {mode !== 'reset' && (
-            <Input label={t('auth.password')} type="password" ltr value={password} onChange={(e) => setPassword(e.target.value)}
-              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required
-              hint={mode === 'signup' ? t('auth.password_rule') : undefined} />
-          )}
-          <button type="submit" className="btn btn-primary" disabled={busy || configMissing || !email.trim() || (mode !== 'reset' && !password)}>
-            {busy ? t('c.loading') : t(mode === 'signup' ? 'auth.signup' : mode === 'reset' ? 'auth.reset_send' : 'auth.signin')}
-          </button>
-          <div className="row" style={{ justifyContent: 'space-between' }}>
-            {mode === 'signin'
-              ? <><Button kind="ghost" small onClick={() => { setMode('signup'); setMsg(null); }}>{t('auth.no_account')}</Button>
-                  <Button kind="ghost" small onClick={() => { setMode('reset'); setMsg(null); }}>{t('auth.forgot')}</Button></>
-              : <Button kind="ghost" small onClick={() => { setMode('signin'); setMsg(null); }}>{t('auth.have_account')}</Button>}
-          </div>
-        </form>
-      </div>
+        <div className="auth-form-wrap">{children}</div>
+      </section>
     </div>
   );
 }
@@ -92,15 +121,14 @@ export function SetPasswordPage() {
     else { setMsg({ text: t('auth.password_set') }); window.setTimeout(clearRecovery, 1200); }
   };
   return (
-    <div className="auth-wrap">
-      <form className="auth-card panel panel-pad stack" onSubmit={submit}>
-        <Brand />
-        <h1 style={{ fontSize: '1.3rem' }}>{t('auth.set_password')}</h1>
+    <AuthFrame>
+      <form className="stack" onSubmit={submit}>
+        <h2>{t('auth.set_password')}</h2>
         {msg && <div className={`note ${msg.bad ? 'note-bad' : 'note-ok'}`}>{msg.text}</div>}
         <Input label={t('auth.new_password')} type="password" ltr value={pw} onChange={(e) => setPw(e.target.value)}
           autoComplete="new-password" hint={t('auth.password_rule')} required />
         <button type="submit" className="btn btn-primary" disabled={busy}>{t('auth.set_password')}</button>
       </form>
-    </div>
+    </AuthFrame>
   );
 }
