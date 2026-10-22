@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Purpose | development | demos, HR acceptance testing | live use |
 | Database | Supabase in Docker (Supabase CLI) | Supabase cloud project `nbseyccerlzerkmcwknw` | self-hosted Supabase in Docker on Ubuntu 24.04 |
-| Data | **dummy** (`supabase/seed.sql`) | sample/dummy only | **real** employee data |
+| Data | AACT masters only (`supabase/seed_masters.sql`) | AACT masters only; no employees | **real** employee data |
 | Front end | `npm run dev` | Vercel | static files behind nginx with HTTPS |
 | E-mail | Mailpit (nothing leaves the laptop) | Supabase default; HR notifications off | company M365 (sign-in e-mails by relay; HR notifications by the `send-mail` function) |
 | Environment label in the app | LOCAL – dummy data | TEST (set `VITE_ENV_LABEL=TEST` in Vercel) | none |
@@ -17,14 +17,10 @@
 
 ## What exists only in one place
 
-- `supabase/seed.sql` — local only. It refuses to run on a database that already has employees.
-- `supabase/seed_phase2.sql` — local/test only (shifts, punches, leave). It stops if shifts already exist.
-- `supabase/seed_phase3.sql` — local/test only (payroll months, loans, settlement). It stops if payroll runs exist.
-- `supabase/seed_phase4.sql` — local/test only (letters, change requests). It stops if letters exist.
-- `supabase/seed_phase5.sql` — local/test only (requisitions, candidates, offers, onboarding). It stops if requisitions exist.
-- `supabase/seed_phase6.sql` — local/test only (appraisal cycle, training, cases, assets, housing, injuries, an exit). It stops if appraisal cycles exist.
-- `supabase/seed_phase7.sql` — local/test only (published privacy notice, consents, requests, breaches). It stops if a notice is already published.
-- `supabase/seed_phase8.sql` — local/test only (demo admin and Finance form the management payroll team; four department heads become MG). It stops if anyone is already MG.
+- `supabase/seed_masters.sql` — everywhere: company, departments, designations, categories, pay components (no personal data).
+- `scripts/reset-test-data.sql` — cloud test project only: wipes every employee, transaction and login, then loads the masters.
+  It refuses to run on a database with non-demo employees.
+- The dummy employee seeds were removed in 1.10.0.
 - `.env.development.local` — local only, written by `npm run env:local`, never committed.
 - Production secrets (database password, JWT secret, SMTP password) — only on the company server, never in git.
 
@@ -33,10 +29,10 @@
 1. Al Anwar IT provides the server (Ubuntu 24.04, Docker, fixed IP, ports 80/443), the DNS name from the web vendor,
    and the M365 mail relay.
 2. `sudo bash deploy/scripts/install.sh` — installs self-hosted Supabase, applies `supabase/migrations`, builds the web app with
-   TLS and schedules backups (full guide: `deploy/README-SERVER.md`). Do **not** load `seed.sql` or any `seed_phase*.sql`.
+   TLS and schedules backups (full guide: `deploy/README-SERVER.md`). Then load `supabase/seed_masters.sql`.
 3. Test a backup **and a restore** (`restore.sh --verify`).
 4. Create the real administrator (first sign-up), then invite HR and Finance. Public sign-up is off.
-5. Enter the real master data (company, departments, grades, job titles, Omanisation targets with their sources).
+5. Complete the master data: company CR and SPF numbers, locations, grades, Omanisation targets with their sources (departments, designations and pay components come from `seed_masters.sql`).
 6. Import employees, documents and opening salaries (*Import data*; see `docs/DATA-MIGRATION.md`).
 7. Parallel payroll for at least one month; user acceptance test (`docs/UAT-PLAN.md`) signed; then go live.
 

@@ -7,9 +7,10 @@ import { Badge, Button, Check, Empty, ErrorNote, Input, Loading, Modal, Select, 
 import { clearMasterCache, CountrySelect, EmployeePicker, MasterSelect } from '../components/pickers';
 import { PageHead } from '../components/Layout';
 import { fmtMoney } from '../lib/format';
+import { splitAliases } from '../lib/aliases';
 
 type Kind = 'entity' | 'location' | 'cost_centre' | 'department' | 'grade' | 'job_title' | 'category' | 'document_type';
-type FType = 'text' | 'textarea' | 'number' | 'money' | 'bool' | 'select' | 'master' | 'intarray' | 'country' | 'employee';
+type FType = 'text' | 'textarea' | 'number' | 'money' | 'bool' | 'select' | 'master' | 'intarray' | 'textarray' | 'country' | 'employee';
 interface FDef { key: string; label: Key; type: FType; required?: boolean; ltr?: boolean; options?: [string, Key][]; master?: Kind;
   hint?: Key; rule?: boolean; wide?: boolean; upper?: boolean }
 
@@ -18,6 +19,8 @@ const common: FDef[] = [
   { key: 'name_en', label: 'c.name_en', type: 'text', required: true },
   { key: 'name_ar', label: 'c.name_ar', type: 'text' },
 ];
+
+const aliases: FDef = { key: 'aliases', label: 'org.f_aliases', type: 'textarray', hint: 'org.f_aliases_hint', wide: true };
 
 const DEFS: Record<Kind, { title: Key; fields: FDef[]; cols: string[] }> = {
   entity: { title: 'org.entity', cols: ['cr_number', 'country'], fields: [...common,
@@ -29,14 +32,14 @@ const DEFS: Record<Kind, { title: Key; fields: FDef[]; cols: string[] }> = {
     { key: 'city', label: 'org.f_city', type: 'text' }, { key: 'governorate', label: 'org.f_governorate', type: 'text' },
     { key: 'address', label: 'org.f_address', type: 'textarea', wide: true }] },
   cost_centre: { title: 'org.cost_centre', cols: ['gl_code'], fields: [...common, { key: 'gl_code', label: 'org.f_gl', type: 'text', ltr: true }] },
-  department: { title: 'org.department', cols: ['parent_id', 'cost_centre_id'], fields: [...common,
+  department: { title: 'org.department', cols: ['aliases', 'parent_id', 'cost_centre_id'], fields: [...common,
     { key: 'parent_id', label: 'org.f_parent', type: 'master', master: 'department' },
     { key: 'cost_centre_id', label: 'org.f_cost_centre', type: 'master', master: 'cost_centre' },
-    { key: 'head_employee_id', label: 'org.f_head', type: 'employee' }] },
+    { key: 'head_employee_id', label: 'org.f_head', type: 'employee' }, aliases] },
   grade: { title: 'org.grade', cols: ['level', 'min_basic', 'max_basic'], fields: [...common,
     { key: 'level', label: 'org.f_level', type: 'number' }, { key: 'min_basic', label: 'org.f_min', type: 'money' }, { key: 'max_basic', label: 'org.f_max', type: 'money' }] },
-  job_title: { title: 'org.job_title', cols: ['profession_code', 'omani_only'], fields: [...common,
-    { key: 'profession_code', label: 'org.f_profession', type: 'text', ltr: true },
+  job_title: { title: 'org.job_title', cols: ['aliases', 'profession_code', 'omani_only'], fields: [...common,
+    { key: 'profession_code', label: 'org.f_profession', type: 'text', ltr: true }, aliases,
     { key: 'description', label: 'org.f_description', type: 'textarea', wide: true },
     { key: 'required_qualifications', label: 'org.f_qualifications', type: 'textarea', wide: true },
     { key: 'omani_only', label: 'org.f_omani_only', type: 'bool', rule: true },
@@ -81,6 +84,7 @@ export default function OrganisationPage() {
       if (f.type === 'number') v = v === '' || v === null || v === undefined ? null : Number(v);
       if (f.type === 'money') v = v === '' || v === null || v === undefined ? null : String(v).replace(/,/g, '');
       if (f.type === 'intarray') v = String(v ?? '').split(/[,\s،]+/).filter(Boolean).map(Number).filter((n) => Number.isInteger(n) && n > 0);
+      if (f.type === 'textarray') v = splitAliases(v);
       if (f.type === 'bool') v = !!v;
       if (typeof v === 'string') v = v.trim() === '' ? null : (f.upper ? v.trim().toUpperCase() : v.trim());
       row[f.key] = v;
@@ -122,6 +126,8 @@ export default function OrganisationPage() {
       case 'country': return <CountrySelect key={f.key} label={t(f.label)} value={val as string | null} onChange={set} />;
       case 'employee': return <EmployeePicker key={f.key} label={t(f.label)} value={(val as string | null) ?? null} valueLabel={edit!.headLabel}
         onChange={(id, lbl) => setEdit({ ...edit!, headLabel: lbl, row: { ...row, [f.key]: id } })} />;
+      case 'textarray': return <Input key={f.key} className={cls} label={t(f.label)} hint={f.hint ? t(f.hint) : undefined} disabled={disabled}
+        value={Array.isArray(val) ? val.join(', ') : String(val ?? '')} onChange={(e) => set(e.target.value)} />;
       case 'intarray': return <Input key={f.key} label={t(f.label)} hint={f.hint ? t(f.hint) : undefined} ltr disabled={disabled}
         value={Array.isArray(val) ? val.join(', ') : String(val ?? '')} onChange={(e) => set(e.target.value)} />;
       default: return <Input key={f.key} className={cls} label={t(f.label)} required={f.required} ltr={f.ltr} disabled={disabled}

@@ -817,3 +817,6 @@ progress { width: 100%; max-width: 200px; height: 8px; accent-color: var(--petro
 .dash-cols { columns: 2 440px; column-gap: 18px; }
 .dash-cols > * { display: inline-block; width: 100%; break-inside: avoid; margin-bottom: 18px; vertical-align: top; }
 .dash-cols > *:last-child { margin-bottom: 0; }
+
+/* 1.10.0 — switched-off rows (pay components) */
+.t tr.row-muted td { opacity: .62; }

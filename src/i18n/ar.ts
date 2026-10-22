@@ -197,7 +197,7 @@ const base: Record<BaseKey, string> = {
   'org.f_level': 'المستوى', 'org.f_min': 'الحد الأدنى للأساسي (ر.ع.)', 'org.f_max': 'الحد الأعلى للأساسي (ر.ع.)',
   'org.f_profession': 'رمز المهنة (الوزارة)', 'org.f_omani_only': 'وظيفة مقصورة على العُمانيين', 'org.f_omani_source': 'مصدر القصر',
   'org.f_omani_verified': 'تمت المطابقة مع المصدر الرسمي', 'org.f_description': 'الوصف الوظيفي',
-  'org.f_qualifications': 'المؤهلات المطلوبة', 'org.f_pay_basis': 'أساس الأجر', 'org.f_counts': 'يُحتسب في التعمين',
+  'org.f_qualifications': 'المؤهلات المطلوبة', 'org.f_aliases': 'أسماء أخرى', 'org.f_aliases_hint': 'أسماء أخرى مستخدمة في الملفات والقوائم، مفصولة بفواصل (مثل Lab، Plant 1). يطابقها الاستيراد أيضاً.', 'org.f_pay_basis': 'أساس الأجر', 'org.f_counts': 'يُحتسب في التعمين',
   'org.f_category': 'المجموعة', 'org.f_has_number': 'له رقم', 'org.f_has_expiry': 'له تاريخ انتهاء',
   'org.f_alert_days': 'التذكير قبل الانتهاء (أيام)', 'org.f_alert_hint': 'مفصولة بفواصل، مثل 90، 60، 30',
   'org.f_applies': 'مطلوب من', 'org.f_mandatory': 'إلزامي', 'org.f_multiple': 'يُسمح بأكثر من واحد',

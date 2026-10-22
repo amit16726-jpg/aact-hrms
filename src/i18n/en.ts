@@ -217,7 +217,7 @@ const base = {
   'org.f_level': 'Level', 'org.f_min': 'Minimum basic (OMR)', 'org.f_max': 'Maximum basic (OMR)',
   'org.f_profession': 'Profession code (Ministry)', 'org.f_omani_only': 'Omani-only job', 'org.f_omani_source': 'Source of the restriction',
   'org.f_omani_verified': 'Verified against the official source', 'org.f_description': 'Job description',
-  'org.f_qualifications': 'Required qualifications', 'org.f_pay_basis': 'Pay basis', 'org.f_counts': 'Counts for Omanisation',
+  'org.f_qualifications': 'Required qualifications', 'org.f_aliases': 'Also known as', 'org.f_aliases_hint': 'Other names used in files and lists, separated by commas (e.g. Lab, Plant 1). Imports match these too.', 'org.f_pay_basis': 'Pay basis', 'org.f_counts': 'Counts for Omanisation',
   'org.f_category': 'Group', 'org.f_has_number': 'Has a number', 'org.f_has_expiry': 'Has an expiry date',
   'org.f_alert_days': 'Remind before expiry (days)', 'org.f_alert_hint': 'Comma-separated, e.g. 90, 60, 30',
   'org.f_applies': 'Required for', 'org.f_mandatory': 'Mandatory', 'org.f_multiple': 'More than one allowed',

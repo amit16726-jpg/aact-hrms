@@ -1,4 +1,5 @@
 """Dump Phase 2–7 RPC responses from a seeded local database (as the demo HR manager) into e2e/fixtures_time.json.
+# NOTE (1.10.0): the dummy seeds this script read were removed; the fixtures it produced are kept in e2e/ and still used by screens.py.
 
 Usage (after loading supabase/seed.sql, seed_phase2.sql, seed_phase3.sql, seed_phase4.sql, seed_phase5.sql, seed_phase6.sql and seed_phase7.sql into the local test database):
   python3 e2e/gen_time_fixtures.py

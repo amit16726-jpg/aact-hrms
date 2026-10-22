@@ -180,7 +180,7 @@ begin
       'department_code', 'PROD', 'job_code', 'OPR', 'category_code', 'STAFF', 'manager_employee_no', 'ZZZ-999'));
   r := public.hr_import('EMPLOYEES', v_rows, true, 'employees.csv');
   perform tst.check((r->>'ok')::int = 1 and (r->>'failed')::int = 2 and (r->>'dry_run')::boolean, 'dry run: 1 good row, 2 errors');
-  perform tst.check(exists (select 1 from jsonb_array_elements(r->'results') x where x->>'message' like '%departments code "NOPE"%'), 'clear message for an unknown code');
+  perform tst.check(exists (select 1 from jsonb_array_elements(r->'results') x where x->>'message' like '%department "NOPE"%'), 'clear message for an unknown code');
   perform tst.check(exists (select 1 from jsonb_array_elements(r->'results') x where x->>'message' like '%manager employee number "ZZZ-999"%'), 'clear message for an unknown manager');
   perform tst.check((select count(*) from hr.employees) = v_before, 'dry run created nothing');
 

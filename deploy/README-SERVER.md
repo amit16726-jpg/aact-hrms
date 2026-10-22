@@ -106,7 +106,8 @@ was applied is reported and never re-run.
 
 - [ ] Server hardened: automatic security updates, SSH keys only, firewall (80/443 from office/VPN, 22 from IT only).
 - [ ] `supabase/.env` and `deploy/.env` stored in the company password safe.
-- [ ] Administrator account created; demo logins (`*@aact.test`) do **not** exist here (dummy seeds are never run on this server).
+- [ ] Administrator account created; no demo logins (`*@aact.test`) exist here.
+- [ ] AACT masters loaded (`supabase/seed_masters.sql`); company CR, SPF employer number and WPS details entered; pay component names and SPF flags checked in *Payroll → Set-up*.
 - [ ] Legal values confirmed with the company's lawyer and recorded with dates: SPF rates and ceiling, gratuity rules, leave,
       overtime, probation, notice, discipline limits, injury reporting deadline (*Oman time rules*, *Payroll rules*, *Settings → HR policy limits*).
 - [ ] Management payroll team named (at least three people, so an MG payroll can be calculated, verified and approved by different people); the first member is given the role on *Users*, then adds the others in *Settings*.

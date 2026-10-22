@@ -15,6 +15,7 @@ describe('import files', () => {
   it('lists required columns that are missing', () => {
     expect(missingColumns('EMPLOYEES', ['full_name_en', 'Nationality', 'join_date'])).toEqual(['department_code', 'job_code', 'category_code']);
     expect(missingColumns('SALARIES', ['employee_no', 'basic'])).toEqual([]);
+    expect(missingColumns('EMPLOYEES', ['full_name_en', 'nationality', 'join_date', 'Department', 'designation', 'category'])).toEqual([]);
   });
 });
 

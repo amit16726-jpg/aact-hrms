@@ -109,7 +109,7 @@ export const enPay = {
   // set-up
   'psu.title': 'Payroll set-up', 'psu.companies': 'Companies — bank salary file', 'psu.cr': 'CR number', 'psu.spf_no': 'SPF employer number',
   'psu.bank_code': 'Payer bank short name', 'psu.account': 'Payer account number', 'psu.payer_cr': 'Payer CR (if different)',
-  'psu.components': 'Pay components', 'psu.gl': 'GL account', 'psu.spf_base': 'Counts for SPF', 'psu.basic': 'Basic',
+  'psu.components': 'Pay components', 'psu.active': 'In use', 'psu.components_hint': 'Correct a component name here. A component that is not in use is hidden from new salaries but kept on old payslips; the basic salary is always in use.', 'psu.gl': 'GL account', 'psu.spf_base': 'Counts for SPF', 'psu.basic': 'Basic',
   'psu.accounts': 'Journal accounts', 'psu.pay_day': 'Default pay day (day of month)', 'psu.saved': 'Set-up saved.',
   'psu.a_salary_payable': 'Salaries payable', 'psu.a_spf_payable': 'SPF payable', 'psu.a_eosb_provision': 'End-of-service provision',
   'psu.a_loans_receivable': 'Staff loans receivable', 'psu.a_salary_expense': 'Salaries expense', 'psu.a_overtime_expense': 'Overtime expense',

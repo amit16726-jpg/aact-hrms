@@ -2,7 +2,7 @@
 
 The laptop runs the **same Supabase stack** (in Docker) that will later run on the company server,
 with the **same database files** (`supabase/migrations`). Only the data differs: the laptop holds
-**dummy data only** (`supabase/seed.sql`, then `supabase/seed_phase2.sql` for attendance and leave `supabase/seed_phase3.sql` for payroll `supabase/seed_phase4.sql` for letters and requests and `supabase/seed_phase5.sql` for recruitment and `supabase/seed_phase6.sql` for people operations and `supabase/seed_phase7.sql` for data protection and `supabase/seed_phase8.sql` for management pay).
+**no personal data**: `npm run db:reset` loads only the AACT masters (`supabase/seed_masters.sql`). Sign up, claim the administrator role on the Setup page and add made-up people by hand or with a small made-up import file.
 
 ## One-time setup (Windows 10/11)
 
@@ -55,8 +55,7 @@ and a **dummy** Omanisation target of 40 %.
    under `supabase/migrations`, then run `npm run db:reset` to prove the whole database builds from zero.
    Never create or alter tables by hand in Studio: the company server would not get that change.
 2. **Never edit a migration that has already been installed on test or production.** Add a new one instead.
-3. **Dummy data only on the laptop.** Change `scripts/gen-seed.py`, then run `npm run seed:gen` and `npm run db:reset`.
-   Attendance and leave demo data (`supabase/seed_phase2.sql`) is written by hand, uses dates relative to today and loads after `seed.sql`.
+3. **No real employee data on the laptop.** Only made-up people. Masters change in `supabase/seed_masters.sql` (keep it safe to re-run).
    Real employee data is loaded only on the company server.
 4. **Nothing environment-specific in the code.** Addresses and keys live in `.env.*` files and server settings.
 5. **Before every commit:** `npm run typecheck`, `npm test`, `npm run build`.

@@ -14,11 +14,13 @@ mkdir -p "$STORAGE_DIR/employee-docs" && echo test > "$STORAGE_DIR/employee-docs
 bash deploy/scripts/apply-migrations.sh | tail -1
 out="$(bash deploy/scripts/apply-migrations.sh | tail -1)"; echo "$out"
 [[ "$out" == *"done: 0 applied"* ]] || { echo "FAIL: second run applied migrations"; exit 1; }
-psql $H -q -d $DB -f supabase/seed.sql 2>&1 | grep -q "60 employees" || { echo "FAIL: seed"; exit 1; }
+psql $H -q -v ON_ERROR_STOP=1 -d $DB -f supabase/seed_masters.sql >/dev/null || { echo "FAIL: masters"; exit 1; }
+psql $H -q -v ON_ERROR_STOP=1 -d $DB -f supabase/seed_masters.sql >/dev/null || { echo "FAIL: masters second run"; exit 1; }
+[ "$(psql $H -At -d $DB -c "select count(*) from hr.departments")" = "30" ] || { echo "FAIL: masters departments"; exit 1; }
 
 bash deploy/scripts/backup.sh | tail -1
 D="$(ls -1d "$BACKUP_DIR"/20* | tail -1)"
-[ -s "$D/db.dump" ] && [ -s "$D/storage.tar.gz" ] && grep -q '^employees=60$' "$D/manifest.txt" || { echo "FAIL: backup contents"; exit 1; }
+[ -s "$D/db.dump" ] && [ -s "$D/storage.tar.gz" ] && grep -q '^employees=0$' "$D/manifest.txt" || { echo "FAIL: backup contents"; exit 1; }
 bash deploy/scripts/restore.sh --verify "$D" | tail -1
 echo tamper >> "$D/storage.tar.gz"
 if bash deploy/scripts/restore.sh --verify "$D" >/dev/null 2>&1; then echo "FAIL: damaged backup not detected"; exit 1; fi

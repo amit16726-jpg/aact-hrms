@@ -19,11 +19,20 @@ import history with its results.
 | 8 | Check | *Employees*, *Expiries*, *Omanisation*, *Localisation report* | Compare head-count, Omani %, and totals with the old system |
 | 9 | Parallel payroll | *Payroll* → *Parallel run* | At least one month; every difference explained before go-live |
 
+## AACT masters (already loaded)
+
+`supabase/seed_masters.sql` sets up company **AACT**, the 30 departments of the NMG and MG staff lists (short MG names such as
+*Lab*, *Maint*, *GP*, *Elect*, *Plant 1*, *FC* are kept as *also known as* names), the designations (Operator, Jr. Supervisor,
+Supervisor, Sr. Supervisor, Foreman, Management staff), the staff categories **NMG** and **MG**, the AACT pay components and
+the employee number format `AACT-0000`. On the company server run it once after the migrations:
+`psql … -f supabase/seed_masters.sql` (safe to run again; it never overwrites later changes). Check names, Arabic names and the
+SPF flag of every pay component in *Payroll → Set-up* before the first payroll.
+
 ## Preparing the files
 
 1. In *Import data*, choose the type and click **Download template**. Open it in Excel.
 2. Fill one row per record. Keep the first row (the column headings) exactly as it is. Extra columns are ignored.
-3. Dates: `YYYY-MM-DD` (e.g. `2021-03-01`) or `DD/MM/YYYY` (e.g. `01/03/2021`).
+3. Dates: `YYYY-MM-DD` (e.g. `2021-03-01`) or day first — `01/03/2021`, `01.03.2021`, `01-03-2021` (mixed separators such as `12.05-1998` are accepted too).
 4. **Save As → "CSV UTF-8 (Comma delimited)"** — this keeps Arabic names correct.
 5. Upload, run **Trial run**, fix the rows listed with problems, upload again, and only then **Import**.
 
@@ -31,10 +40,10 @@ import history with its results.
 
 | Column | Required | Example | Rule |
 |---|---|---|---|
-| `employee_no` | no | `AACT-00101` | Blank = next number automatically |
+| `employee_no` | no | `472` or `AACT-0472` | A plain number from the old sheet becomes `AACT-0472`. Blank = next number automatically (continues after the highest number in use) |
 | `full_name_en` | yes | `Ravi Kumar` | |
 | `full_name_ar` | no | `رافي كومار` | |
-| `nationality` | yes | `IN`, `OM` | 2-letter country code |
+| `nationality` | yes | `IN`, `OM`, `Omani` | 2-letter country code (`Omani` = `OM`). The old lists only say *Expats* / *Omanis*: the real country of every expatriate is needed for the SPF and MoL reports |
 | `gender` | no | `M` / `F` | |
 | `date_of_birth` | no | `1990-05-20` | |
 | `marital_status` | no | `SINGLE`, `MARRIED`, `DIVORCED`, `WIDOWED` | |
@@ -43,9 +52,10 @@ import history with its results.
 | `join_date` | yes | `2021-03-01` | |
 | `probation_end_date` | no | | After the join date → employee is *on probation* |
 | `company_code` | if more than one company | `AACT` | |
-| `department_code`, `job_code`, `category_code` | yes | `PROD`, `OPR`, `WRK` | Codes from *Organisation* |
+| `department_code` (or `department`), `job_code` (or `designation`), `category_code` (or `category`) | yes | `Lab`, `Plant 1`, `Jr.Supervisor`, `NMG` | Code, name or *also known as* name from *Organisation*; spaces, dots and capitals are ignored |
+| `pay_group` | no | `MG` / `NMG` | Category `MG` means `MG`. Only the management payroll team can import MG staff |
 | `grade_code`, `location_code` | no | `W1`, `SOHAR` | |
-| `manager_employee_no` | no | `AACT-00001` | Must already exist |
+| `manager_employee_no` | no | `5` or `AACT-0005` | Must already exist |
 | `employment_type` | no | `FULL_TIME` | |
 | `shift_code` | no | `DAY` | |
 
@@ -58,8 +68,9 @@ The usual rules apply exactly as when typing an employee in: duplicate check (sa
 `expiry_date`, `issuing_authority`, `issue_place`, `notes`. Number and expiry date are required for the types that have them.
 
 ### Opening salaries — columns
-`employee_no`, `effective_from` (blank = joining date), then **one column per pay component code** (`BASIC`, `HOUSING`,
-`TRANSPORT`, …) with the monthly amount, and `notes`. `BASIC` is required. Each row becomes a salary proposal waiting for approval.
+`employee_no`, `effective_from` (blank = joining date), then **one column per pay component code** with the monthly amount —
+the AACT codes as in the salary sheets: `BASIC`, `HRA`, `EAIR12`, `EAIR24`, `EFOOD`, `ESPL`, `ETRA`, `ESUALL`, `EFLIFT`, `EDUST`, `AUTL` — and `notes`.
+Blank cells and a `Gross` / name column are ignored (the gross is recalculated). Salaries of MG staff can only be loaded by the management payroll team. `BASIC` is required. Each row becomes a salary proposal waiting for approval.
 
 ## After the import
 - Run the **Localisation report** and **Omanisation** page and compare with the last MoL statement.

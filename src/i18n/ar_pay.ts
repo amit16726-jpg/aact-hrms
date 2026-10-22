@@ -98,7 +98,7 @@ export const arPay: Record<PayKey, string> = {
 
   'psu.title': 'إعداد الرواتب', 'psu.companies': 'الشركات — ملف الرواتب البنكي', 'psu.cr': 'رقم السجل التجاري', 'psu.spf_no': 'رقم صاحب العمل في الصندوق',
   'psu.bank_code': 'الاسم المختصر للبنك الدافع', 'psu.account': 'رقم حساب الدافع', 'psu.payer_cr': 'سجل الدافع (إن اختلف)',
-  'psu.components': 'مكونات الراتب', 'psu.gl': 'الحساب', 'psu.spf_base': 'يُحتسب للحماية الاجتماعية', 'psu.basic': 'أساسي',
+  'psu.components': 'مكونات الراتب', 'psu.active': 'مستخدم', 'psu.components_hint': 'يمكن تصحيح اسم المكوّن هنا. المكوّن غير المستخدم يُخفى من الرواتب الجديدة ويبقى في كشوف الرواتب السابقة؛ والراتب الأساسي مستخدم دائماً.', 'psu.gl': 'الحساب', 'psu.spf_base': 'يُحتسب للحماية الاجتماعية', 'psu.basic': 'أساسي',
   'psu.accounts': 'حسابات القيد', 'psu.pay_day': 'يوم الدفع الافتراضي (يوم من الشهر)', 'psu.saved': 'تم حفظ الإعداد.',
   'psu.a_salary_payable': 'رواتب مستحقة الدفع', 'psu.a_spf_payable': 'الحماية الاجتماعية مستحقة الدفع', 'psu.a_eosb_provision': 'مخصص نهاية الخدمة',
   'psu.a_loans_receivable': 'قروض الموظفين المدينة', 'psu.a_salary_expense': 'مصروف الرواتب', 'psu.a_overtime_expense': 'مصروف العمل الإضافي',

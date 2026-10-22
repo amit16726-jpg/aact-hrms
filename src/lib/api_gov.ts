@@ -120,14 +120,14 @@ export const govapi = {
 export const IMPORT_COLUMNS: Record<ImportKind, string[]> = {
   EMPLOYEES: ['employee_no', 'full_name_en', 'full_name_ar', 'nationality', 'gender', 'date_of_birth', 'marital_status', 'civil_number', 'mobile', 'personal_email',
     'work_email', 'join_date', 'probation_end_date', 'company_code', 'department_code', 'job_code', 'grade_code', 'category_code', 'location_code',
-    'manager_employee_no', 'employment_type', 'shift_code'],
+    'manager_employee_no', 'employment_type', 'shift_code', 'pay_group'],
   DOCUMENTS: ['employee_no', 'doc_type', 'doc_number', 'issue_date', 'expiry_date', 'issuing_authority', 'issue_place', 'notes'],
-  SALARIES: ['employee_no', 'effective_from', 'BASIC', 'HOUSING', 'TRANSPORT', 'notes'],
+  SALARIES: ['employee_no', 'effective_from', 'BASIC', 'HRA', 'EAIR12', 'EAIR24', 'EFOOD', 'ESPL', 'ETRA', 'ESUALL', 'EFLIFT', 'EDUST', 'AUTL', 'notes'],
 };
 export const IMPORT_EXAMPLE: Record<ImportKind, string[]> = {
-  EMPLOYEES: ['AACT-00101', 'Example Person', '', 'IN', 'M', '1990-05-20', 'MARRIED', '', '+968 9123 4567', '', '', '2021-03-01', '', '', 'PROD', 'OPR', '', 'WRK', 'SOHAR', 'AACT-00001', 'FULL_TIME', ''],
-  DOCUMENTS: ['AACT-00101', 'PASSPORT', 'Z1234567', '2020-01-10', '2030-01-09', 'Government of India', 'Muscat', ''],
-  SALARIES: ['AACT-00101', '2021-03-01', '250.000', '60.000', '20.000', 'Opening salary'],
+  EMPLOYEES: ['9001', 'Example Person', '', 'IN', 'M', '20/05/1990', 'MARRIED', '', '+968 9123 4567', '', '', '01/03/2021', '', 'AACT', 'Plant 1', 'Operator', '', 'NMG', '', '', 'FULL_TIME', '', 'NMG'],
+  DOCUMENTS: ['9001', 'PASSPORT', 'Z1234567', '2020-01-10', '2030-01-09', 'Government of India', 'Muscat', ''],
+  SALARIES: ['9001', '01/03/2021', '250.000', '60.000', '', '', '', '', '20.000', '', '', '', '', 'Opening salary'],
 };
 
 /** Accepts DD/MM/YYYY or YYYY-MM-DD (as Excel often saves either); returns ISO or the original text. */
@@ -154,15 +154,15 @@ export function csvToRows(text: string): { headers: string[]; rows: Record<strin
   return { headers, rows };
 }
 
-/** Required headings missing from an uploaded file. */
+/** Required headings missing from an uploaded file ("a|b" = either heading will do; the first is reported). */
 export function missingColumns(kind: ImportKind, headers: string[]): string[] {
   const req: Record<ImportKind, string[]> = {
-    EMPLOYEES: ['full_name_en', 'nationality', 'join_date', 'department_code', 'job_code', 'category_code'],
+    EMPLOYEES: ['full_name_en', 'nationality', 'join_date', 'department_code|department', 'job_code|designation|job_title', 'category_code|category'],
     DOCUMENTS: ['employee_no', 'doc_type'],
     SALARIES: ['employee_no', 'BASIC'],
   };
   const have = new Set(headers.map((h) => h.toLowerCase()));
-  return req[kind].filter((c) => !have.has(c.toLowerCase()));
+  return req[kind].filter((c) => !c.split('|').some((x) => have.has(x.toLowerCase()))).map((c) => c.split('|')[0]);
 }
 
 /** Labour turnover for the last 12 months: leavers ÷ average headcount × 100. */

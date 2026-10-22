@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.10.0 — 2026-10-22 — AACT masters, dummy data removed
+
+- **All dummy data removed**: the demo employee seeds (`seed.sql`, `seed_phase2…8.sql`) and their generator are deleted.
+  `scripts/reset-test-data.sql` wipes the cloud test project (every employee, transaction, audit entry and login; settings and
+  rules back to the installed defaults) and loads the masters. It refuses to run where non-demo employees exist.
+- **AACT masters** (`supabase/seed_masters.sql`, no personal data, safe to re-run): company AACT; 30 departments from the NMG and
+  MG staff lists, with the MG short names as *also known as* names; designations Operator, Jr. Supervisor, Supervisor,
+  Sr. Supervisor, Foreman, Management staff; staff categories NMG and MG; pay components BASIC, HRA, EAIR12, EAIR24, EFOOD,
+  ESPL, ETRA, ESUALL, EFLIFT, EDUST, AUTL (SPF wage = basic + monthly allowances; air-ticket allowances excluded); the generic
+  demo components are switched off; employee numbers `AACT-0000`.
+- Departments and job titles have **also known as** names (*Organisation*), used by imports.
+- **Import** understands the old sheets: plain employee numbers (`472` → `AACT-0472`), names or short names instead of codes,
+  `department` / `designation` / `category` headings, day-first dates with any separator, `Omani` as a nationality, a `pay_group`
+  column (category MG = MG; management payroll team only), and ignores a `Gross` column in salary files.
+- The next automatic employee number continues after the highest number in use.
+- **Payroll → Set-up**: component names (English and Arabic) can be corrected and components switched off (never the basic salary).
+- Database: migration `20261028000100_masters_support`; tests `tests/db/90_masters.sql`.
+
 ## 1.9.0 — 2026-10-22 — management (MG) pay confidentiality
 
 - Every employee is in pay group **NMG** (non-management, default) or **MG** (management).
