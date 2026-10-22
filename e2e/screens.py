@@ -121,6 +121,8 @@ RPC = {
 
 # Phase 2 (attendance & leave): real responses dumped from the seeded local database by e2e/gen_time_fixtures.py
 RPC.update(json.loads((pathlib.Path(__file__).with_name('fixtures_time.json')).read_text(encoding='utf-8')))
+# 1.13.0 report centre: real responses dumped from the test database (plus 120 made-up rows for W02)
+RPC.update(json.loads((pathlib.Path(__file__).with_name('fixtures_reports.json')).read_text(encoding='utf-8')))
 # 1.9.0 management (MG) pay
 RPC['hr_list_mg_access'] = [{'user_id': 'u1', 'name': 'Maryam Al Hinai', 'email': 'hr.manager@aact.om', 'member': True, 'is_me': True},
                             {'user_id': 'u2', 'name': 'Anil Sharma', 'email': 'cfo@aact.om', 'member': True, 'is_me': False},
@@ -179,7 +181,9 @@ SCREENS = [('dashboard', '/'), ('employees', '/employees'), ('employee', f'/empl
            ('executive', '/executive'), ('mol-report', '/reports/mol'), ('spf-report', '/reports/spf'), ('import-data', '/admin/import'),
            ('privacy', '/privacy'), ('privacy-notice', '/privacy?tab=notice'), ('privacy-consents', '/privacy?tab=consents'),
            ('privacy-requests', '/privacy?tab=requests'), ('privacy-breaches', '/privacy?tab=breaches'), ('privacy-register', '/privacy?tab=register'),
-           ('privacy-retention', '/privacy?tab=retention'), ('privacy-settings', '/privacy?tab=settings')]
+           ('privacy-retention', '/privacy?tab=retention'), ('privacy-settings', '/privacy?tab=settings'),
+           ('reports', '/reports'), ('reports-run', '/reports?code=P01&run=1'), ('reports-list', '/reports?code=W02&run=1'),
+           ('reports-board', '/reports?tab=board'), ('reports-schedules', '/reports?tab=schedules')]
 
 with sync_playwright() as p:
     br = p.chromium.launch()
@@ -190,6 +194,9 @@ with sync_playwright() as p:
             def handle(route):
                 fn = route.request.url.split('/rpc/')[-1].split('?')[0]
                 body = RPC.get(fn)
+                if fn == 'hr_run_report':
+                    code = (route.request.post_data_json or {}).get('p_code', 'P01')
+                    body = RPC['hr_run_report'].get(code) or RPC['hr_run_report']['P01']
                 if fn == 'hr_me':
                     body = {**ME, 'language': lang}
                 if body is None:

@@ -77,7 +77,7 @@ export function AuthPage() {
 }
 
 /** Split sign-in frame: brand panel (hidden on phones) and the form side. */
-function AuthFrame({ children }: { children: ReactNode }) {
+export function AuthFrame({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   return (
     <div className="auth-split">

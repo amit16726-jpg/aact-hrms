@@ -37,3 +37,5 @@ New change → `npm run db:new <name>`. Masters (company, departments, designati
 E-mail: `supabase/functions/send-mail` (Microsoft Graph). Set-up: [docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md#e-mail-through-microsoft-365).
 
 Phone apps (Android APK / iPhone): `docs/MOBILE-APPS.md` — built by the *Mobile apps* GitHub Actions workflow or with `npm run mobile:android` / `npm run mobile:ios`.
+
+Reports (59, Excel / PDF / PowerPoint board pack, scheduled e-mails): `docs/REPORTS.md`. Latest audit: `docs/AUDIT-2026-10-22.md`.

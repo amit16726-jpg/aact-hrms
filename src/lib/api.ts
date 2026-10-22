@@ -21,6 +21,8 @@ export interface Me {
   employee_id: string | null; employee_no: string | null; employee_name: string | null; employee_name_ar: string | null;
   roles: string[]; permissions: string[]; is_manager: boolean; admin_exists: boolean;
   settings: Record<string, unknown>; entities: Entity[]; unread_notifications: number;
+  /** OK, CHALLENGE (enter the authenticator code) or SETUP (two-step sign-in required for this role) */
+  mfa_state?: 'OK' | 'CHALLENGE' | 'SETUP'; mfa_enrolled?: boolean;
 }
 
 export interface Named { id: string; code: string; name_en: string; name_ar: string | null; is_active: boolean; entity_id?: string }

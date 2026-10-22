@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.13.0 — 2026-10-22 — report centre, board pack, two-step sign-in, audit fixes
+
+- **Report centre** (*Reports*): 59 reports in six groups — workforce, payroll and end of service, time and leave, compliance,
+  talent and people operations, audit and control — with filters, on-screen preview and totals, and downloads as **Excel**
+  (formatted workbook) and **PDF** (A4, Arabic exact, page numbers, confidentiality line). Full list: `docs/REPORTS.md`.
+- **Board pack**: PowerPoint for management with editable charts (key figures, headcount, joiners and leavers, Omanisation, workforce
+  mix, payroll cost, overtime, absence, risks, leavers by reason), in English or Arabic.
+- **Scheduled reports**: monthly in-app and e-mail reminders with a link to the report (the e-mail never contains the report), only to
+  people whose role allows it; new permission `REPORT_ADMIN` (Super administrator, HR manager).
+- Reports follow the same visibility rules as the screens, hide MG pay outside the management payroll team, and log every opening of
+  a pay or sensitive report.
+- **Two-step sign-in** with an authenticator app (Settings); enforced on the server; can be required for chosen roles.
+- **Automatic sign-out** after inactivity (Settings → Security; default 30 minutes; one-minute warning).
+- Audit fixes: 19 foreign-key indexes and report indexes, vendor chunks (main bundle 745 → 336 kB), dependency advisories cleared,
+  leftover `seed_tmp` schema removed from the cloud test project. Audit report: `docs/AUDIT-2026-10-22.md`.
+- Database: migrations `20261029000100_reports`, `20261029000200_security`; tests `tests/db/95_reports.sql`, `tests/db/96_security.sql`;
+  file test `e2e/report_files.py`.
+
 ## 1.12.0 — 2026-10-22 — Android and iPhone apps
 
 - **Native apps** built with Capacitor 8 from the same code: Android (`android/`, APK for direct install and AAB for Google Play) and

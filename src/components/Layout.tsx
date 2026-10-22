@@ -5,7 +5,7 @@ import {
   ChevronDown, CircleCheckBig, ClipboardList, Clock, DoorOpen, FileSpreadsheet, FileUp, FileWarning, Fingerprint,
   Flag, GraduationCap, HandCoins, HardHat, History, Hourglass, IdCard, Inbox, Landmark, LayoutDashboard, ListPlus, LogOut,
   Menu, Network, Package, PiggyBank, Receipt, Scale, Search, Settings, Settings2, ShieldAlert, ShieldCheck, Target, Timer,
-  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, Smartphone, Share, SquarePlus, type LucideIcon,
+  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, FileChartColumn, Smartphone, Share, SquarePlus, type LucideIcon,
 } from 'lucide-react';
 import { useI18n, type Key } from '../i18n';
 import { useSession } from '../lib/session';
@@ -13,6 +13,7 @@ import { api } from '../lib/api';
 import { tapi } from '../lib/api_time';
 import { Loading, Modal, Button } from './ui';
 import { installMode, onInstallChange, promptInstall } from '../lib/install';
+import { IdleGuard } from './security';
 
 interface Item { to: string; key: Key; show: boolean; icon: LucideIcon; count?: number }
 interface Group { id: string; title?: Key; items: Item[] }
@@ -238,6 +239,7 @@ export default function Layout() {
       { to: '/exits', key: 'wnav.exits', icon: LogOut, show: can('EXIT_MANAGE') },
     ] },
     { id: 'gov', title: 'gnav.group', items: [
+      { to: '/reports', key: 'rp.nav', icon: FileChartColumn, show: can('EMP_READ') || can('PAY_READ') || can('ATT_READ') || can('LEAVE_READ') || can('COMPLIANCE_READ') || can('DOC_READ') || can('REC_READ') || can('PERF_MANAGE') || can('TRAIN_WRITE') || can('AUDIT_READ') || can('EXEC_VIEW') },
       { to: '/executive', key: 'gnav.exec', icon: ChartColumn, show: can('EXEC_VIEW') },
       { to: '/reports/mol', key: 'gnav.mol', icon: Landmark, show: can('COMPLIANCE_READ') },
       { to: '/reports/spf', key: 'gnav.spf', icon: FileSpreadsheet, show: can('PAY_READ') },
@@ -348,7 +350,8 @@ export default function Layout() {
           <AccountMenu />
         </header>
         <main className="content" id="main" tabIndex={-1}>
-          <Suspense fallback={<Loading />}>
+          <IdleGuard />
+            <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
         </main>

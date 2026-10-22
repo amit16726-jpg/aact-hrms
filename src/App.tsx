@@ -6,6 +6,7 @@ import { Loading } from './components/ui';
 import Layout from './components/Layout';
 import { AuthPage, SetPasswordPage } from './pages/Auth';
 import { SetupPage } from './pages/Setup';
+import { MfaPage } from './pages/Mfa';
 import { DashboardPage } from './pages/Dashboard';
 
 const EmployeesPage = lazy(() => import('./pages/Employees'));
@@ -62,6 +63,7 @@ const InjuriesPage = lazy(() => import('./pages/wf/InjuriesPage'));
 const ExitsPage = lazy(() => import('./pages/wf/ExitsPage'));
 const ExitPage = lazy(() => import('./pages/wf/ExitPage'));
 const ExecutivePage = lazy(() => import('./pages/gov/ExecutivePage'));
+const ReportsPage = lazy(() => import('./pages/rep/ReportsPage'));
 const MolReportPage = lazy(() => import('./pages/gov/MolReportPage'));
 const SpfReportPage = lazy(() => import('./pages/gov/SpfReportPage'));
 const PrivacyPage = lazy(() => import('./pages/gov/PrivacyPage'));
@@ -85,6 +87,7 @@ export default function App() {
   if (recovery && session) return <SetPasswordPage />;
   if (!session) return <AuthPage />;
   if (!me) return <SetupPage />;
+  if (me.mfa_state === 'CHALLENGE' || me.mfa_state === 'SETUP') return <MfaPage mode={me.mfa_state} />;
   if (!hasAnyRole) return <SetupPage />;
   return (
     <BrowserRouter>
@@ -146,6 +149,7 @@ export default function App() {
             <Route path="exits" element={<ExitsPage />} />
             <Route path="exits/:id" element={<ExitPage />} />
             <Route path="executive" element={<ExecutivePage />} />
+            <Route path="reports" element={<ReportsPage />} />
             <Route path="reports/mol" element={<MolReportPage />} />
             <Route path="reports/spf" element={<SpfReportPage />} />
             <Route path="privacy" element={<PrivacyPage />} />

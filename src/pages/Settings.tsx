@@ -8,6 +8,7 @@ import { useSession } from '../lib/session';
 import { Button, Input, Select, useAction } from '../components/ui';
 import { PageHead } from '../components/Layout';
 import { HrPoliciesPanel } from '../components/wf';
+import { MyMfaPanel, SecurityPolicyPanel } from '../components/security';
 
 export default function SettingsPage() {
   const { t } = useI18n();
@@ -46,6 +47,8 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      <MyMfaPanel />
+      {can('USERS_ADMIN') && <SecurityPolicyPanel />}
       <EmailPrefPanel />
       {can('EMAIL_ADMIN') && <EmailAdminPanel />}
       {can('PERF_MANAGE') && can('DISC_APPROVE') && <HrPoliciesPanel />}

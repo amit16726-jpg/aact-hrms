@@ -222,3 +222,20 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
   members use `hr_list_mg_access` / `hr_set_mg_access`.
 - Known limits: job offers and requisitions still show the offered salary to recruiters (prepare offers for MG posts inside the team);
   a payroll run's totals still include every payslip in it, which is why MG staff are paid in their own run.
+
+## 14. Report centre and security hardening (v1.13.0)
+
+- Catalogue `hr.report_defs` (code, group, permission, money / sensitive flags, filters, names). One function `hr.rpt_<code>(p jsonb)`
+  per report returns `{columns, rows, meta}`; columns carry key, English and Arabic labels, type (text, int, num, money, pct, date) and a
+  sum flag. `public.hr_run_report(code, params)` is the only entry point: permission check, MG checks inside each report
+  (`hr.money_ok`, `hr.run_ok`, `hr.require_run`), access-log row for money and sensitive reports.
+- Common helpers: `hr.rp_people` (visible employees with their job on a date and the standard filters), `hr.rp_run` (run asked for, else
+  latest calculated run of the company and pay group), `hr.rp_entity`.
+- Files are made in the browser: Excel with exceljs, PDF by laying out A4 pages in HTML and rendering them (html-to-image + jsPDF) so
+  Arabic shaping and right-to-left are exactly as on screen, PowerPoint with pptxgenjs (native charts). Libraries load on demand.
+- Scheduled reports: `hr.report_schedules`; daily job `hr.send_due_report_schedules()` (pg_cron 02:15 UTC) sends notifications (and
+  e-mails through the outbox) with a link `/reports?schedule=<id>`; recipients must hold the report's permission at sending time.
+- Two-step sign-in: `hr.mfa_state()` = OK / CHALLENGE / SETUP from `auth.mfa_factors` and the JWT `aal` claim; `hr.require_user`,
+  `hr.require_perm` and `hr.has_perm` refuse until the second step is passed; policy in `hr.settings.mfa` (required + roles).
+- Automatic sign-out: `hr.settings.session_idle_minutes`, enforced in the browser (`src/lib/idle.ts`), shared across tabs.
+

@@ -101,3 +101,15 @@ Go-live needs **no open A or B items**.
 | Finance / payroll | | | | |
 | IT / server | | | | |
 | Management | | | | |
+
+## 8. Reports and security (1.13.0)
+| # | Test | Expected |
+|---|---|---|
+| 8.1 | Run W01, P01, T01, C03, A04; download Excel and PDF of each | Figures agree with the screens; Excel opens with filters and totals; PDF prints on A4 with page numbers |
+| 8.2 | Finance (not in the MG team) runs P01, P14, P09 | No MG employee or MG run appears |
+| 8.3 | Board pack in English and Arabic | Opens in PowerPoint; charts editable; figures match the executive dashboard |
+| 8.4 | Schedule W01 for day = today + 1 to two people | Next day both get the notification and e-mail with a link; a person without permission cannot be chosen |
+| 8.5 | Set up two-step sign-in; sign out and in again | Code asked after the password; without it nothing loads |
+| 8.6 | Require two-step sign-in for HR officer | An HR officer without it must set it up at next sign-in |
+| 8.7 | Leave the app idle beyond the sign-out time | Warning one minute before; then signed out |
+

@@ -827,3 +827,60 @@ progress { width: 100%; max-width: 200px; height: 8px; accent-color: var(--petro
 .install-steps li::before { content: counter(st); display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
   background: var(--petrol); color: #fff; font-size: 13px; font-weight: 600; flex: none; }
 .install-steps svg { color: var(--petrol); flex: none; }
+
+/* 1.13.0 — report centre */
+.rp-layout { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.rp-list { padding: 12px 8px; position: sticky; top: 76px; max-height: calc(100vh - 100px); overflow: auto; }
+.rp-search { display: flex; align-items: center; gap: 8px; padding: 0 8px 10px; color: var(--muted); }
+.rp-search .input { flex: 1; }
+.rp-group h3 { margin: 12px 8px 4px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+:root[dir='rtl'] .rp-group h3 { letter-spacing: 0; text-transform: none; }
+.rp-group ul { list-style: none; margin: 0; padding: 0; }
+.rp-group button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: var(--r-sm, 6px); background: none;
+  color: var(--ink); font: inherit; font-size: 14px; text-align: start; cursor: pointer; }
+.rp-group button:hover { background: var(--hover); }
+.rp-group button.on { background: var(--petrol); color: #fff; }
+.rp-group button.on .rp-code { color: #DCE8EB; }
+.rp-group button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.rp-code { font-size: 12px; color: var(--muted); min-width: 30px; }
+.rp-name { flex: 1; }
+.rp-icon { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--petrol); color: #fff; flex: none; }
+.rp-filters { align-items: end; }
+.rp-table { max-height: 70vh; overflow: auto; }
+.rp-table thead th { position: sticky; top: 0; z-index: 1; }
+.rp-table th.n, .rp-table td.n { text-align: end; white-space: nowrap; }
+.rp-table tfoot td { font-weight: 600; background: var(--page); border-top: 2px solid var(--line, #D5DDE0); position: sticky; bottom: 0; }
+.rp-bullets { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; }
+.rp-recipients { border: 1px solid var(--line, #D5DDE0); border-radius: 8px; padding: 10px 14px; display: grid; gap: 8px; max-height: 300px; overflow: auto; }
+.rp-recipients legend { padding: 0 6px; font-weight: 600; }
+@media (max-width: 900px) {
+  .rp-layout { grid-template-columns: 1fr; }
+  .rp-list { position: static; max-height: 300px; }
+}
+
+/* report PDF pages (rendered off screen, then turned into the PDF) */
+.rp-pdf-host { position: fixed; left: -30000px; top: 0; pointer-events: none; }
+.rp-pdf-page { box-sizing: border-box; background: #fff; color: #1B2A2F; padding: 34px 38px 26px; display: flex; flex-direction: column;
+  font-family: 'IBM Plex Sans', 'IBM Plex Sans Arabic', Arial, sans-serif; font-size: 10.5px; margin-bottom: 20px; }
+.rp-pdf-page[dir='rtl'] { font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', Arial, sans-serif; }
+.rp-pdf-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid #0B5A6B; margin-bottom: 10px; }
+.rp-pdf-head h1 { margin: 2px 0 4px; font-size: 18px; color: #0B5A6B; }
+.rp-pdf-entity { font-size: 11px; font-weight: 600; color: #08434F; }
+.rp-pdf-filters { font-size: 10px; color: #5E6E73; }
+.rp-pdf-brand { font-size: 11px; font-weight: 600; color: #C9A24D; white-space: nowrap; }
+.rp-pdf-body { flex: 1; overflow: hidden; }
+.rp-pdf-body table { width: 100%; border-collapse: collapse; }
+.rp-pdf-body th { background: #0B5A6B; color: #fff; font-weight: 600; text-align: start; padding: 5px 6px; font-size: 10px; }
+.rp-pdf-body td { padding: 4px 6px; border-bottom: 1px solid #E1E6E8; vertical-align: top; }
+.rp-pdf-body tr:nth-child(even) td { background: #F7F9FA; }
+.rp-pdf-body .n { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rp-pdf-body tr.tot td { font-weight: 700; background: #EEF3F4; border-top: 1.5px solid #0B5A6B; }
+.rp-pdf-body tr.note td { font-style: italic; color: #5E6E73; }
+.rp-pdf-foot { display: flex; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid #D5DDE0; font-size: 9px; color: #5E6E73; }
+.rp-pdf-conf { flex: 1; text-align: center; }
+.rp-layout > * { min-width: 0; }
+.rp-table th, .rp-table td { white-space: nowrap; }
+
+/* 1.13.0 — two-step sign-in */
+.mfa-qr { display: grid; justify-items: center; gap: 8px; padding: 12px; background: #fff; border: 1px solid var(--line, #D5DDE0); border-radius: 10px; }
+.mfa-qr img { image-rendering: pixelated; }
