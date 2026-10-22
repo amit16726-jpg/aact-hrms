@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.1 — 2026-10-22
+
+### Changed
+- **Oman time rules page redesigned.** Summary strip (rules in force, waiting for approval, scheduled changes, last approved change);
+  rules grouped into Working time, Overtime and Attendance; each rule card shows its values as tiles with units
+  (h, min, days, +25 %), a Law / Company policy chip, the legal reference and the in-force date.
+- A change waiting for approval or scheduled for a later date now shows only the values that change (now → new), with Approve and Reject
+  on the card. Earlier versions sit in a collapsible history.
+- English and Arabic labels for the new layout; works on phone width with no sideways scrolling.
+
 ## 1.13.0 — 2026-10-22 — report centre, board pack, two-step sign-in, audit fixes
 
 - **Report centre** (*Reports*): 59 reports in six groups — workforce, payroll and end of service, time and leave, compliance,

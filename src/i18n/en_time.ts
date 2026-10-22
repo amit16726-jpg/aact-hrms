@@ -181,6 +181,28 @@ export const enTime = {
   'err.CONSENT_REQUIRED': 'The employee’s consent is required.', 'err.BALANCE': 'There is not enough leave balance.',
   'err.NOT_ELIGIBLE': 'This leave does not apply to the employee (yet).', 'err.LEGAL_MINIMUM': 'This is below the legal minimum.',
   'err.INVALID_TIME': 'A time is not valid.', 'err.OVERLAP': 'This overlaps an existing record.',
+  // rules page (1.13.1 redesign)
+  'rule.g_TIME': 'Working time', 'rule.g_OT': 'Overtime', 'rule.g_ATT': 'Attendance',
+  'rule.gd_TIME': 'Daily and weekly limits, Ramadan hours and weekly rest.',
+  'rule.gd_OT': 'Premiums paid on top of the basic hourly wage, and the daily ceiling.',
+  'rule.gd_ATT': 'How punches from the devices are read and when lateness starts.',
+  'rule.d_WORK_HOURS': 'Normal working time and breaks', 'rule.d_RAMADAN_HOURS': 'Reduced hours during Ramadan',
+  'rule.d_WEEKLY_REST': 'Paid rest each week', 'rule.d_OVERTIME': 'Overtime the employee agreed to',
+  'rule.d_OVERTIME_NO_CONSENT': 'Stock-taking and urgent work', 'rule.d_ATTENDANCE': 'Punch reading and lateness',
+  'rule.s_inforce': 'Rules in force', 'rule.s_pending': 'Waiting for approval', 'rule.s_future': 'Scheduled changes', 'rule.s_last': 'Last approved change',
+  'rule.since': 'In force since {d}', 'rule.by': 'approved by {n}', 'rule.none_in_force': 'No version of this rule is in force today.',
+  'rule.pending_title': 'Change waiting for approval', 'rule.future_title': 'Change scheduled', 'rule.starts': 'Starts {d}',
+  'rule.proposed_by': 'Proposed by {n} · {t}', 'rule.col_value': 'Value', 'rule.col_now': 'Now', 'rule.col_new': 'New',
+  'rule.history': 'History ({n})', 'rule.premium_hint': 'Premiums are added to the basic hourly wage: +25% means 1.25 × the hourly wage.',
+  'rule.reference': 'Reference', 'rule.no_change': 'No values change',
+  'u.h': 'h', 'u.min': 'min', 'u.days': 'days',
+  'rl.daily_max_hours': 'Per day', 'rl.weekly_max_hours': 'Per week', 'rl.break_minutes': 'Break',
+  'rl.max_continuous_hours': 'Longest stretch without a break', 'rl.min_consecutive_days': 'Consecutive rest days',
+  'rl.day_premium': 'Day premium', 'rl.night_premium': 'Night premium', 'rl.rest_day_premium': 'Rest-day premium',
+  'rl.max_total_daily_hours': 'Day ceiling incl. overtime', 'rl.night_start': 'Night starts', 'rl.night_end': 'Night ends',
+  'rl.max_inventory_days_per_year': 'Stock-taking days a year', 'rl.late_grace_minutes': 'Late grace',
+  'rl.window_before_minutes': 'Punch window before shift', 'rl.window_after_minutes': 'Punch window after shift',
+  'rl.min_minutes_between_punches': 'Minimum between in and out',
 };
 
 export type TimeKey = keyof typeof enTime;

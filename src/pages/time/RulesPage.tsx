@@ -4,7 +4,8 @@ import { useI18n, type Key } from '../../i18n';
 import { useSession } from '../../lib/session';
 import { Badge, Button, DateText, ErrorNote, Input, Loading, Modal, Select, useAction, useAsync, useConfirm } from '../../components/ui';
 import { PageHead } from '../../components/Layout';
-import { addDays, fmtDateTime, todayMuscat } from '../../lib/format';
+import { addDays, fmtDate, fmtDateTime, todayMuscat } from '../../lib/format';
+import { ArrowRight, Building2, CalendarClock, CalendarDays, ChevronDown, CircleCheck, Clock, Fingerprint, History, Hourglass, MoonStar, PencilLine, Scale, Timer, TriangleAlert } from 'lucide-react';
 
 export const RULE_KEYS: Record<RuleCode, string[]> = {
   WORK_HOURS: ['daily_max_hours', 'weekly_max_hours', 'break_minutes', 'max_continuous_hours'],
@@ -33,6 +34,74 @@ export function RuleValues({ code, value }: { code: RuleCode; value: Record<stri
   );
 }
 
+type Unit = 'h' | 'min' | 'days' | 'pct' | 'time';
+const UNITS: Record<string, Unit> = {
+  daily_max_hours: 'h', weekly_max_hours: 'h', max_continuous_hours: 'h', max_total_daily_hours: 'h',
+  break_minutes: 'min', late_grace_minutes: 'min', window_before_minutes: 'min', window_after_minutes: 'min', min_minutes_between_punches: 'min',
+  min_consecutive_days: 'days', max_inventory_days_per_year: 'days',
+  day_premium: 'pct', night_premium: 'pct', rest_day_premium: 'pct', night_start: 'time', night_end: 'time',
+};
+const ICONS: Record<RuleCode, typeof Clock> = {
+  WORK_HOURS: Clock, RAMADAN_HOURS: MoonStar, WEEKLY_REST: CalendarDays, OVERTIME: Timer, OVERTIME_NO_CONSENT: TriangleAlert, ATTENDANCE: Fingerprint,
+};
+const GROUPS: { key: 'TIME' | 'OT' | 'ATT'; codes: RuleCode[] }[] = [
+  { key: 'TIME', codes: ['WORK_HOURS', 'RAMADAN_HOURS', 'WEEKLY_REST'] },
+  { key: 'OT', codes: ['OVERTIME', 'OVERTIME_NO_CONSENT'] },
+  { key: 'ATT', codes: ['ATTENDANCE'] },
+];
+
+/** A rule value split into the number and its unit, e.g. 0.25 → "+25" "%". */
+function useValueText() {
+  const { t } = useI18n();
+  return (k: string, v: number | string | undefined): { num: string; unit: string } => {
+    if (v === undefined || v === null || v === '') return { num: '—', unit: '' };
+    const u = UNITS[k];
+    if (u === 'pct') { const n = Math.round(Number(v) * 10000) / 100; return { num: `+${n}`, unit: '%' }; }
+    if (u === 'time') return { num: String(v), unit: '' };
+    if (u === 'h' || u === 'min' || u === 'days') return { num: String(v), unit: t(`u.${u}` as Key) };
+    return { num: String(v), unit: '' };
+  };
+}
+
+function Metric({ k, v }: { k: string; v: number | string | undefined }) {
+  const { t } = useI18n();
+  const vt = useValueText();
+  const x = vt(k, v);
+  return (
+    <div className="tr-metric">
+      {x.unit === '%'
+        ? <div className="tr-metric-val"><span dir="ltr" className="num">{x.num}<span className="tr-unit">%</span></span></div>
+        : <div className="tr-metric-val"><bdi dir="ltr" className="num">{x.num}</bdi>{x.unit && <span className="tr-unit">{x.unit}</span>}</div>}
+      <div className="tr-metric-label">{t(`rl.${k}` as Key)}</div>
+    </div>
+  );
+}
+
+/** Old → new values of a proposed or scheduled version, changed rows highlighted. */
+function ChangeTable({ code, cur, next }: { code: RuleCode; cur: TimeRule | undefined; next: TimeRule }) {
+  const { t } = useI18n();
+  const vt = useValueText();
+  const keys = RULE_KEYS[code];
+  const show = (k: string, v: number | string | undefined) => { const x = vt(k, v); return `${x.num}${x.unit ? (x.unit === '%' ? '%' : ` ${x.unit}`) : ''}`; };
+  const changed = keys.filter((k) => String(cur?.value[k] ?? '') !== String(next.value[k] ?? ''));
+  if (cur && changed.length === 0) return <div className="muted small">{t('rule.no_change')}</div>;
+  return (
+    <table className="tr-diff">
+      <thead><tr><th>{t('rule.col_value')}</th><th>{t('rule.col_now')}</th><th aria-hidden="true" /><th>{t('rule.col_new')}</th></tr></thead>
+      <tbody>{(cur ? changed : keys).map((k) => (
+        <tr key={k}><td>{t(`rl.${k}` as Key)}</td><td className="num" dir="ltr">{cur ? show(k, cur.value[k]) : '—'}</td>
+          <td aria-hidden="true"><ArrowRight size={14} className="tr-arrow" /></td><td className="num tr-new" dir="ltr">{show(k, next.value[k])}</td></tr>))}
+      </tbody>
+    </table>
+  );
+}
+
+function BasisChip({ basis }: { basis: TimeRule['rule_basis'] }) {
+  const { t } = useI18n();
+  const Icon = basis === 'LEGAL' ? Scale : Building2;
+  return <span className={`tr-basis ${basis === 'LEGAL' ? 'is-law' : 'is-policy'}`}><Icon size={13} aria-hidden="true" />{t(`rule.${basis}` as Key)}</span>;
+}
+
 export default function RulesPage() {
   const { t } = useI18n();
   const { can } = useSession();
@@ -50,47 +119,119 @@ export default function RulesPage() {
     if (res) setData(res);
   };
 
+  const all = data ?? [];
+  const inForce = CODES.filter((c) => all.some((r) => r.code === c && phase(r, today) === 'current')).length;
+  const pendingN = all.filter((r) => r.status === 'PENDING').length;
+  const futureN = all.filter((r) => phase(r, today) === 'future').length;
+  const lastDecided = all.filter((r) => r.status === 'APPROVED' && r.decided_at).map((r) => r.decided_at as string).sort().pop() ?? null;
+
+  const card = (code: RuleCode) => {
+    const rows = all.filter((r) => r.code === code).sort((a, b) => b.effective_from.localeCompare(a.effective_from));
+    const cur = rows.find((r) => phase(r, today) === 'current');
+    const pend = rows.filter((r) => phase(r, today) === 'pending');
+    const fut = rows.filter((r) => phase(r, today) === 'future');
+    const hist = rows.filter((r) => phase(r, today) === 'past' || phase(r, today) === 'rejected');
+    const Icon = ICONS[code];
+    return (
+      <section key={code} className="tr-card" aria-labelledby={`tr-${code}`}>
+        <header className="tr-head">
+          <span className="tr-icon" aria-hidden="true"><Icon size={20} /></span>
+          <div className="tr-title">
+            <h3 id={`tr-${code}`}>{t(`rule.${code}` as Key)}</h3>
+            <p>{t(`rule.d_${code}` as Key)}</p>
+          </div>
+          {cur && <div className="tr-head-end"><BasisChip basis={cur.rule_basis} /></div>}
+        </header>
+
+        {pend.map((r) => (
+          <div key={r.id} className="tr-change is-pending">
+            <div className="tr-change-head">
+              <Hourglass size={16} aria-hidden="true" />
+              <b>{t('rule.pending_title')}</b>
+              <span className="muted">· {t('rule.starts', { d: fmtDate(r.effective_from) })}</span>
+            </div>
+            <ChangeTable code={code} cur={cur} next={r} />
+            <div className="tr-change-foot">
+              <span className="muted small">{t('rule.proposed_by', { n: r.proposed_by_name ?? '—', t: fmtDateTime(r.proposed_at) })}</span>
+              {r.can_decide && <span className="row" style={{ gap: 6 }}>
+                <Button small kind="primary" busy={busy} onClick={() => void decide(r, true)}>{t('c.approve')}</Button>
+                <Button small kind="danger" busy={busy} onClick={() => void decide(r, false)}>{t('c.reject')}</Button></span>}
+            </div>
+          </div>))}
+
+        {fut.map((r) => (
+          <div key={r.id} className="tr-change is-future">
+            <div className="tr-change-head">
+              <CalendarClock size={16} aria-hidden="true" />
+              <b>{t('rule.future_title')}</b>
+              <span className="muted">· {t('rule.starts', { d: fmtDate(r.effective_from) })}</span>
+            </div>
+            <ChangeTable code={code} cur={cur} next={r} />
+          </div>))}
+
+        {cur ? (
+          <div className={`tr-metrics n${RULE_KEYS[code].length}`}>
+            {RULE_KEYS[code].map((k) => <Metric key={k} k={k} v={cur.value[k]} />)}
+          </div>
+        ) : <div className="tr-empty">{t('rule.none_in_force')}</div>}
+        {(code === 'OVERTIME' || code === 'OVERTIME_NO_CONSENT') && cur && <p className="tr-hint">{t('rule.premium_hint')}</p>}
+
+        {cur && (
+          <footer className="tr-foot">
+            <div className="tr-foot-info">
+              <div className="tr-ref"><Scale size={14} aria-hidden="true" /><span><span className="tr-ref-label">{t('rule.reference')}:</span> {cur.legal_basis}</span></div>
+              <div className="tr-since">
+                <CircleCheck size={14} aria-hidden="true" />
+                <span>{t('rule.since', { d: fmtDate(cur.effective_from) })}{cur.decided_by_name && <> · {t('rule.by', { n: cur.decided_by_name })}</>}</span>
+              </div>
+            </div>
+            {can('RULES_PROPOSE') && pend.length === 0 && (
+              <Button small onClick={() => setProp(cur)}><PencilLine size={14} aria-hidden="true" /> {t('rule.propose')}</Button>)}
+          </footer>)}
+
+        {hist.length > 0 && (
+          <details className="tr-history">
+            <summary><History size={14} aria-hidden="true" /> {t('rule.history', { n: hist.length })}<ChevronDown size={14} className="tr-chev" aria-hidden="true" /></summary>
+            <ol>{hist.map((r) => {
+              const ph = phase(r, today);
+              return (
+                <li key={r.id}>
+                  <div className="row" style={{ gap: 8, justifyContent: 'space-between' }}>
+                    <span><Badge tone={ph === 'rejected' ? 'bad' : undefined}>{ph === 'rejected' ? t('rst.REJECTED') : t('rule.past')}</Badge>{' '}
+                      <span className="num"><DateText v={r.effective_from} />{r.effective_to && <> – <DateText v={r.effective_to} /></>}</span></span>
+                    <BasisChip basis={r.rule_basis} />
+                  </div>
+                  <RuleValues code={code} value={r.value} />
+                  <div className="muted small">{r.legal_basis}{r.proposed_by_name && <> · {r.proposed_by_name}</>}
+                    {r.decided_by_name && <> → {r.decided_by_name}</>}{r.decision_note && <> — {r.decision_note}</>}</div>
+                </li>);
+            })}</ol>
+          </details>)}
+      </section>
+    );
+  };
+
   return (
-    <div className="stack">
-      <PageHead title={t('rule.title')} />
-      <div className="note">{t('rule.hint')}</div>
+    <div className="stack tr-page">
+      <PageHead title={t('rule.title')} sub={t('rule.hint')} />
       <ErrorNote error={error} onRetry={reload} />
       {loading && !data ? <Loading /> : (
-        <div className="grid-2" style={{ alignItems: 'start' }}>
-          {CODES.map((code) => {
-            const rows = (data ?? []).filter((r) => r.code === code).sort((a, b) => b.effective_from.localeCompare(a.effective_from));
-            const cur = rows.find((r) => phase(r, today) === 'current');
-            const pending = rows.some((r) => r.status === 'PENDING');
-            return (
-              <section key={code} className="panel">
-                <div className="panel-head"><h2>{t(`rule.${code}` as Key)}</h2>
-                  {can('RULES_PROPOSE') && cur && !pending && <Button small onClick={() => setProp(cur)}>{t('rule.propose')}</Button>}</div>
-                <div className="panel-pad stack">
-                  {rows.map((r) => {
-                    const ph = phase(r, today);
-                    return (
-                      <div key={r.id} className="rule-card" style={{ opacity: ph === 'past' || ph === 'rejected' ? 0.6 : 1 }}>
-                        <div className="row" style={{ gap: 8, justifyContent: 'space-between' }}>
-                          <div>
-                            <Badge tone={ph === 'current' ? 'ok' : ph === 'pending' ? 'warn' : ph === 'future' ? 'info' : ph === 'rejected' ? 'bad' : undefined}>
-                              {ph === 'rejected' ? t('rst.REJECTED') : t(`rule.${ph}` as Key)}</Badge>{' '}
-                            <span className="num"><DateText v={r.effective_from} />{r.effective_to && <> – <DateText v={r.effective_to} /></>}</span>
-                          </div>
-                          <Badge>{t(`rule.${r.rule_basis}` as Key)}</Badge>
-                        </div>
-                        <RuleValues code={code} value={r.value} />
-                        <div className="muted small">{r.legal_basis}</div>
-                        {r.proposed_by_name && <div className="muted small">{r.proposed_by_name} · {fmtDateTime(r.proposed_at)}
-                          {r.decided_by_name && <> → {r.decided_by_name} · {fmtDateTime(r.decided_at)}</>}{r.decision_note && <> — {r.decision_note}</>}</div>}
-                        {r.can_decide && <div className="row" style={{ gap: 6, marginTop: 6 }}>
-                          <Button small kind="primary" busy={busy} onClick={() => void decide(r, true)}>{t('c.approve')}</Button>
-                          <Button small kind="danger" busy={busy} onClick={() => void decide(r, false)}>{t('c.reject')}</Button></div>}
-                      </div>);
-                  })}
-                </div>
-              </section>);
-          })}
-        </div>
+        <>
+          <div className="tr-stats">
+            <div className="tr-stat"><span className="tr-stat-num num">{inForce} / {CODES.length}</span><span className="tr-stat-label">{t('rule.s_inforce')}</span></div>
+            <div className={`tr-stat ${pendingN ? 'is-warn' : ''}`}><span className="tr-stat-num num">{pendingN}</span><span className="tr-stat-label">{t('rule.s_pending')}</span></div>
+            <div className="tr-stat"><span className="tr-stat-num num">{futureN}</span><span className="tr-stat-label">{t('rule.s_future')}</span></div>
+            <div className="tr-stat"><span className="tr-stat-num num">{lastDecided ? fmtDate(lastDecided.slice(0, 10)) : '—'}</span><span className="tr-stat-label">{t('rule.s_last')}</span></div>
+          </div>
+          {GROUPS.map((g) => (
+            <section key={g.key} className="tr-group" aria-labelledby={`trg-${g.key}`}>
+              <div className="tr-group-head">
+                <h2 id={`trg-${g.key}`}>{t(`rule.g_${g.key}` as Key)}</h2>
+                <p>{t(`rule.gd_${g.key}` as Key)}</p>
+              </div>
+              <div className={`tr-grid ${g.codes.length === 1 ? 'is-single' : g.codes.length === 3 ? 'is-three' : ''}`}>{g.codes.map(card)}</div>
+            </section>))}
+        </>
       )}
       <ProposeDialog base={prop} onClose={() => setProp(null)} onDone={(d) => setData(d)} />
       {confirm.node}
