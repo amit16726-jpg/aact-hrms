@@ -5,13 +5,14 @@ import {
   ChevronDown, CircleCheckBig, ClipboardList, Clock, DoorOpen, FileSpreadsheet, FileUp, FileWarning, Fingerprint,
   Flag, GraduationCap, HandCoins, HardHat, History, Hourglass, IdCard, Inbox, Landmark, LayoutDashboard, ListPlus, LogOut,
   Menu, Network, Package, PiggyBank, Receipt, Scale, Search, Settings, Settings2, ShieldAlert, ShieldCheck, Target, Timer,
-  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, type LucideIcon,
+  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, Smartphone, Share, SquarePlus, type LucideIcon,
 } from 'lucide-react';
 import { useI18n, type Key } from '../i18n';
 import { useSession } from '../lib/session';
 import { api } from '../lib/api';
 import { tapi } from '../lib/api_time';
-import { Loading } from './ui';
+import { Loading, Modal, Button } from './ui';
+import { installMode, onInstallChange, promptInstall } from '../lib/install';
 
 interface Item { to: string; key: Key; show: boolean; icon: LucideIcon; count?: number }
 interface Group { id: string; title?: Key; items: Item[] }
@@ -99,6 +100,13 @@ function AccountMenu() {
     return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
   }, [open]);
   const name = me?.display_name || me?.email || '';
+  const [mode, setMode] = useState(installMode);
+  const [iosHelp, setIosHelp] = useState(false);
+  useEffect(() => onInstallChange(() => setMode(installMode())), []);
+  const install = async () => {
+    setOpen(false);
+    if (mode === 'ios') setIosHelp(true); else await promptInstall();
+  };
   return (
     <div className="acct" ref={box}>
       <button type="button" className="acct-btn" aria-haspopup="menu" aria-expanded={open} aria-label={t('shell.account')}
@@ -120,11 +128,22 @@ function AccountMenu() {
             <NavLink role="menuitem" to="/me" onClick={() => setOpen(false)}><UserRound size={16} aria-hidden="true" />{t('snav.my_hr')}</NavLink>
           )}
           <NavLink role="menuitem" to="/settings" onClick={() => setOpen(false)}><Settings size={16} aria-hidden="true" />{t('nav.settings')}</NavLink>
+          {mode && (
+            <button type="button" role="menuitem" onClick={() => void install()}><Smartphone size={16} aria-hidden="true" />{t('shell.install')}</button>
+          )}
           <button type="button" role="menuitem" className="acct-out" onClick={() => void signOut()}>
             <LogOut size={16} aria-hidden="true" />{t('c.signout')}
           </button>
         </div>
       )}
+      <Modal open={iosHelp} title={t('shell.install_title')} onClose={() => setIosHelp(false)}
+        footer={<Button kind="primary" onClick={() => setIosHelp(false)}>{t('c.close')}</Button>}>
+        <ol className="install-steps">
+          <li><Share size={18} aria-hidden="true" />{t('shell.install_ios_1')}</li>
+          <li><SquarePlus size={18} aria-hidden="true" />{t('shell.install_ios_2')}</li>
+          <li><Smartphone size={18} aria-hidden="true" />{t('shell.install_ios_3')}</li>
+        </ol>
+      </Modal>
     </div>
   );
 }

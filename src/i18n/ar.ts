@@ -29,7 +29,7 @@ const base: Record<BaseKey, string> = {
   'nav.omanisation': 'التعمين', 'nav.targets': 'أهداف التعمين', 'nav.organisation': 'الهيكل التنظيمي',
   'nav.admin': 'الإدارة', 'nav.users': 'المستخدمون والأدوار', 'nav.settings': 'الإعدادات', 'nav.audit': 'سجل التدقيق',
   'nav.notifications': 'التنبيهات', 'nav.menu': 'القائمة',
-  'shell.search': 'البحث عن موظف', 'shell.search_ph': 'ابحث بالاسم أو الرقم الوظيفي', 'shell.account': 'الحساب',
+  'shell.search': 'البحث عن موظف', 'shell.search_ph': 'ابحث بالاسم أو الرقم الوظيفي', 'shell.account': 'الحساب', 'shell.install': 'تثبيت التطبيق على هذا الجهاز', 'shell.install_title': 'التثبيت على iPhone أو iPad', 'shell.install_ios_1': 'افتح هذه الصفحة في متصفح Safari واضغط زر المشاركة.', 'shell.install_ios_2': 'اختر «إضافة إلى الشاشة الرئيسية» ثم اضغط إضافة.', 'shell.install_ios_3': 'افتح تطبيق AACT HR من الأيقونة الجديدة على الشاشة الرئيسية.',
   'shell.home': 'الرئيسية', 'c.skip_to_content': 'انتقل إلى المحتوى', 'shell.open_group': 'إظهار أو إخفاء {g}',
   'auth.hero_title': 'الموارد البشرية لشركة AACT', 'auth.hero_sub': 'مكان واحد لكل من يدير المصنع — من يوم الالتحاق حتى التسوية النهائية.',
   'auth.hero_1': 'الرواتب مع اشتراكات صندوق الحماية الاجتماعية وملف نظام حماية الأجور', 'auth.hero_2': 'الحضور والإجازات والعمل الإضافي وساعات رمضان',

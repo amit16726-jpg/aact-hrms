@@ -30,7 +30,7 @@ const base = {
   'nav.omanisation': 'Omanisation', 'nav.targets': 'Omanisation targets', 'nav.organisation': 'Organisation',
   'nav.admin': 'Administration', 'nav.users': 'Users and roles', 'nav.settings': 'Settings', 'nav.audit': 'Audit trail',
   'nav.notifications': 'Notifications', 'nav.menu': 'Menu',
-  'shell.search': 'Search employees', 'shell.search_ph': 'Search by name or employee number', 'shell.account': 'Account',
+  'shell.search': 'Search employees', 'shell.search_ph': 'Search by name or employee number', 'shell.account': 'Account', 'shell.install': 'Install the app on this device', 'shell.install_title': 'Install on iPhone or iPad', 'shell.install_ios_1': 'Open this page in Safari and tap the Share button.', 'shell.install_ios_2': 'Choose “Add to Home Screen”, then tap Add.', 'shell.install_ios_3': 'Open AACT HR from the new icon on your home screen.',
   'shell.home': 'Home', 'c.skip_to_content': 'Skip to content', 'shell.open_group': 'Show or hide {g}',
   'auth.hero_title': 'Human resources for AACT', 'auth.hero_sub': 'One place for the people who run the factory — from joining day to final settlement.',
   'auth.hero_1': 'Payroll with SPF contributions and the WPS bank file', 'auth.hero_2': 'Attendance, leave, overtime and Ramadan hours',

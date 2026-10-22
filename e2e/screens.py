@@ -185,7 +185,7 @@ with sync_playwright() as p:
     br = p.chromium.launch()
     for lang in ('en', 'ar'):
         for w, h, tag in ((1440, 900, 'desktop'), (390, 844, 'phone')):
-            ctx = br.new_context(viewport={'width': w, 'height': h}, device_scale_factor=1)
+            ctx = br.new_context(viewport={'width': w, 'height': h}, device_scale_factor=1, service_workers='block')
             ctx.add_init_script(f"localStorage.setItem('sb-mockref-auth-token', {json.dumps(SESSION)}); localStorage.setItem('aact-hrms-lang', '{lang}');")
             def handle(route):
                 fn = route.request.url.split('/rpc/')[-1].split('?')[0]

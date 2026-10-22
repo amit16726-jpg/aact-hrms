@@ -10,6 +10,10 @@ import App from './App';
 import { I18nProvider } from './i18n';
 import { SessionProvider } from './lib/session';
 import { ToastProvider } from './components/ui';
+import { initInstall, registerServiceWorker } from './lib/install';
+
+initInstall();
+registerServiceWorker(import.meta.env.PROD);
 
 // Not wrapped in StrictMode: dialogs register a history entry so Android "back" closes them,
 // and StrictMode's double effects would immediately pop that entry in development.

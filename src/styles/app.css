@@ -820,3 +820,10 @@ progress { width: 100%; max-width: 200px; height: 8px; accent-color: var(--petro
 
 /* 1.10.0 — switched-off rows (pay components) */
 .t tr.row-muted td { opacity: .62; }
+
+/* 1.11.0 — install the app (iPhone steps) */
+.install-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: st; }
+.install-steps li { display: flex; align-items: center; gap: 10px; counter-increment: st; }
+.install-steps li::before { content: counter(st); display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--petrol); color: #fff; font-size: 13px; font-weight: 600; flex: none; }
+.install-steps svg { color: var(--petrol); flex: none; }

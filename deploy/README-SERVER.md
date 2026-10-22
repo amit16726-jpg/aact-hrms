@@ -49,7 +49,7 @@ The installer:
 6. builds and starts the web app with TLS;
 7. installs the nightly backup (02:00) and a monthly restore test (`/etc/cron.d/aact-hrms`).
 
-Then open `https://hr.aact.om`. The **first person to sign up** on the set-up page becomes the administrator — do this
+Then open `https://hr.aact.om`. Staff can install it as an app on Android, iPhone and computers from the account menu (*Install the app on this device*); HTTPS with a trusted certificate is required for this. The **first person to sign up** on the set-up page becomes the administrator — do this
 immediately, then invite everyone else from *Users*.
 
 ### E-mail notifications (Microsoft 365)

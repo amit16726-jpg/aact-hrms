@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.11.0 — 2026-10-22 — installable app for Android and iPhone
+
+- The HRMS can be **installed as an app** on Android phones and tablets (Chrome, Edge, Samsung Internet), iPhone and iPad
+  (Safari → Share → Add to Home Screen) and on Windows / macOS (Chrome, Edge). It opens full-screen from its own icon, with the
+  same sign-in, permissions and English / Arabic screens as the browser.
+- New account-menu item **Install the app on this device**: shows the browser's install offer on Android and desktop, and the
+  three Add-to-Home-Screen steps on iPhone and iPad. Hidden when the app is already installed.
+- Web app manifest, app icons (including maskable and Apple touch icons) and a service worker that caches **only the app files**
+  (never API calls or employee data) and always loads the newest release when online.
+- Vercel and the company-server nginx serve the manifest with its type and never cache the service worker.
+
 ## 1.10.1 — 2026-10-22
 
 - A browser still signed in to an account that no longer exists (for example after the test database reset) is now signed
