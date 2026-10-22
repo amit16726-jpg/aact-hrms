@@ -48,7 +48,12 @@ export interface Employee {
   notice_given_date?: string | null; last_working_date?: string | null; separation_date?: string | null;
   separation_type?: string | null; separation_reason?: string | null; is_omani: boolean;
   entity_en?: string; entity_ar?: string | null;
+  /** management (MG) or non-management (NMG) pay group; absent for a line manager's limited view */
+  pay_group?: PayGroup;
 }
+
+export type PayGroup = 'NMG' | 'MG';
+export interface MgAccessRow { user_id: string; name: string; email: string | null; member: boolean; is_me: boolean }
 
 export type EmployeeStatus = 'PROBATION' | 'ACTIVE' | 'NOTICE' | 'SUSPENDED' | 'SEPARATED';
 
@@ -75,6 +80,10 @@ export interface OmanisationException {
 export interface Caps {
   edit: boolean; salary_read: boolean; salary_write: boolean; salary_approve: boolean; bank_read: boolean; bank_write: boolean;
   bank_approve: boolean; docs_read: boolean; docs_write: boolean; docs_sensitive: boolean; history: boolean; exception_approve: boolean;
+  /** the employee's pay is management (MG) and this user is not in the management payroll team */
+  pay_restricted?: boolean;
+  /** this user may move the employee between MG and NMG */
+  pay_group_change?: boolean;
 }
 
 export interface EmployeeFile {
@@ -217,6 +226,9 @@ export const api = {
     rpc<{ id: string; employee_no: string; full_name_en: string; full_name_ar: string | null; status: string; entity_id: string }[]>(
       'hr_employee_lookup', { p_search: search, p_limit: 20 }),
   getEmployee: (id: string) => rpc<EmployeeFile>('hr_get_employee', { p_id: id }),
+  setPayGroup: (id: string, group: PayGroup, reason: string) => rpc<EmployeeFile>('hr_set_pay_group', { p_employee: id, p_group: group, p_reason: reason }),
+  listMgAccess: () => rpc<MgAccessRow[]>('hr_list_mg_access', {}),
+  setMgAccess: (userId: string, member: boolean) => rpc<MgAccessRow[]>('hr_set_mg_access', { p_user: userId, p_member: member }),
   saveEmployee: (p: Json) => rpc<EmployeeFile>('hr_save_employee', { p }),
   setPhoto: (id: string, path: string | null) => rpc<EmployeeFile>('hr_set_employee_photo', { p_employee: id, p_path: path }),
   addAssignment: (id: string, p: Json) => rpc<EmployeeFile>('hr_add_assignment', { p_employee: id, p }),

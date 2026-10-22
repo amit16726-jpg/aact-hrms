@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.9.0 — 2026-10-22 — management (MG) pay confidentiality
+
+- Every employee is in pay group **NMG** (non-management, default) or **MG** (management).
+- New permission **Management pay** (`MG_PAY`), held only by the new role **Management payroll**. It cannot be added to any
+  other role, and the super administrator does not get it. Only an existing member can add or remove members
+  (*Settings → Management payroll team*); the administrator can give the role once, to the first member.
+- For MG employees, everyone outside the team loses every money item: salary, bank account, payslips, loans and advances,
+  one-off pay items, final settlement, gratuity, salary letters, and the matching audit-trail rows. Approval requests
+  and notifications about MG pay go to the team only. HR keeps all non-financial records (personal details, documents,
+  attendance, leave, performance, discipline, exits).
+- **Separate MG payroll run** each month (choose the pay group when creating a run), with its own calculate → verify →
+  approve chain (three different team members), payslips, bank (WPS) file and SPF schedule. NMG runs never include MG staff.
+- Dashboards and reports (executive dashboard, gratuity, localisation report) leave out MG money figures for people outside the team.
+- Moving someone between MG and NMG needs a reason and is refused while they are in a payroll run waiting for verification or approval.
+- Database: migrations `20261027000100_mg_pay`, `20261027000200_api_mg_pay`, `20261027000300_mg_payroll_runs`; tests `tests/db/80_mg_pay.sql`.
+
 ## 1.8.1 — 2026-10-22
 
 - Pages use the full width of the screen (the 1480 px limit is removed); figure boxes stretch to fill their panel.

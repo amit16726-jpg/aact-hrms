@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { ssapi, type EmailAdmin } from '../lib/api_ss';
-import { Badge, Check, Empty, useAsync } from '../components/ui';
+import { Badge, Check, Empty, ErrorNote, useAsync } from '../components/ui';
 import { fmtDateTime } from '../lib/format';
 import { useI18n } from '../i18n';
 import { useSession } from '../lib/session';
@@ -49,6 +49,7 @@ export default function SettingsPage() {
       <EmailPrefPanel />
       {can('EMAIL_ADMIN') && <EmailAdminPanel />}
       {can('PERF_MANAGE') && can('DISC_APPROVE') && <HrPoliciesPanel />}
+      {can('MG_PAY') && <MgTeamPanel />}
 
       {can('USERS_ADMIN') && (
         <section className="panel panel-pad stack" style={{ maxWidth: 640 }}>
@@ -120,6 +121,47 @@ function EmailAdminPanel() {
                 {r.last_error && <span className="sub">{r.last_error}</span>}</td>
             </tr>))}
           </tbody></table></div>)}
+    </section>
+  );
+}
+
+/** Management payroll team: members add and remove each other (MG pay confidentiality). */
+function MgTeamPanel() {
+  const { t } = useI18n();
+  const { data, setData, error } = useAsync(() => api.listMgAccess(), []);
+  const { busy, run } = useAction();
+  const toggle = async (userId: string, member: boolean) => {
+    const r = await run(() => api.setMgAccess(userId, member), t(member ? 'pg.added' : 'pg.removed'));
+    if (r) setData(r);
+  };
+  const members = (data ?? []).filter((u) => u.member);
+  const others = (data ?? []).filter((u) => !u.member);
+  const [pick, setPick] = useState('');
+  return (
+    <section className="panel stack" style={{ maxWidth: 820, gap: 0 }}>
+      <div className="panel-head"><h2>{t('pg.team_title')}</h2><Badge tone="warn">{t('pg.MG')}</Badge></div>
+      <div className="panel-body stack">
+        <p className="muted" style={{ margin: 0 }}>{t('pg.team_hint')}</p>
+        <ErrorNote error={error} />
+        {!members.length ? <Empty>—</Empty> : (
+          <div className="table-wrap"><table className="t">
+            <tbody>{members.map((u) => (
+              <tr key={u.user_id}>
+                <td>{u.name}{u.is_me && <span className="muted"> ({t('pg.you')})</span>}<span className="sub ltr-inline">{u.email}</span></td>
+                <td className="r">{!u.is_me && <Button small kind="danger" busy={busy} onClick={() => void toggle(u.user_id, false)}>{t('pg.remove')}</Button>}</td>
+              </tr>))}
+            </tbody></table></div>
+        )}
+        {others.length > 0 && (
+          <div className="row" style={{ alignItems: 'flex-end' }}>
+            <Select label={t('pg.add')} value={pick} onChange={(e) => setPick(e.target.value)} style={{ minWidth: 260 }}>
+              <option value="">—</option>
+              {others.map((u) => <option key={u.user_id} value={u.user_id}>{u.name}{u.email ? ` — ${u.email}` : ''}</option>)}
+            </Select>
+            <Button kind="primary" busy={busy} disabled={!pick} onClick={() => { void toggle(pick, true); setPick(''); }}>{t('pg.add')}</Button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

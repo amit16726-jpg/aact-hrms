@@ -18,6 +18,7 @@ export interface PayrollRun {
   calculated_by_name: string | null; verified_by_name: string | null; approved_by_name: string | null; paid_by_name: string | null;
   return_note: string | null; reopen_reason: string | null; notes: string | null; totals: RunTotals; warning_count: number;
   entity_code: string; entity_en: string; entity_ar: string | null; attendance_locked: boolean;
+  pay_group?: 'NMG' | 'MG';
   can_calculate: boolean; can_verify: boolean; can_approve: boolean; can_return: boolean; can_pay: boolean; can_reopen: boolean; can_export_bank: boolean;
 }
 export interface PayslipBrief {
@@ -123,7 +124,8 @@ export const papi = {
   saveSetup: (p: Json) => rpc<PayrollSetup>('hr_save_payroll_setup', { p }),
 
   listRuns: (entityId: string | null, year: number | null) => rpc<PayrollRun[]>('hr_list_payroll_runs', { p_entity: entityId, p_year: year }),
-  createRun: (entityId: string, month: string, payDate: string | null) => rpc<PayrollRun>('hr_create_payroll_run', { p_entity: entityId, p_month: month, p_pay_date: payDate }),
+  createRun: (entityId: string, month: string, payDate: string | null, payGroup: 'NMG' | 'MG' = 'NMG') =>
+    rpc<PayrollRun>('hr_create_payroll_run', { p_entity: entityId, p_month: month, p_pay_date: payDate, p_pay_group: payGroup }),
   calculate: (id: string) => rpc<PayrollRun>('hr_calculate_payroll', { p_run: id }),
   verify: (id: string, note: string | null) => rpc<PayrollRun>('hr_verify_payroll', { p_run: id, p_note: note }),
   approve: (id: string, note: string | null) => rpc<PayrollRun>('hr_approve_payroll', { p_run: id, p_note: note }),

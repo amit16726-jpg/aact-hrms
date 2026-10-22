@@ -5,6 +5,7 @@ import { Badge, Button, Check, DateText, Empty, Input, Modal, Select, Textarea, 
 import { MasterSelect } from '../../components/pickers';
 import { PersonalFields, personalFrom, personalPayload, type PersonalForm } from './PersonalFields';
 import { todayMuscat } from '../../lib/format';
+import { PayGroupBadge } from '../../components/pay';
 
 export type ConfirmFn = ReturnType<typeof useConfirm>['ask'];
 
@@ -90,6 +91,7 @@ export function ProfileTab({ file, onChange, confirm }: { file: EmployeeFile; on
           <div className="panel-body">
             <dl className="facts">
               <Fact label={t('c.company')}>{L(e.entity_en, e.entity_ar)}</Fact>
+              {full && e.pay_group && <Fact label={t('pg.group')}><PayGroupFact file={file} onChange={onChange} /></Fact>}
               <Fact label={t('emp.joined')}><DateText v={e.join_date} /></Fact>
               {full && e.original_join_date && e.original_join_date !== e.join_date &&
                 <Fact label={t('ed.first_joined')}><DateText v={e.original_join_date} /></Fact>}
@@ -103,6 +105,7 @@ export function ProfileTab({ file, onChange, confirm }: { file: EmployeeFile; on
               </>}
               {file.access === 'FULL' && <Fact label={t('ed.linked_login')}>{file.linked_user ? file.linked_user.email : <span className="muted">{t('ed.no_login')}</span>}</Fact>}
             </dl>
+            {file.caps.pay_restricted && <div className="note" style={{ marginTop: 14 }}>{t('pg.restricted')}</div>}
           </div>
         </section>
 
@@ -233,5 +236,38 @@ function StatusActions({ file, onChange }: { file: EmployeeFile; onChange: (f: E
         </div>
       </Modal>
     </section>
+  );
+}
+
+/** Pay group with the change action for the management payroll team. */
+function PayGroupFact({ file, onChange }: { file: EmployeeFile; onChange: (f: EmployeeFile) => void }) {
+  const { t } = useI18n();
+  const { busy, run } = useAction();
+  const cur = file.employee.pay_group ?? 'NMG';
+  const [open, setOpen] = useState(false);
+  const [group, setGroup] = useState<'NMG' | 'MG'>(cur === 'MG' ? 'NMG' : 'MG');
+  const [reason, setReason] = useState('');
+  const save = async () => {
+    const r = await run(() => api.setPayGroup(file.employee.id, group, reason.trim()), t('pg.changed'));
+    if (r) { setOpen(false); setReason(''); onChange(r); }
+  };
+  return (
+    <span className="row" style={{ gap: 8 }}>
+      <PayGroupBadge group={cur} />
+      {file.caps.pay_group_change && (
+        <Button kind="ghost" small onClick={() => { setGroup(cur === 'MG' ? 'NMG' : 'MG'); setOpen(true); }}>{t('pg.change')}</Button>
+      )}
+      <Modal open={open} title={t('pg.change')} onClose={() => setOpen(false)}
+        footer={<><Button onClick={() => setOpen(false)}>{t('c.cancel')}</Button>
+          <Button kind="primary" busy={busy} disabled={group === cur || reason.trim().length < 5} onClick={() => void save()}>{t('c.save')}</Button></>}>
+        <div className="stack">
+          <div className="note">{t('pg.change_hint')}</div>
+          <Select label={t('pg.group')} value={group} onChange={(ev) => setGroup(ev.target.value as 'NMG' | 'MG')}>
+            <option value="NMG">{t('pg.NMG')}</option><option value="MG">{t('pg.MG')}</option>
+          </Select>
+          <Textarea label={t('pg.reason')} required value={reason} onChange={(ev) => setReason(ev.target.value)} />
+        </div>
+      </Modal>
+    </span>
   );
 }

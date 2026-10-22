@@ -17,6 +17,13 @@ export function RunBadge({ status }: { status: RunStatus }) {
   return <Badge tone={tone}>{t(`prs.${status}` as Key)}</Badge>;
 }
 
+/** Management (MG) or non-management (NMG) pay group. */
+export function PayGroupBadge({ group, short }: { group?: 'NMG' | 'MG' | null; short?: boolean }) {
+  const { t } = useI18n();
+  const g = group ?? 'NMG';
+  return <Badge tone={g === 'MG' ? 'warn' : undefined}>{short ? g : t(`pg.${g}` as Key)}</Badge>;
+}
+
 /** Calculated → verified → approved → paid, with who and when. */
 export function RunSteps({ run }: { run: PayrollRun }) {
   const { t } = useI18n();

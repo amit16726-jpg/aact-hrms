@@ -94,6 +94,7 @@ export default function EmployeeDetailPage() {
               <h1>{L(e.full_name_en, e.full_name_ar)}</h1>
               <StatusBadge status={e.status} />
               {e.is_omani ? <Badge tone="info">{t('dash.omani')}</Badge> : <Badge>{t('dash.expat')}</Badge>}
+              {e.pay_group === 'MG' && <Badge tone="warn">{t('pg.MG')}</Badge>}
             </div>
             {lang === 'en' && e.full_name_ar && <div className="ar-name" lang="ar" dir="rtl">{e.full_name_ar}</div>}
             {lang === 'ar' && <div className="muted" lang="en" dir="ltr">{e.full_name_en}</div>}

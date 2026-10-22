@@ -55,6 +55,7 @@ Go-live needs **no open A or B items**.
 | 4.6 | Bank file (WPS) and journal | Bank accepts the file in a test upload; journal balances |
 | 4.7 | Final settlement: resignation and termination, both before and after July 2023 service | Gratuity, leave pay, notice pay correct; approved by another person |
 | 4.8 | Payslips: employee sees only his own; Arabic payslip prints | Correct |
+| 4.9 | Management (MG) pay: HR manager, HR officer, normal Finance and the auditor open an MG employee; MG run made and approved by three team members | No salary, bank, payslip, loan, settlement or salary-letter figure of MG staff visible outside the team; MG run, bank file and SPF schedule separate; HR still sees attendance, leave and documents |
 
 ## 5. Self-service, letters, recruitment
 | # | Test | Expected |

@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { papi, type PayrollRun } from '../../lib/api_pay';
 import { useI18n } from '../../i18n';
 import { useSession } from '../../lib/session';
-import { Button, Empty, ErrorNote, Input, Loading, Modal, useAction, useAsync } from '../../components/ui';
+import { Button, Empty, ErrorNote, Input, Loading, Modal, Select, useAction, useAsync } from '../../components/ui';
 import { PageHead } from '../../components/Layout';
 import { EntitySelect, useEntity } from '../../components/time';
-import { OMR, RunBadge, monthName } from '../../components/pay';
+import { OMR, PayGroupBadge, RunBadge, monthName } from '../../components/pay';
 import { addMonths, todayMuscat } from '../../lib/format';
 
 export default function PayrollPage() {
@@ -16,6 +16,7 @@ export default function PayrollPage() {
   const [year, setYear] = useState(Number(todayMuscat().slice(0, 4)));
   const { data, error, loading, reload } = useAsync(() => papi.listRuns(entity || null, year), [entity, year]);
   const [open, setOpen] = useState(false);
+  const showGroup = can('MG_PAY') || (data ?? []).some((r) => r.pay_group === 'MG');
   return (
     <div className="stack">
       <PageHead title={t('pr.title')} sub={t('pr.chain')}
@@ -34,7 +35,8 @@ export default function PayrollPage() {
               <th className="r">{t('pr.deductions')}</th><th className="r">{t('pr.net')}</th><th className="r">{t('pr.employer_cost')}</th><th>{t('pr.pay_date')}</th></tr></thead>
             <tbody>{data.map((r: PayrollRun) => (
               <tr key={r.id}>
-                <td data-label={t('pr.month')}><Link to={`/payroll/${r.id}`}>{monthName(r.month, lang)}</Link><span className="sub">{r.entity_code}</span></td>
+                <td data-label={t('pr.month')}><Link to={`/payroll/${r.id}`}>{monthName(r.month, lang)}</Link>
+                  <span className="sub">{r.entity_code}{showGroup && <> <PayGroupBadge group={r.pay_group} short /></>}</span></td>
                 <td data-label={t('c.status')}><RunBadge status={r.status} />
                   {r.warning_count > 0 && r.status !== 'DRAFT' && <span className="sub">{t('pr.warnings')}: {r.warning_count}</span>}
                   {!r.attendance_locked && r.status === 'DRAFT' && <span className="sub bad-text">{t('pr.attendance_open')}</span>}</td>
@@ -59,8 +61,10 @@ function NewRunDialog({ open, entity, onClose }: { open: boolean; entity: string
   const { busy, run } = useAction();
   const [month, setMonth] = useState(addMonths(todayMuscat().slice(0, 7), -1));
   const [payDate, setPayDate] = useState('');
+  const { can } = useSession();
+  const [group, setGroup] = useState<'NMG' | 'MG'>('NMG');
   const submit = async () => {
-    const r = await run(() => papi.createRun(entity, month, payDate || null));
+    const r = await run(() => papi.createRun(entity, month, payDate || null, group));
     if (r) { onClose(); nav(`/payroll/${r.id}`); }
   };
   return (
@@ -69,6 +73,12 @@ function NewRunDialog({ open, entity, onClose }: { open: boolean; entity: string
       <div className="form-grid">
         <Input label={t('pr.month')} type="month" ltr required value={month} max={todayMuscat().slice(0, 7)} onChange={(e) => setMonth(e.target.value)} />
         <Input label={t('pr.pay_date')} type="date" ltr value={payDate} onChange={(e) => setPayDate(e.target.value)} />
+        {can('MG_PAY') && <>
+          <Select label={t('pg.run_group')} value={group} onChange={(e) => setGroup(e.target.value as 'NMG' | 'MG')}>
+            <option value="NMG">{t('pg.NMG')}</option><option value="MG">{t('pg.MG')}</option>
+          </Select>
+          <div className="muted" style={{ alignSelf: 'end' }}>{t('pg.run_hint')}</div>
+        </>}
         <div className="span-2 muted">{t('pr.chain')}</div>
       </div>
     </Modal>

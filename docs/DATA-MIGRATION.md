@@ -12,7 +12,8 @@ import history with its results.
 | 2 | Pay components and legal rules (SPF, gratuity, overtime, leave) with effective dates | *Payroll setup*, *Payroll rules*, *Oman time rules* | Confirm values with the lawyer first |
 | 3 | **Employees** | *Import data → Employees* | Import line managers first (or in an earlier file) — a manager's employee number must already exist |
 | 4 | **Documents** (passport, visa, resident card, labour card, contract copy…) | *Import data → Documents* | Numbers and dates only; scans can be attached later on each employee |
-| 5 | **Opening salaries** | *Import data → Opening salaries* | Created as proposals; a second person approves them in *Approvals* |
+| 4b | Management (MG) pay group | each MG employee → *Employment → Change pay group* (management payroll team) | Do this **before** salaries are imported, so HR never sees MG pay |
+| 5 | **Opening salaries** | *Import data → Opening salaries* | Created as proposals; a second person approves them in *Approvals*. HR's import refuses MG employees; the management payroll team enters MG salaries |
 | 6 | Opening leave balances | *Leave → Balances → Import* | Days as at the opening date; approved by a second person |
 | 7 | Contracts, bank accounts, emergency contacts | each employee | Bank accounts are approved by Finance |
 | 8 | Check | *Employees*, *Expiries*, *Omanisation*, *Localisation report* | Compare head-count, Omani %, and totals with the old system |

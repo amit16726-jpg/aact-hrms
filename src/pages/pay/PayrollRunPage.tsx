@@ -5,7 +5,7 @@ import { useI18n, type Key } from '../../i18n';
 import { useSession } from '../../lib/session';
 import { Badge, Button, Check, Empty, ErrorNote, Loading, Tabs, useAction, useAsync, useConfirm, useToast } from '../../components/ui';
 import { PageHead } from '../../components/Layout';
-import { OMR, RunBadge, RunSteps, monthName } from '../../components/pay';
+import { OMR, PayGroupBadge, RunBadge, RunSteps, monthName } from '../../components/pay';
 import { downloadCsv } from '../../lib/csv';
 import { parseCsv } from '../../lib/punches';
 
@@ -18,6 +18,7 @@ export default function PayrollRunPage() {
   const [tab, setTab] = useState<TabId>('slips');
   const { busy, run } = useAction();
   const confirm = useConfirm();
+  const { can } = useSession();
   const merge = (r: PayrollRun) => setData((d) => (d ? { ...d, ...r } : d));
 
   if (loading && !data) return <Loading />;
@@ -34,7 +35,7 @@ export default function PayrollRunPage() {
 
   return (
     <div className="stack">
-      <PageHead title={t('pr.run_title', { m, c: L(r.entity_en, r.entity_ar) })} sub={<RunBadge status={r.status} />}
+      <PageHead title={t('pr.run_title', { m, c: L(r.entity_en, r.entity_ar) })} sub={<span className="row" style={{ gap: 8 }}><RunBadge status={r.status} />{(r.pay_group === 'MG' || can('MG_PAY')) && <PayGroupBadge group={r.pay_group} />}</span>}
         actions={<>
           {r.can_calculate && <Button kind="primary" busy={busy} disabled={!r.attendance_locked}
             onClick={() => void act(() => papi.calculate(r.id), 'pr.calculated_done', true)}>{r.status === 'DRAFT' && r.calc_count === 0 ? t('pr.calculate') : t('pr.recalculate')}</Button>}

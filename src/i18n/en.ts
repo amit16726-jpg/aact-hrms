@@ -249,6 +249,16 @@ const base = {
   'nt.title': 'Notifications', 'nt.mark_all': 'Mark all read', 'nt.empty': 'No notifications.', 'nt.unread': '{n} unread',
 
   // errors
+  'pg.group': 'Pay group', 'pg.NMG': 'Non-management (NMG)', 'pg.MG': 'Management (MG)',
+  'pg.restricted': 'Management pay: salary, bank, payslips and other money items of this employee are handled only by the management payroll team.',
+  'pg.change': 'Change pay group', 'pg.reason': 'Reason for the change', 'pg.changed': 'Pay group changed',
+  'pg.change_hint': 'Moving someone to management (MG) hides their salary, bank, payslips, loans, settlement and salary letters from everyone outside the management payroll team. They are paid in the separate MG payroll run.',
+  'pg.team_title': 'Management payroll team', 'pg.team_hint': 'Members see and process the pay of management (MG) employees. Each change is recorded and the other members are told.',
+  'pg.member': 'Member', 'pg.add': 'Add to team', 'pg.remove': 'Remove', 'pg.added': 'Added to the management payroll team',
+  'pg.removed': 'Removed from the management payroll team', 'pg.you': 'you',
+  'pg.run_group': 'Payroll for', 'pg.run_hint': 'Management (MG) and non-management (NMG) staff are paid in separate runs, each with its own approval and bank file.',
+  'err.MG_ONLY': 'Pay details of management (MG) employees are restricted to the management payroll team.',
+  'err.PAYROLL_OPEN': 'The employee is in a payroll run waiting for verification or approval. Approve or return that run first.',
   'err.NOT_SIGNED_IN': 'Your session has ended. Sign in again.',
   'err.NOT_ALLOWED': 'Your role does not allow this.',
   'err.NOT_FOUND': 'The record was not found. It may have been changed by someone else.',

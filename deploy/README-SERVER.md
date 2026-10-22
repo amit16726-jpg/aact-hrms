@@ -109,7 +109,8 @@ was applied is reported and never re-run.
 - [ ] Administrator account created; demo logins (`*@aact.test`) do **not** exist here (dummy seeds are never run on this server).
 - [ ] Legal values confirmed with the company's lawyer and recorded with dates: SPF rates and ceiling, gratuity rules, leave,
       overtime, probation, notice, discipline limits, injury reporting deadline (*Oman time rules*, *Payroll rules*, *Settings → HR policy limits*).
-- [ ] Data migrated (see `docs/DATA-MIGRATION.md`) and checked by HR against the old system.
+- [ ] Management payroll team named (at least three people, so an MG payroll can be calculated, verified and approved by different people); the first member is given the role on *Users*, then adds the others in *Settings*.
+- [ ] Data migrated (see `docs/DATA-MIGRATION.md`) and checked by HR against the old system; MG pay group set before salaries are imported.
 - [ ] **Parallel payroll run** for at least one month: both systems produce the same net pay per employee, differences explained.
 - [ ] User acceptance test signed (`docs/UAT-PLAN.md`).
 - [ ] Privacy notice reviewed by the lawyer, published, and staff asked to acknowledge it.

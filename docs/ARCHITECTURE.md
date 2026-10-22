@@ -207,3 +207,18 @@ Nothing below is hard-coded. Each is a setting, a master record, or a rule with 
 - Server: see `deploy/README-SERVER.md`. Migrations on the server are applied by `deploy/scripts/apply-migrations.sh`, recorded in
   `aact_admin.migrations` with a checksum.
 - Tests: `tests/db/70_governance.sql`, `tests/deploy/test-scripts.sh`, `src/lib/api_gov.test.ts`.
+
+## 13. Management (MG) pay confidentiality (v1.9.0)
+
+- `hr.employees.pay_group` and `hr.payroll_runs.pay_group`: `NMG` (default) or `MG`. One payroll run per company, month and pay group.
+- Permission `MG_PAY` belongs only to role `MG_PAYROLL`. A trigger on `hr.role_permissions` silently skips `MG_PAY` for any
+  other role, so a later "give the super administrator every permission" statement cannot leak it. **Future migrations must
+  not try to grant `MG_PAY` to another role.**
+- Central checks (`20261027000100_mg_pay.sql`): `hr.money_ok(employee)`, `hr.require_money(employee)`, `hr.run_ok(group)`,
+  `hr.require_run(run)`, `hr.money_users(perm, employee, group)` / `hr.notify_money(...)` for notifications, `hr.audit_ok(row)` for the audit trail.
+  Every function that reads or writes salary, bank, payslips, loans, pay items, settlements, gratuity or salary letters calls them.
+  Self-service (the employee's own payslips, salary and letters) is unchanged.
+- Team membership: `hr_set_user_roles` refuses to add or remove `MG_PAYROLL` unless the caller holds `MG_PAY` (or nobody does yet);
+  members use `hr_list_mg_access` / `hr_set_mg_access`.
+- Known limits: job offers and requisitions still show the offered salary to recruiters (prepare offers for MG posts inside the team);
+  a payroll run's totals still include every payslip in it, which is why MG staff are paid in their own run.

@@ -1,7 +1,7 @@
 {
   "name": "aact-hrms",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.9.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,7 +17,7 @@
     "env:local": "node scripts/local-env.mjs",
     "local:setup": "supabase start && node scripts/local-env.mjs",
     "seed:gen": "python scripts/gen-seed.py",
-    "db:test": "bash scripts/local-db-reset.sh && psql -h ${PGHOST:-/tmp} -p ${PGPORT:-5433} -U postgres -d aact_test -q -v ON_ERROR_STOP=1 -f tests/db/10_priority1.sql -f tests/db/20_phase2.sql -f tests/db/30_payroll.sql -f tests/db/40_selfservice.sql -f tests/db/50_recruitment.sql -f tests/db/60_workforce.sql -f tests/db/70_governance.sql",
+    "db:test": "bash scripts/local-db-reset.sh && psql -h ${PGHOST:-/tmp} -p ${PGPORT:-5433} -U postgres -d aact_test -q -v ON_ERROR_STOP=1 -f tests/db/10_priority1.sql -f tests/db/20_phase2.sql -f tests/db/30_payroll.sql -f tests/db/40_selfservice.sql -f tests/db/50_recruitment.sql -f tests/db/60_workforce.sql -f tests/db/70_governance.sql -f tests/db/80_mg_pay.sql",
     "deploy:test": "bash tests/deploy/test-scripts.sh"
   },
   "dependencies": {

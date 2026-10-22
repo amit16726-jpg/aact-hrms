@@ -24,6 +24,7 @@
 - `supabase/seed_phase5.sql` — local/test only (requisitions, candidates, offers, onboarding). It stops if requisitions exist.
 - `supabase/seed_phase6.sql` — local/test only (appraisal cycle, training, cases, assets, housing, injuries, an exit). It stops if appraisal cycles exist.
 - `supabase/seed_phase7.sql` — local/test only (published privacy notice, consents, requests, breaches). It stops if a notice is already published.
+- `supabase/seed_phase8.sql` — local/test only (demo admin and Finance form the management payroll team; four department heads become MG). It stops if anyone is already MG.
 - `.env.development.local` — local only, written by `npm run env:local`, never committed.
 - Production secrets (database password, JWT secret, SMTP password) — only on the company server, never in git.
 
