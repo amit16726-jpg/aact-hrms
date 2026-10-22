@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.15.1 — 2026-10-22
+
+### Changed — translation now runs on the company server (LibreTranslate)
+- The **Translate** buttons use **LibreTranslate**, an open-source translator installed on the company server
+  (container `aact-hrms-translate`, English and Arabic models only). No outside account or key; no text leaves the company.
+- Omani terms are kept exact: Ministry of Labour, Social Protection Fund, Omanisation, Wage Protection System, end-of-service gratuity,
+  National Day, Renaissance Day, Eid holidays, leave types, allowances, Muscat, Sohar, Salalah … (and company terms from
+  `translation_glossary`). Arabic articles and prepositions are joined correctly (ل + الإجازة = للإجازة). Bullets, numbering and blank
+  lines are kept. If a term cannot be kept, the line is translated plainly — no stray numbers.
+- Server: `deploy/docker-compose.app.yml` adds the container; `deploy/supabase-override.yml` sets `LIBRETRANSLATE_URL`;
+  `update.sh` now also refreshes the edge-function settings. Server memory: 12 GB recommended.
+- The Claude API remains an optional alternative (only if `ANTHROPIC_API_KEY` is set and LibreTranslate is not).
+- Phone app version 1.15.1.
+
 ## 1.15.0 — 2026-10-22
 
 ### Added — Announcements: translation and signed PDF

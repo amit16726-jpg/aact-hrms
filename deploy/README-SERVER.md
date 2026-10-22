@@ -16,12 +16,13 @@ through an SSH tunnel.
 
 | Item | Minimum |
 |---|---|
-| Server | Ubuntu Server 24.04 LTS, 4 vCPU, 8 GB RAM, 100 GB SSD (VM is fine) |
+| Server | Ubuntu Server 24.04 LTS, 4 vCPU, 8 GB RAM (12 GB recommended with the translation service), 100 GB SSD (VM is fine) |
 | Software | Docker Engine 26+ with the Compose plugin 2.24+, `git`, `openssl`, `rsync` |
 | Network | A fixed internal IP; DNS name (e.g. `hr.aact.om`) pointing to it; ports 80 and 443 open from the office network / VPN only |
 | Certificate | Company TLS certificate for the name (`fullchain.pem`, `privkey.pem`). Without one, a self-signed certificate is created (browsers warn). |
 | E-mail | An SMTP account for password resets and invitations (Microsoft 365: `smtp.office365.com:587`, licensed mailbox with SMTP AUTH enabled) |
 | Backup target | A second machine or NAS reachable with `rsync` over SSH for off-site copies |
+| Translation models | On the **first start only**, the translation container downloads the English↔Arabic models (about 200 MB) from `raw.githubusercontent.com` and `argos-net.com` (HTTPS). After that it works fully offline. |
 | Biometric devices | Exported punch files (CSV) are imported in *Import punches*; no device connection is needed |
 
 Do **not** open ports 5432, 6543 or 8000 to the network — the installer binds them to the server itself.
@@ -65,6 +66,17 @@ select cron.schedule('hr-send-mail', '*/2 * * * *', $$
                        body := '{}'::jsonb) $$);
 ```
 4. In the app: *Settings → E-mail notifications* → system address `https://hr.aact.om` → switch on → **Send me a test e-mail**.
+
+### Translation of announcements (LibreTranslate, on this server)
+The installer starts the container `aact-hrms-translate` (LibreTranslate, English and Arabic only) next to the web app. It has
+no published port — only the edge functions reach it, as `http://aact-hrms-translate:5000`. Nothing is sent outside the company.
+1. First start: watch `docker logs -f aact-hrms-translate` until it says it is running (a few minutes while the models download).
+2. Check from the server: `docker exec aact-hrms-translate python3 -c "import urllib.request;print(urllib.request.urlopen('http://localhost:5000/languages').read()[:200])"` — it should list `en` and `ar`.
+3. In the app: *Engagement admin → New announcement* → write an English title → **English → Arabic**.
+4. No internet on the server? Download the two model files on another PC (`translate-en_ar-1_0.argosmodel`, `translate-ar_en-1_0.argosmodel`
+   from `argos-net.com/v1/`) and install them: for each file: `docker cp <file> aact-hrms-translate:/tmp/` then
+   `docker exec aact-hrms-translate /app/venv/bin/python -c "import argostranslate.package as p; p.install_from_path('/tmp/<file>')"`,
+   then `docker restart aact-hrms-translate`.
 
 ## 3. Backups and restore
 

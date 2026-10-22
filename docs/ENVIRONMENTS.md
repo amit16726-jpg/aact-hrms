@@ -63,20 +63,37 @@ when **Settings → E-mail notifications** is switched on; the `send-mail` edge 
 
 Employees can switch e-mails off for themselves in Settings. Real employee e-mails are sent only from the company server.
 
-## Translation of announcements (1.15.0)
+## Translation of announcements (1.15.0, LibreTranslate from 1.15.1)
 
-The **Translate** buttons in the announcement form call the `translate` edge function, which uses the Claude API (Anthropic).
-Only the announcement title and message are sent — no employee data. Each request is logged in `hr.translation_log` (who, when,
-direction, length) and limited per person per day (`engagement.translate_daily_limit`, default 100).
+The **Translate** buttons in the announcement form call the `translate` edge function, which sends the title and the message to
+**LibreTranslate running on the company server** (open-source machine translation, English and Arabic models only). No outside
+service and no account are used; no text leaves the company. Each request is logged in `hr.translation_log` (who, when, direction,
+length) and limited per person per day (`engagement.translate_daily_limit`, default 100).
 
-1. Create an API key at console.anthropic.com (company account) and note it.
-2. Set the secrets (self-hosted: in the functions `.env`; cloud: Project → Edge Functions → Secrets, or `supabase secrets set`):
-   `ANTHROPIC_API_KEY=<key>` and optionally `TRANSLATE_MODEL` (default `claude-sonnet-5-5`).
-3. Deploy the function: `npx supabase functions deploy translate` (sign-in is checked; keep JWT verification on).
-4. The server must reach `https://api.anthropic.com` over HTTPS (port 443).
-5. Test: Engagement admin → New announcement → write an English title → **English → Arabic**.
+Omani terms (Ministry of Labour, Social Protection Fund, Omanisation, end-of-service gratuity, National Day, Eid holidays, places …)
+are kept exact: before translation each term is replaced by a number the translator copies unchanged, and the exact Arabic / English
+term is put back afterwards. Company terms can be added in `hr.settings` → `translation_glossary`. If the translator damages a
+number, that line is translated again without the terms, so no stray numbers ever appear. Machine translation is weaker than a
+human translator — HR must read and correct the text before sending it for approval.
 
-Without the key the buttons show "Translation is not set up on this server yet"; everything else works.
+**Company server** (done by `install.sh` / `update.sh`):
+- Container `aact-hrms-translate` (`deploy/docker-compose.app.yml`, image `libretranslate/libretranslate:v1.9.6`), internal only, about 2–3 GB of memory.
+- Edge function setting `LIBRETRANSLATE_URL=http://aact-hrms-translate:5000` (`deploy/supabase-override.yml`).
+- First start downloads the models (needs HTTPS to `raw.githubusercontent.com` and `argos-net.com` once). Offline install: copy the two
+  `.argosmodel` files into the container (`docker cp <file> aact-hrms-translate:/tmp/`) and for each run
+  `docker exec aact-hrms-translate /app/venv/bin/python -c "import argostranslate.package as p; p.install_from_path('/tmp/<file>')"`,
+  then `docker restart aact-hrms-translate`.
+
+**Laptop** (optional, Docker Desktop):
+```powershell
+docker run -d --name aact-translate -p 5000:5000 -e LT_LOAD_ONLY=en,ar -v aact-translate-models:/home/libretranslate/.local libretranslate/libretranslate:v1.9.6
+Set-Content supabase\functions\.env "LIBRETRANSLATE_URL=http://host.docker.internal:5000"
+npx supabase functions serve translate --env-file supabase\functions\.env
+```
+(The local Supabase stack must be running: `npm run local:setup`.)
+
+**Cloud test project:** the cloud cannot reach a LibreTranslate on the company network or a laptop, so there the buttons show
+"Translation is not set up on this server yet"; everything else works. (Optional alternative: `ANTHROPIC_API_KEY`, see `readProvider`.)
 
 ## Letter verification address
 

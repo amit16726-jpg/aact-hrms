@@ -111,3 +111,148 @@ describe('beginRequest', () => {
     expect(jwt).toEqual({ ok: false, status: 401, error: 'NOT_SIGNED_IN: Please sign in again.' });
   });
 });
+
+// ------------------------------------------------------------------------------------------------ LibreTranslate
+import {
+  MT_TERMS_AR_EN, MT_TERMS_EN_AR, joinArabic, mtTerms, protectTerms, readProvider, restoreTerms, splitLines, translateLibre, translateWith,
+} from './translate';
+
+const libre = { kind: 'libretranslate' as const, url: 'http://aact-hrms-translate:5000', apiKey: '' };
+
+/** A stand-in for LibreTranslate: "translates" by tagging each text, copying numbers (as a real model does). */
+function fakeLibre(map: (s: string, i: number, call: number) => string = (s) => `«${s}»`, status = 200) {
+  const calls: { url: string; body: { q: string[]; source: string; target: string; format: string; api_key?: string } }[] = [];
+  const f: Fetch = async (url, init) => {
+    const body = JSON.parse(init.body);
+    calls.push({ url, body });
+    const n = calls.length;
+    const out = status === 200 ? { translatedText: body.q.map((s: string, i: number) => map(s, i, n)) } : { error: 'ar is not supported' };
+    return { ok: status === 200, status, text: async () => JSON.stringify(out) };
+  };
+  return { f, calls };
+}
+
+describe('readProvider', () => {
+  const env = (o: Record<string, string>) => (k: string) => o[k];
+  it('prefers LibreTranslate when its address is set', () => {
+    expect(readProvider(env({ LIBRETRANSLATE_URL: 'http://lt:5000/', ANTHROPIC_API_KEY: 'k' })))
+      .toEqual({ kind: 'libretranslate', url: 'http://lt:5000', apiKey: '' });
+    expect(readProvider(env({ LIBRETRANSLATE_URL: 'http://lt:5000', LIBRETRANSLATE_API_KEY: ' s ' }))).toMatchObject({ apiKey: 's' });
+  });
+  it('falls back to Claude, can be forced, and is off when nothing is set', () => {
+    expect(readProvider(env({ ANTHROPIC_API_KEY: 'k' }))?.kind).toBe('claude');
+    expect(readProvider(env({ LIBRETRANSLATE_URL: 'http://lt:5000', ANTHROPIC_API_KEY: 'k', TRANSLATE_PROVIDER: 'claude' }))?.kind).toBe('claude');
+    expect(readProvider(env({ TRANSLATE_PROVIDER: 'libretranslate', ANTHROPIC_API_KEY: 'k' }))).toBeNull();
+    expect(readProvider(env({ LIBRETRANSLATE_URL: 'not a url' }))).toBeNull();
+    expect(readProvider(env({}))).toBeNull();
+  });
+});
+
+describe('glossary protection', () => {
+  it('replaces English terms (any case, longest first, hyphen or space) and puts the Arabic back', () => {
+    const p = protectTerms('Offices close for national day; end of service gratuity is paid by the Social Protection Fund in Muscat.', 'en-ar', MT_TERMS_EN_AR);
+    expect(p.text).not.toMatch(/national day|gratuity|Social Protection|Muscat/i);
+    expect(p.tokens.map((t) => t.to)).toEqual(['مكافأة نهاية الخدمة', 'صندوق الحماية الاجتماعية', 'العيد الوطني', 'مسقط']);
+    const back = restoreTerms(`تغلق المكاتب ${p.tokens[2].token}؛ ${p.tokens[0].token} يدفعها ${p.tokens[1].token} في ${p.tokens[3].token}.`, p, 'ar');
+    expect(back).toBe('تغلق المكاتب العيد الوطني؛ مكافأة نهاية الخدمة يدفعها صندوق الحماية الاجتماعية في مسقط.');
+  });
+  it('does not touch words inside other words, or single common words', () => {
+    const p = protectTerms('Muscatel and the shift allowance', 'en-ar', MT_TERMS_EN_AR);
+    expect(p.tokens).toHaveLength(0);
+    expect(p.text).toBe('Muscatel and the shift allowance');
+  });
+  it('accepts Arabic-Indic digits and joins an attached article or preposition correctly', () => {
+    const p = protectTerms('Closed on National Day and for annual leave in Muscat', 'en-ar', MT_TERMS_EN_AR);
+    const tok = (to: string) => p.tokens.find((x) => x.to === to)!.token;
+    const nd = tok('العيد الوطني'); const al = tok('الإجازة السنوية'); const mu = tok('مسقط');
+    const indic = (s: string) => [...s].map((d) => String.fromCharCode(0x0660 + Number(d))).join('');
+    expect(restoreTerms(`مغلق في ال${indic(nd)} ولل${al} في ال${mu}`, p, 'ar')).toBe('مغلق في العيد الوطني وللإجازة السنوية في مسقط');
+    expect(restoreTerms(`مغلق بال${nd} ول${al} ب${mu}`, p, 'ar')).toBe('مغلق بالعيد الوطني وللإجازة السنوية بمسقط');
+    expect(restoreTerms(`مغلق ${nd} لال${al} ل${mu}`, p, 'ar')).toBe('مغلق العيد الوطني للإجازة السنوية لمسقط');
+  });
+  it('joinArabic', () => {
+    expect(joinArabic('', 'العيد')).toBe('العيد');
+    expect(joinArabic('وال', 'العيد')).toBe('والعيد');
+    expect(joinArabic('ل', 'العيد')).toBe('للعيد');
+    expect(joinArabic('ولال', 'العيد')).toBe('وللعيد');
+    expect(joinArabic('ال', 'مسقط')).toBe('مسقط');
+    expect(joinArabic('ب', 'مسقط')).toBe('بمسقط');
+  });
+  it('fails when the translator drops or changes a number', () => {
+    const p = protectTerms('National Day in Muscat', 'en-ar', MT_TERMS_EN_AR);
+    expect(restoreTerms(`اليوم في ${p.tokens[1].token}`, p, 'ar')).toBeNull();
+    expect(restoreTerms(`${p.tokens[0].token}9 في ${p.tokens[1].token}`, p, 'ar')).toBeNull();
+  });
+  it('matches Arabic terms with or without short vowels, alef forms and an attached و / ب', () => {
+    const p = protectTerms('اشتراكات وصندوق الحمايةِ الاجتماعية بسلطنة عُمان وفق التّعمين', 'ar-en', MT_TERMS_AR_EN);
+    expect(p.tokens.map((t) => t.to).sort()).toEqual(['Omanisation', 'the Social Protection Fund', 'the Sultanate of Oman'].sort());
+    expect(p.text).toMatch(/^اشتراكات و\d{4} ب\d{4} وفق \d{4}$/);
+    const tok = (to: string) => p.tokens.find((t) => t.to === to)!.token;
+    expect(restoreTerms(`the ${tok('the Social Protection Fund')} contributions in ${tok('the Sultanate of Oman')} under ${tok('Omanisation')}`, p, 'en'))
+      .toBe('The Social Protection Fund contributions in the Sultanate of Oman under Omanisation');
+  });
+  it('company terms come first', () => {
+    const t = mtTerms('en-ar', [{ en: 'Rusayl plant', ar: 'مصنع الرسيل' }, { en: '', ar: 'x' }]);
+    expect(t[0]).toEqual({ match: ['Rusayl plant'], to: 'مصنع الرسيل' });
+    const p = protectTerms('Visit the Rusayl plant', 'en-ar', t);
+    expect(p.tokens).toEqual([{ token: expect.any(String), to: 'مصنع الرسيل', count: 1 }]);
+    expect(mtTerms('ar-en', [{ en: 'Rusayl plant', ar: 'مصنع الرسيل' }])[0]).toEqual({ match: ['مصنع الرسيل'], to: 'Rusayl plant' });
+  });
+  it('never reuses a number that is already in the text', () => {
+    const p = protectTerms('Room 7301: National Day', 'en-ar', MT_TERMS_EN_AR);
+    expect(p.tokens[0].token).not.toBe('7301');
+  });
+});
+
+describe('splitLines', () => {
+  it('keeps bullets and numbering out of the text to translate', () => {
+    expect(splitLines('Intro\n- first\n2. second\n\n• third')).toEqual([
+      { prefix: '', text: 'Intro' }, { prefix: '- ', text: 'first' }, { prefix: '2. ', text: 'second' }, { prefix: '', text: '' }, { prefix: '• ', text: 'third' },
+    ]);
+  });
+});
+
+describe('translateLibre', () => {
+  it('sends the title and every line in one request and rebuilds the message', async () => {
+    const { f, calls } = fakeLibre();
+    const out = await translateLibre(libre, { direction: 'en-ar', title: 'Holiday notice', body: 'Dear all,\n\n- Bring your badge\n- Arrive early' }, [], f);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe('http://aact-hrms-translate:5000/translate');
+    expect(calls[0].body).toEqual({ q: ['Holiday notice', 'Dear all,', 'Bring your badge', 'Arrive early'], source: 'en', target: 'ar', format: 'text' });
+    expect(out).toEqual({ title: '«Holiday notice»', body: '«Dear all,»\n\n- «Bring your badge»\n- «Arrive early»' });
+  });
+  it('keeps glossary terms exact and sends the API key when set', async () => {
+    const { f, calls } = fakeLibre((s) => s.replace('Closed for', 'مغلق بمناسبة'));
+    const out = await translateLibre({ ...libre, apiKey: 'k1' }, { direction: 'en-ar', title: 'Closed for National Day', body: '' }, [], f);
+    expect(calls[0].body.api_key).toBe('k1');
+    expect(calls[0].body.q[0]).toMatch(/^Closed for \d{4}$/);
+    expect(out.title).toBe('مغلق بمناسبة العيد الوطني');
+    expect(out.body).toBe('');
+  });
+  it('re-translates a line plainly when a number came back changed', async () => {
+    const { f, calls } = fakeLibre((s, _i, call) => (call === 1 ? 'شيء آخر' : `«${s}»`));
+    const out = await translateLibre(libre, { direction: 'en-ar', title: 'National Day', body: 'Plain line' }, [], f);
+    expect(calls).toHaveLength(2);
+    expect(calls[1].body.q).toEqual(['National Day']);
+    expect(out).toEqual({ title: '«National Day»', body: 'شيء آخر' });
+  });
+  it('Arabic to English', async () => {
+    const { f, calls } = fakeLibre((s) => s.replace('إجازة', 'Holiday'));
+    const out = await translateLibre(libre, { direction: 'ar-en', title: 'إجازة العيد الوطني', body: '' }, [], f);
+    expect(calls[0].body.source).toBe('ar');
+    expect(calls[0].body.target).toBe('en');
+    expect(out.title).toBe('Holiday National Day');
+  });
+  it('reports a server that is down or refuses', async () => {
+    const down: Fetch = async () => { throw new Error('connection refused'); };
+    await expect(translateLibre(libre, req, [], down)).rejects.toThrow('cannot be reached');
+    await expect(translateLibre(libre, req, [], fakeLibre(undefined, 400).f)).rejects.toThrow('LibreTranslate answered 400: ar is not supported');
+    const short: Fetch = async () => ({ ok: true, status: 200, text: async () => '{"translatedText":["only one"]}' });
+    await expect(translateLibre(libre, req, [], short)).rejects.toThrow('unexpected answer');
+  });
+  it('translateWith picks the service', async () => {
+    const { f, calls } = fakeLibre();
+    await translateWith(libre, { direction: 'en-ar', title: 'Hello there', body: '' }, [], f);
+    expect(calls[0].url).toContain('/translate');
+  });
+});

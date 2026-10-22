@@ -18,6 +18,30 @@ services:
     volumes:
       - ${CERT_DIR:-/opt/aact-hrms/certs}:/etc/nginx/certs:ro
     networks: [supabase]
+
+  # Translation of announcements (English <-> Arabic). Internal only: no port is published; the edge function
+  # reaches it on the Docker network as http://aact-hrms-translate:5000. Models (English and Arabic only) are
+  # downloaded on the first start (a few minutes) and kept in the volume. Needs about 2-3 GB of memory.
+  translate:
+    container_name: aact-hrms-translate
+    image: libretranslate/libretranslate:${LIBRETRANSLATE_VERSION:-v1.9.6}
+    restart: unless-stopped
+    environment:
+      LT_LOAD_ONLY: en,ar
+      LT_UPDATE_MODELS: "false"
+      LT_DISABLE_WEB_UI: "true"
+      LT_DISABLE_FILES_TRANSLATION: "true"
+      LT_CHAR_LIMIT: "6000"
+      LT_BATCH_LIMIT: "200"
+      LT_THREADS: ${LIBRETRANSLATE_THREADS:-4}
+    volumes:
+      - translate-models:/home/libretranslate/.local
+    networks: [supabase]
+
+volumes:
+  translate-models:
+    name: aact-hrms-translate-models
+
 networks:
   supabase:
     name: supabase_default

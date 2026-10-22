@@ -12,8 +12,8 @@ Works the same in the browser and in the Android / iPhone apps, in English and A
   (`ann/<random>.pdf`); HR can open it at any time, employees only while the announcement is live for them. Replacing or removing the PDF
   changes the draft (it goes through approval again); old files are kept, never overwritten.
 - **Translate (1.15.0):** *English → Arabic* / *Arabic → English* fill the other language's title and message in one step.
-  Arabic follows official Omani circulars and a glossary of Omani terms; *Undo* restores the previous text. Always read the result
-  before sending for approval. Set-up: `docs/ENVIRONMENTS.md` → *Translation*.
+  Machine translation by LibreTranslate on the company server (from 1.15.1); Omani terms are kept exact; *Undo* restores the previous
+  text. Always read and correct the result before sending for approval. Set-up: `docs/ENVIRONMENTS.md` → *Translation*.
 - Everyone in the audience is notified on the publish date (high priority when confirmation is asked). HR sees read and confirmed counts and the list of who has / has not.
 
 ## Surveys
