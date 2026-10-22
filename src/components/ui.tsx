@@ -166,16 +166,20 @@ export function Modal({ open, title, onClose, children, footer, wide }:
       (opener.current as HTMLElement | null)?.focus?.();
     }
   }, [open]);
+  // The latest onClose, so the back-button handler is set up once per opening. (Re-running it whenever a parent passed a
+  // new inline onClose made history.back() fire a popstate that closed the dialog while the person was still typing.)
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     if (!open) return;
-    const onPop = () => onClose();
+    const onPop = () => closeRef.current();
     window.history.pushState({ hrDialog: true }, '');
     window.addEventListener('popstate', onPop);
     return () => {
       window.removeEventListener('popstate', onPop);
       if (window.history.state && (window.history.state as { hrDialog?: boolean }).hrDialog) window.history.back();
     };
-  }, [open, onClose]);
+  }, [open]);
   return (
     <dialog ref={ref} className={`dlg ${wide ? 'wide' : ''}`} aria-modal="true"
       onCancel={(e) => { e.preventDefault(); onClose(); }}

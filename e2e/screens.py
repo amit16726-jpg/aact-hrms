@@ -18,7 +18,7 @@ perms = ['ORG_READ','ORG_WRITE','EMP_READ','EMP_WRITE','EMP_SALARY_READ','EMP_SA
          'EMP_BANK_WRITE','DOC_READ','DOC_WRITE','DOC_SENSITIVE','COMPLIANCE_READ','RULES_PROPOSE','RULES_APPROVE','EXCEPTION_APPROVE','AUDIT_READ',
          'ATT_READ','ATT_WRITE','ATT_APPROVE','ATT_LOCK','LEAVE_READ','LEAVE_WRITE','LEAVE_APPROVE',
          'PAY_READ','PAY_PREPARE','PAY_VERIFY','PAY_APPROVE','SS_APPROVE','LETTER_PREPARE','LETTER_APPROVE','EMAIL_ADMIN','REC_READ','REC_WRITE','REC_APPROVE','EXCEPTION_APPROVE',
-         'PERF_MANAGE','TRAIN_WRITE','DISC_READ','DISC_WRITE','DISC_APPROVE','ASSET_WRITE','HSE_WRITE','EXIT_MANAGE','PDPL_READ','PDPL_MANAGE','EXEC_VIEW','DATA_IMPORT','MG_PAY']
+         'PERF_MANAGE','TRAIN_WRITE','DISC_READ','DISC_WRITE','DISC_APPROVE','ASSET_WRITE','HSE_WRITE','EXIT_MANAGE','PDPL_READ','PDPL_MANAGE','EXEC_VIEW','DATA_IMPORT','MG_PAY','ENGAGE_MANAGE','ENGAGE_APPROVE']
 ME = {'user_id': 'u1', 'email': 'hr.manager@aact.om', 'display_name': 'Maryam Al Hinai', 'language': 'en', 'is_active': True,
       'employee_id': None, 'employee_no': None, 'employee_name': None, 'employee_name_ar': None, 'roles': ['HR_MANAGER'],
       'permissions': perms, 'is_manager': False, 'admin_exists': True, 'settings': {'employee_no_prefix': 'AACT-', 'employee_no_digits': 5, 'leave_opening_date': '2026-07-01'},
@@ -123,6 +123,8 @@ RPC = {
 RPC.update(json.loads((pathlib.Path(__file__).with_name('fixtures_time.json')).read_text(encoding='utf-8')))
 # 1.13.0 report centre: real responses dumped from the test database (plus 120 made-up rows for W02)
 RPC.update(json.loads((pathlib.Path(__file__).with_name('fixtures_reports.json')).read_text(encoding='utf-8')))
+# 1.14.0 engagement: real responses from the test database (e2e/gen_eng_fixtures.py)
+RPC.update(json.loads((pathlib.Path(__file__).with_name('fixtures_eng.json')).read_text(encoding='utf-8')))
 # 1.9.0 management (MG) pay
 RPC['hr_list_mg_access'] = [{'user_id': 'u1', 'name': 'Maryam Al Hinai', 'email': 'hr.manager@aact.om', 'member': True, 'is_me': True},
                             {'user_id': 'u2', 'name': 'Anil Sharma', 'email': 'cfo@aact.om', 'member': True, 'is_me': False},
@@ -183,7 +185,10 @@ SCREENS = [('dashboard', '/'), ('employees', '/employees'), ('employee', f'/empl
            ('privacy-requests', '/privacy?tab=requests'), ('privacy-breaches', '/privacy?tab=breaches'), ('privacy-register', '/privacy?tab=register'),
            ('privacy-retention', '/privacy?tab=retention'), ('privacy-settings', '/privacy?tab=settings'),
            ('reports', '/reports'), ('reports-run', '/reports?code=P01&run=1'), ('reports-list', '/reports?code=W02&run=1'),
-           ('reports-board', '/reports?tab=board'), ('reports-schedules', '/reports?tab=schedules')]
+           ('reports-board', '/reports?tab=board'), ('reports-schedules', '/reports?tab=schedules'),
+           ('engage', '/engage'), ('engage-surveys', '/engage?tab=surveys'), ('engage-recog', '/engage?tab=recognition'),
+           ('engage-news', f"/engage/news/{RPC['hr_get_announcement']['id']}"), ('engage-survey', f"/engage/survey/{RPC['hr_get_survey']['id']}"),
+           ('engage-admin', '/engage/admin'), ('engage-admin-surveys', '/engage/admin?tab=surveys'), ('engage-admin-awards', '/engage/admin?tab=awards')]
 
 with sync_playwright() as p:
     br = p.chromium.launch()

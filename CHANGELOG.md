@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.14.0 — 2026-10-22
+
+### Added — Employee engagement (web and phone apps, English and Arabic)
+- **Announcements:** categories, audience by company or department, pin, publish and end dates, optional "confirm you have read it";
+  prepared by HR and published only after a second person approves; notifications to the audience; read and confirmation tracking.
+- **Surveys:** rating, one-choice and free-text questions; approved before opening; one answer per person; anonymous by default —
+  answers carry no person or time and are kept out of the audit trail; results hidden until 5 answers; automatic closing.
+- **Recognition:** thank a colleague (category + message), colleague and manager notified, applause, daily limit, HR moderation with reason;
+  awards such as Employee of the month with second-person approval; "most recognised this month".
+- Menu items **Engagement** (with unread / to-answer count) and **Engagement admin** (with approvals count).
+- New permissions `ENGAGE_MANAGE` (HR manager, HR officer) and `ENGAGE_APPROVE` (HR manager); daily job `hr-engagement-daily`.
+- Docs: `docs/ENGAGEMENT.md`; UAT section 9. Tests: `tests/db/97_engagement.sql`, `src/lib/api_eng.test.ts`, browser checks `e2e/flows.py`.
+
+### Fixed
+- Typing in a dialog that re-draws while you type (for example the reason box when rejecting a rule, leave or salary change) could close
+  the dialog after the first letters. Dialogs now stay open until you press a button or go back.
+
 ## 1.13.1 — 2026-10-22
 
 ### Changed

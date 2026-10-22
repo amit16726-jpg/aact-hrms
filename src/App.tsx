@@ -21,6 +21,10 @@ const OrganisationPage = lazy(() => import('./pages/Organisation'));
 const UsersPage = lazy(() => import('./pages/Users'));
 const AuditPage = lazy(() => import('./pages/Audit'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
+const EngagePage = lazy(() => import('./pages/eng/EngagePage'));
+const EngageAdminPage = lazy(() => import('./pages/eng/EngageAdminPage'));
+const AnnouncementPage = lazy(() => import('./pages/eng/AnnouncementPage'));
+const SurveyPage = lazy(() => import('./pages/eng/SurveyPage'));
 const NotificationsPage = lazy(() => import('./pages/Notifications'));
 const AttendancePage = lazy(() => import('./pages/time/AttendancePage'));
 const OvertimePage = lazy(() => import('./pages/time/OvertimePage'));
@@ -130,6 +134,10 @@ export default function App() {
             <Route path="payslips" element={<MyPayslipsPage />} />
             <Route path="payslips/:id" element={<PayslipPage />} />
             <Route path="me" element={<MyHrPage />} />
+            <Route path="engage" element={<EngagePage />} />
+            <Route path="engage/admin" element={<EngageAdminPage />} />
+            <Route path="engage/news/:id" element={<AnnouncementPage />} />
+            <Route path="engage/survey/:id" element={<SurveyPage />} />
             <Route path="team" element={<TeamPage />} />
             <Route path="requests" element={<RequestsPage />} />
             <Route path="letters/:id" element={<LetterPage />} />

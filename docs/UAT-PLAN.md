@@ -113,3 +113,17 @@ Go-live needs **no open A or B items**.
 | 8.6 | Require two-step sign-in for HR officer | An HR officer without it must set it up at next sign-in |
 | 8.7 | Leave the app idle beyond the sign-out time | Warning one minute before; then signed out |
 
+
+## 9. Employee engagement (1.14.0)
+| # | Test | Expected |
+|---|---|---|
+| 9.1 | HR officer writes a safety announcement for one department, "confirm reading" on, and sends it for approval | Shows "Waiting for approval"; the HR manager gets a notification; nobody else sees it yet |
+| 9.2 | The HR officer tries to approve it; the HR manager rejects it without a reason | Officer has no Approve button; reject asks for a reason |
+| 9.3 | HR manager approves it | Everyone in the department (and its sub-departments) gets a high-priority notification; other departments do not see it |
+| 9.4 | An employee opens it on the phone and taps "I have read and understood this" | "Who has read it" shows the read and confirmation time for that employee |
+| 9.5 | HR creates an anonymous survey (rating, one-choice and text questions); a second person approves it | Employees are notified; each can answer once; a second answer is refused |
+| 9.6 | HR opens results after 3 answers, then after 5 | Hidden below 5 answers; then averages, choice counts and comments without names |
+| 9.7 | Check the audit trail for the survey answers | Participation shows who took part; no entry shows which answers a person gave |
+| 9.8 | An employee recognises a colleague; the colleague and their manager check notifications | Both notified; post on the wall of the same company only; a sixth post in a day is refused |
+| 9.9 | HR hides an unsuitable post with a reason | Gone from the wall; reason visible to HR only |
+| 9.10 | HR proposes "Employee of the month"; the proposer tries to approve; a second person approves | Proposer cannot approve; after approval the winner is notified and the award appears on the wall |

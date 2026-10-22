@@ -6,6 +6,7 @@ import { arRec } from './ar_rec';
 import { arWf } from './ar_wf';
 import { arGov } from './ar_gov';
 import { arRep } from './ar_rep';
+import { arEng } from './ar_eng';
 
 const base: Record<BaseKey, string> = {
   'app.name': 'نظام الموارد البشرية AACT',
@@ -251,4 +252,4 @@ const base: Record<BaseKey, string> = {
   'err.UNKNOWN': 'حدث خطأ ما.',
 };
 
-export const ar: Record<Key, string> = { ...base, ...arTime, ...arPay, ...arSs, ...arRec, ...arWf, ...arGov, ...arRep };
+export const ar: Record<Key, string> = { ...base, ...arTime, ...arPay, ...arSs, ...arRec, ...arWf, ...arGov, ...arRep, ...arEng };

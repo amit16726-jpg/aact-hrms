@@ -5,12 +5,13 @@ import {
   ChevronDown, CircleCheckBig, ClipboardList, Clock, DoorOpen, FileSpreadsheet, FileUp, FileWarning, Fingerprint,
   Flag, GraduationCap, HandCoins, HardHat, History, Hourglass, IdCard, Inbox, Landmark, LayoutDashboard, ListPlus, LogOut,
   Menu, Network, Package, PiggyBank, Receipt, Scale, Search, Settings, Settings2, ShieldAlert, ShieldCheck, Target, Timer,
-  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, FileChartColumn, Smartphone, Share, SquarePlus, type LucideIcon,
+  Upload, UserCog, UserRound, Users, UsersRound, X, Bell, FileChartColumn, Smartphone, Share, SquarePlus, Megaphone, MessagesSquare, type LucideIcon,
 } from 'lucide-react';
 import { useI18n, type Key } from '../i18n';
 import { useSession } from '../lib/session';
 import { api } from '../lib/api';
 import { tapi } from '../lib/api_time';
+import { eapi } from '../lib/api_eng';
 import { Loading, Modal, Button } from './ui';
 import { installMode, onInstallChange, promptInstall } from '../lib/install';
 import { IdleGuard } from './security';
@@ -174,6 +175,7 @@ export default function Layout() {
   const [navOpen, setNavOpen] = useState(false);
   const [unread, setUnread] = useState(me?.unread_notifications ?? 0);
   const [approvals, setApprovals] = useState(0);
+  const [engage, setEngage] = useState({ unread: 0, surveys: 0, to_approve: 0 });
   const [closed, setClosed] = useState<string[]>(readClosed);
 
   useEffect(() => { setNavOpen(false); }, [loc.pathname]);
@@ -186,6 +188,7 @@ export default function Layout() {
         hr ? api.dashboard().then((d) => d.approvals.salary + d.approvals.bank + d.approvals.targets).catch(() => 0) : Promise.resolve(0),
         tapi.myTasks().then((x) => x.count).catch(() => 0),
       ]).then(([a, b]) => { if (alive) setApprovals(a + b); }).catch(() => undefined);
+      eapi.counts().then((c) => alive && setEngage(c)).catch(() => undefined);
     };
     load();
     const id = window.setInterval(load, 120000);
@@ -199,6 +202,7 @@ export default function Layout() {
       { to: '/', key: 'nav.dashboard', icon: LayoutDashboard, show: true },
       { to: '/me', key: 'snav.my_hr', icon: UserRound, show: !!me?.employee_id },
       { to: '/my', key: 'nav.my_record', icon: IdCard, show: !!me?.employee_id },
+      { to: '/engage', key: 'enav.engage', icon: Megaphone, show: true, count: engage.unread + engage.surveys },
       { to: '/team', key: 'snav.team', icon: UsersRound, show: !!me?.is_manager },
       { to: '/employees', key: 'nav.employees', icon: Users, show: can('EMP_READ') || !!me?.is_manager },
       { to: '/approvals', key: 'nav.approvals', icon: CircleCheckBig, show: can('SALARY_APPROVE') || can('BANK_APPROVE') || can('RULES_APPROVE') || can('LEAVE_APPROVE') || can('ATT_APPROVE') || can('PAY_VERIFY') || can('PAY_APPROVE') || can('REC_APPROVE') || can('DISC_APPROVE') || can('PERF_MANAGE') || !!me?.is_manager || approvals > 0, count: approvals },
@@ -237,6 +241,7 @@ export default function Layout() {
       { to: '/facilities', key: 'wnav.facilities', icon: Building2, show: can('ASSET_WRITE') || can('EMP_READ') },
       { to: '/injuries', key: 'wnav.injuries', icon: HardHat, show: can('HSE_WRITE') || can('EMP_READ') },
       { to: '/exits', key: 'wnav.exits', icon: LogOut, show: can('EXIT_MANAGE') },
+      { to: '/engage/admin', key: 'enav.admin', icon: MessagesSquare, show: can('ENGAGE_MANAGE') || can('ENGAGE_APPROVE'), count: engage.to_approve },
     ] },
     { id: 'gov', title: 'gnav.group', items: [
       { to: '/reports', key: 'rp.nav', icon: FileChartColumn, show: can('EMP_READ') || can('PAY_READ') || can('ATT_READ') || can('LEAVE_READ') || can('COMPLIANCE_READ') || can('DOC_READ') || can('REC_READ') || can('PERF_MANAGE') || can('TRAIN_WRITE') || can('AUDIT_READ') || can('EXEC_VIEW') },
@@ -305,7 +310,7 @@ export default function Layout() {
                     {g.items.map((i) => {
                       const Icon = i.icon;
                       return (
-                        <NavLink key={i.to} to={i.to} end={i.to === '/' || i.to === '/payroll' || i.to === '/leave'}
+                        <NavLink key={i.to} to={i.to} end={i.to === '/' || i.to === '/payroll' || i.to === '/leave' || i.to === '/engage'}
                           className={({ isActive: a }) => (a || (current?.i.to === i.to) ? 'active' : undefined)}>
                           <Icon size={18} strokeWidth={1.75} aria-hidden="true" className="nav-ico" />
                           <span className="nav-label">{t(i.key)}</span>
